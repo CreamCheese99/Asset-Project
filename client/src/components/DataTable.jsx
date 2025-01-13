@@ -50,40 +50,49 @@ const DataTable = () => {
   ];
 
   return (
-    <div className="bg-white mt-4 p-4 rounded-md shadow-md">
-      <table className="table-auto w-full border-collapse">
-        <thead>
-          <tr className="bg-gray-200 text-gray-700">
-            <th className="border px-4 py-2">หมายเลขครุภัณฑ์</th>
-            <th className="border px-4 py-2">รหัสทรัพย์สิน GFMIS</th>
-            <th className="border px-4 py-2">หน่วยงานครุภัณฑ์</th>
-            <th className="border px-4 py-2">ประเภทครุภัณฑ์</th>
-            <th className="border px-4 py-2">หน่วยงาน</th>
-            <th className="border px-4 py-2">สถานะ</th>
-            <th className="border px-4 py-2">มูลค่าลูกหนี้</th>
-            <th className="border px-4 py-2">จัดการ</th>
+    <div className="bg-white mt-4 p-4 rounded-md shadow-md overflow-x-auto">
+    <table className="table-auto w-full border-collapse text-sm">
+      <thead>
+        <tr className="bg-gray-200 text-gray-700">
+          <th className="border px-4 py-2">หมายเลขครุภัณฑ์</th>
+          <th className="border px-4 py-2 hidden md:table-cell">รหัสทรัพย์สิน GFMIS</th>
+          <th className="border px-4 py-2">หน่วยงานครุภัณฑ์</th>
+          <th className="border px-4 py-2 hidden lg:table-cell">ประเภทครุภัณฑ์</th>
+          <th className="border px-4 py-2 hidden lg:table-cell">หน่วยงาน</th>
+          <th className="border px-4 py-2">สถานะ</th>
+          <th className="border px-4 py-2 hidden sm:table-cell">มูลค่าลูกหนี้</th>
+          <th className="border px-4 py-2">จัดการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((item) => (
+          <tr key={item.id} className="text-center">
+            <td className="border px-4 py-2">{item.itemCode}</td>
+            <td className="border px-4 py-2 hidden md:table-cell">{item.assetCode}</td>
+            <td className="border px-4 py-2">{item.department}</td>
+            <td className="border px-4 py-2 hidden lg:table-cell">{item.category}</td>
+            <td className="border px-4 py-2 hidden lg:table-cell">{item.unit}</td>
+            <td className="border px-4 py-2">{item.status}</td>
+            <td className="border px-4 py-2 hidden sm:table-cell">
+              {item.value.toFixed(2)}
+            </td>
+            <td className="border px-4 py-2 flex justify-center space-x-2">
+              <button className="text-blue-500 hover:text-blue-700 bg-gray-200 rounded-lg px-3 py-1">
+                ดู
+              </button>
+              <button className="text-yellow-500 hover:text-yellow-700 bg-gray-200 rounded-lg px-3 py-1">
+                แก้ไข
+              </button>
+              <button className="text-red-500 hover:text-red-700 bg-gray-200 rounded-lg px-3 py-1">
+                ลบ
+              </button>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {data.map((item) => (
-            <tr key={item.id} className="text-center">
-              <td className="border px-4 py-2">{item.itemCode}</td>
-              <td className="border px-4 py-2">{item.assetCode}</td>
-              <td className="border px-4 py-2">{item.department}</td>
-              <td className="border px-4 py-2">{item.category}</td>
-              <td className="border px-4 py-2">{item.unit}</td>
-              <td className="border px-4 py-2">{item.status}</td>
-              <td className="border px-4 py-2">{item.value.toFixed(2)}</td>
-              <td className="border px-4 py-2 flex justify-center space-x-2">
-                <button className="text-blue-500 hover:text-blue-700 bg-gray-200  rounded-lg px-3 py-1 ">ดู</button>
-                <button className="text-yellow-500 hover:text-yellow-700 bg-gray-200 rounded-lg px-3 py-1">แก้ไข</button>
-                <button className="text-red-500 hover:text-red-700  bg-gray-200 rounded-lg px-3 py-1">ลบ</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  
   );
 };
 

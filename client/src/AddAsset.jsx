@@ -7,6 +7,7 @@ import ActionButtons2 from "./components/ActionButtons2";
 import AssetDetails from "./components/AssetDetails";
 import AssetInfoSection from "./components/AssetInfoSection";
 import SubAssetInfo from "./components/SubassetInfo";
+import NavBar from "./components/NavBar";
 
 const AddAsset = () => {
   const handleSave = () => {
@@ -18,8 +19,9 @@ const AddAsset = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen font-sans">
+    <div style={{ backgroundColor: '#f1f8e9' }} className=" min-h-screen font-sans">
       <Header />
+      <NavBar/>
       <Breadcrumb />
       <div className="container mx-auto p-4">
         <AssetForm />

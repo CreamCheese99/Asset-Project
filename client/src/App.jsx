@@ -28,10 +28,12 @@ import AddAsset from "./AddAsset";
 import ActionButtons from "./components/ActionButtons";
 import SearchForm from "./components/SearchForm";
 import DataTable from "./components/DataTable";
+import NavBar from "./components/NavBar";
 
 const HomePage = () => (
-  <div className="bg-gray-100 min-h-screen font-sans">
+  <div style={{ backgroundColor: '#f1f8e9' }} className="min-h-screen font-sans">
     <Header />
+    <NavBar />
     <Breadcrumb2 />
     <div className="container mx-auto p-4">
       <h1 className="text-lg font-bold mb-4">รายการครุภัณฑ์</h1>
