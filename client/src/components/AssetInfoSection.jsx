@@ -29,7 +29,7 @@ const AssetInfoSection = () => {
       <h3 className="text-lg font-bold text-gray-700 mb-4">ข้อมูลสินทรัพย์ย่อย</h3>
       <div className="flex justify-between items-center mb-6">
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"
           onClick={handleButtonClick}
         >
           + เพิ่ม
@@ -82,12 +82,12 @@ const AssetInfoSection = () => {
               </div>
               <div className="flex justify-end mt-4">
                 <button
-                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 mr-2"
+                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700 mr-2"
                   onClick={handleClosePopup}
                 >
                   ยกเลิก
                 </button>
-                <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700">
                   บันทึก
                 </button>
               </div>
