@@ -6,7 +6,6 @@ import AcquisitionInfo from "./components/AcquisitionInfo";
 import ActionButtons2 from "./components/ActionButtons2";
 import AssetDetails from "./components/AssetDetails";
 import AssetInfoSection from "./components/AssetInfoSection";
-import SubAssetInfo from "./components/SubassetInfo";
 import NavBar from "./components/NavBar";
 
 const AddAsset = () => {
@@ -28,7 +27,6 @@ const AddAsset = () => {
         <AcquisitionInfo />
         <AssetDetails />
         <AssetInfoSection />
-        <SubAssetInfo/>
         <ActionButtons2 onSave={handleSave} onCancel={handleCancel} />
       </div>
     </div>

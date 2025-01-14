@@ -9,19 +9,26 @@ const AcquisitionInfo = () => {
               <option>2561</option>
             </select>
           </div>
-          <div>
-            <label className="block text-gray-700 text-sm mb-2">โครงการ</label>
-            <input type="text" className="w-full border-2 border-blue-100 rounded-md" />
-          </div>
+        
           <div>
             <label className="block text-gray-700 text-sm mb-2">วันที่ตรวจรับ</label>
             <input type="date" className="w-full border-2 border-blue-100 rounded-md" />
           </div>
           <div>
-            <label className="block text-gray-700 text-sm mb-2">ประเภทงบประมาณ</label>
+            <label className="block text-gray-700 text-sm mb-2">ประเภทเงิน</label>
             <select className="w-full border-2 border-blue-100 rounded-md">
-              <option>ครุภัณฑ์</option>
+              <option>เงินรายได้</option>
+              <option>เงินงบประมาณ</option>
+              <option>เงินสะสมคลัง</option>
             </select>
+          </div>
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">วงเงินงบประมาณ</label>
+            <input type="text" className="w-full border-2 border-blue-100 rounded-md" />
+          </div>
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">ราคากลาง</label>
+            <input type="text" className="w-full border-2 border-blue-100 rounded-md" />
           </div>
         </div>
       </div>

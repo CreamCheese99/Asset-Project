@@ -2,42 +2,52 @@ import React from "react";
 
 const AssetDetails = () => {
   return (
-    <div className="bg-white rounded-md shadow-md p-6">
+    <div className="bg-white mt-4 p-4 rounded-md shadow-md">
       <h3 className="text-lg font-bold text-gray-700 mb-4">รายละเอียดครุภัณฑ์</h3>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm text-gray-700 mb-2">รายการ</label>
+          <label className="block text-sm text-gray-700 mb-2">ประเภทครุภัณฑ์</label>
           <input
             type="text"
             className="w-full border-2 border-blue-100 rounded-md"
-            placeholder="กรอกชื่อรายการ"
+            placeholder="กรอกชื่อประเภทครุภัณฑ์"
           />
         </div>
         <div>
-          <label className="block text-sm text-gray-700 mb-2">หมายเลขเครื่อง S/N</label>
+          <label className="block text-sm text-gray-700 mb-2">สถานที่ใช้งาน</label>
           <input
             type="text"
             className="w-full border-2 border-blue-100 rounded-md"
-            placeholder="กรอกหมายเลข S/N"
+            placeholder="สถานที่ใช้งาน"
           />
         </div>
         <div>
-          <label className="block text-sm text-gray-700 mb-2">รุ่น</label>
+          <label className="block text-sm text-gray-700 mb-2">การใช้งาน</label>
           <input
             type="text"
             className="w-full border-2 border-blue-100 rounded-md"
-            placeholder="กรอกรุ่น"
+            placeholder="การใช้งาน"
           />
         </div>
         <div>
-          <label className="block text-sm text-gray-700 mb-2">ยี่ห้อ</label>
+          <label className="block text-sm text-gray-700 mb-2">สถานที่ส่งมอบ</label>
           <input
             type="text"
             className="w-full border-2 border-blue-100 rounded-md"
-            placeholder="กรอกยี่ห้อ"
+            placeholder="สถานที่ส่งมอบ"
           />
         </div>
         <div>
+          <label className="block text-sm text-gray-700 mb-2">ผู้รับผิดชอบ</label>
+          <input
+            type="text"
+            className="w-full border-2 border-blue-100 rounded-md"
+            placeholder="ผู้รับผิดชอบ"
+          />
+        </div>
+        
+
+        {/* <div>
           <label className="block text-sm text-gray-700 mb-2">มูลค่า (บาท)</label>
           <input
             type="number"
@@ -52,16 +62,18 @@ const AssetDetails = () => {
             <option>1 ปี</option>
             <option>2 ปี</option>
           </select>
-        </div>
+        </div> */}
+
       </div>
-      <div className="mt-4">
+      {/* <div className="mt-4">
         <label className="block text-sm text-gray-700 mb-2">รายละเอียดเพิ่มเติม</label>
         <textarea
           className="w-full border-2 border-blue-100 rounded-md"
           rows="4"
           placeholder="กรอกรายละเอียด"
         ></textarea>
-      </div>
+      </div> */}
+      
     </div>
   );
 };
