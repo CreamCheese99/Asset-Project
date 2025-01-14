@@ -100,14 +100,14 @@ const AssetInfoSection = () => {
       <table className="table-auto w-full border-collapse text-sm">
         <thead>
         <tr className="bg-gray-200 text-gray-700">
-          <th className="border  px-4 py-2 hidden md:table-cell">รายการพัสดุย่อย</th>
-          <th className="border  px-4 py-2 hidden md:table-cell">ประเภท</th>
-          <th className="border  px-4 py-2 hidden lg:table-cell">รายละเอียด</th>
-          <th className="border  px-4 py-2 hidden sm:table-cell">ราคาต่อหน่วย</th>
-          <th className="border  px-4 py-2 hidden sm:table-cell">จำนวน</th>
-          <th className="border  px-4 py-2 hidden sm:table-cell">หน่วยนับ</th>
-          <th className="border  px-4 py-2 hidden md:table-cell">การใช้งาน</th>
-          <th className="border px-4 py-2 hidden md:table-cell">จัดการ</th>
+          <th className="border  px-4 py-2 ">รายการพัสดุย่อย</th>
+          <th className="border  px-4 py-2 ">ประเภท</th>
+          <th className="border  px-4 py-2 ">รายละเอียด</th>
+          <th className="border  px-4 py-2 ">ราคาต่อหน่วย</th>
+          <th className="border  px-4 py-2 ">จำนวน</th>
+          <th className="border  px-4 py-2 ">หน่วยนับ</th>
+          <th className="border  px-4 py-2 ">การใช้งาน</th>
+          <th className="border px-4 py-2 ">จัดการ</th>
         </tr>
         </thead>
         <tbody>
