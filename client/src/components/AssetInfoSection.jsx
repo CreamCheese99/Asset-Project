@@ -116,7 +116,7 @@ const AssetInfoSection = () => {
               <td className="border px-4 py-2">{item.subasset}</td>
               <td className="border px-4 py-2">{item.type}</td>
               <td className="border px-4 py-2">{item.detail}</td>
-              <td className="border px-4 py-2">{item.price.toFixed()}</td>
+              <td className="border px-4 py-2">{item.price.toFixed(2)}</td>
               <td className="border px-4 py-2">{item.quantity.toFixed()}</td>
               <td className="border px-4 py-2">{item.unit}</td>
               <td className="border px-4 py-2">{item.status}</td>

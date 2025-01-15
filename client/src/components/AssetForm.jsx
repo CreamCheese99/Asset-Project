@@ -5,7 +5,7 @@ const AssetForm = () => {
         <h3 className="text-lg font-bold text-gray-700 mb-4">ข้อมูลครุภัณฑ์</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-gray-700 text-sm mb-2">หมายเลขครุภัณฑ์</label>
+            <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน</label>
             <input
               type="text"
               className="w-full border-2 border-blue-100 rounded-md "
@@ -21,10 +21,10 @@ const AssetForm = () => {
                 <option>ครุศาสตร์การเกษาตร</option>
             </select>
           </div>
-          <div>
+          {/* <div>
             <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน </label>
             <input type="text" className="w-full border-2 border-blue-100 rounded-md" />
-          </div>
+          </div> */}
           <div>
             <label className="block text-gray-700 text-sm mb-2">สถานะ</label>
             <select className="w-full border-2 border-blue-100 rounded-md">

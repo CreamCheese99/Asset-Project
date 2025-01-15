@@ -1,7 +1,9 @@
 import React from 'react'
+import NavBarLink from './NavBarLink'
 
-function NavBar() {
+function NavBar()  {
   return (
+
     <nav style={{ backgroundColor: '#aed581' }} className="rounded-b-md shadow-lg py-2 ">
          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
            <div className="flex h-17 items-center justify-between">
@@ -10,15 +12,17 @@ function NavBar() {
                  {/* <img className="h-8 w-auto" src={logo} alt="logo"  /> */}
                  {/* <h1 className="font-prompt text-xl text-teal-800 font-bold">SIET - ระบบพัสดุ </h1> */}
                </div>
-               <div className="hidden md:block">
-                 <div className="font-prompt ml-10 flex items-baseline space-x-4">
-                   <a href="#" className="rounded-md px-3 py-1 text-sm font-medium text-teal-800 hover:bg-gray-700 hover:text-white" aria-current="page">Dashboard</a>
-                   <a href="#" className="rounded-md bg-gray-200 px-3 py-1 text-sm font-medium text-teal-800 hover:bg-gray-100 hover:text-white ">จัดการพัสดุ</a>
-                   <a href="#" className="rounded-md px-3 py-1 text-sm font-medium text-teal-800 hover:bg-gray-700 hover:text-white">จัดการสิทธิ์</a>
-                   <a href="#" className="rounded-md px-3 py-1 text-sm font-medium text-teal-800 hover:bg-gray-700 hover:text-white">ดูข้อมูลพัสดุ</a>
-                   <a href="#" className="rounded-md px-3 py-1 text-sm font-medium text-teal-800 hover:bg-gray-700 hover:text-white">รายงาน</a>
-                 </div>
-               </div>
+
+               <div className="hidden md:block">                
+                  <div className="font-prompt ml-10 flex items-baseline space-x-4 list-none">
+                    <NavBarLink name="หน้าหลัก" to="/dashboard" />
+                    <NavBarLink name="จัดการพัสดุ" to="/manage-asset" />
+                    <NavBarLink name="จัดการสิทธิ์" to="/manage-role" />
+                    <NavBarLink name="รายการพัสดุ" to="/show-asset" />
+                  </div>
+                </div>
+
+
              </div>
              <div className="hidden md:block">
                <div className="ml-4 flex items-center md:ml-6">
@@ -38,10 +42,8 @@ function NavBar() {
                      </button>
                    </div>
 
-                   <div className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabIndex="-1">
-                     <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex="-1" id="user-menu-item-0">Your Profile</a>
-                     <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex="-1" id="user-menu-item-1">Settings</a>
-                     <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex="-1" id="user-menu-item-2">Sign out</a>
+                   <div className="list-none absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabIndex="-1">
+                     <NavBarLink name="ออกจากระบบ" to="/login"/>
                    </div>
                  </div>
                </div>
