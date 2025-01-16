@@ -15,7 +15,7 @@ const ManageAsset = () => {
         <NavBar />
         <Breadcrumb2 />
         <div className="container mx-auto p-4">
-            <h1 className="text-lg font-bold mb-4">รายการครุภัณฑ์</h1>
+            <h1 className="text-lg font-bold mb-4">รายการพัสดุ</h1>
             <SearchForm />
             <ActionButtons />
             <DataTable />

@@ -3,14 +3,14 @@ import React from "react";
 const AssetDetails = () => {
   return (
     <div className="bg-white mt-4 p-4 rounded-md shadow-md">
-      <h3 className="text-lg font-bold text-gray-700 mb-4">รายละเอียดครุภัณฑ์</h3>
+      <h3 className="text-lg font-bold text-gray-700 mb-4">รายละเอียดพัสดุ</h3>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm text-gray-700 mb-2">ประเภทครุภัณฑ์</label>
+          <label className="block text-sm text-gray-700 mb-2">ประเภทพัสดุ</label>
           <input
             type="text"
             className="w-full border-2 border-blue-100 rounded-md"
-            placeholder="กรอกชื่อประเภทครุภัณฑ์"
+            placeholder="กรอกชื่อประเภทพัสดุ"
           />
         </div>
         <div>

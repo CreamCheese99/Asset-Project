@@ -15,7 +15,7 @@ function NavBar()  {
 
                <div className="hidden md:block">                
                   <div className="font-prompt ml-10 flex items-baseline space-x-4 list-none">
-                    <NavBarLink name="หน้าหลัก" to="/dashboard" />
+                    <NavBarLink name="หน้าหลัก" to="/" />
                     <NavBarLink name="จัดการพัสดุ" to="/manage-asset" />
                     <NavBarLink name="จัดการสิทธิ์" to="/manage-role" />
                     <NavBarLink name="รายการพัสดุ" to="/show-asset" />

@@ -13,6 +13,7 @@ import AddAsset from './AddAsset.jsx'
 import ShowAllAsset from './ShowAllAsset.jsx';
 import ManageAsset from './ManageAsset.jsx';
 import Login from './Login.jsx';
+import Dashboard from './Dashboard.jsx';
 
 
 
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
   {
     path: "/login",  
     element: <Login />,  
+  },
+  {
+    path: "/",  
+    element: <Dashboard />,  
   },
   {
     path: "/manage-asset",  

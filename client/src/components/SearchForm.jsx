@@ -42,10 +42,10 @@ const SearchForm = () => {
           <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน </label>
           <input type="text" className="w-full border-2 border-blue-100 rounded-md" />
         </div>
-        <div className="col-span-2">
+        {/* <div className="col-span-2">
           <label className="block text-gray-700 text-sm mb-2">หมายเลขครุภัณฑ์</label>
           <input type="text" className="w-full border-2 border-blue-100 rounded-md" />
-        </div>
+        </div> */}
         <div className="col-span-4 flex justify-end">
           <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
             ค้นหา
