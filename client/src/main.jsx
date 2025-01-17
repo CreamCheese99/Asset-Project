@@ -17,6 +17,7 @@ import Dashboard from './Dashboard.jsx';
 import Permissions from './Permissions.jsx';
 import UserPage from './UserPage.jsx';
 import AdminPage from './AdminPage.jsx';
+import ManageShowAsset from './ManageShowAsset.jsx';
 
 
 // สร้าง router สำหรับจัดการเส้นทาง
@@ -56,7 +57,11 @@ const router = createBrowserRouter([
     path: "/admin",  
     element: <AdminPage />,  
   },
-  
+  {
+    path: "/manage-show-asset",  
+    element: < ManageShowAsset />,  
+  },
+ 
 ]);
 
 // สร้าง root และ render app โดยใช้ RouterProvider

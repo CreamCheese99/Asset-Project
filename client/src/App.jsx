@@ -6,19 +6,21 @@ import ManageAsset from "./ManageAsset";
 import Login from "./Login";
 import Dashboard from "./Dashboard";
 import Permissions from "./Permissions";
-
+import Layout from "./components/Layout";
 
 const App = () => {
   return (
     <Router>
-      <Routes>
-      <Route path="/" element={<Dashboard/>}/>
-        <Route path="/login" element={<Login />} />
-        <Route path="/manage-asset" element={<ManageAsset />} />
-        <Route path="/add-asset" element={<AddAsset />} />
-        <Route path="/show-asset" element={<ShowAllAsset/>}/>
-        <Route path="/permissions" element={<Permissions />} />
-      </Routes>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/manage-asset" element={<ManageAsset />} />
+          <Route path="/add-asset" element={<AddAsset />} />
+          <Route path="/show-asset" element={<ShowAllAsset />} />
+          <Route path="/permissions" element={<Permissions />} />
+        </Routes>
+      </Layout>
     </Router>
   );
 };
