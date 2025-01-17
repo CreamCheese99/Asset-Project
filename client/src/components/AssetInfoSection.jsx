@@ -26,7 +26,7 @@ const AssetInfoSection = () => {
 
   return (
     <div className="bg-white mt-4 p-4 rounded-md shadow-md overflow-x-auto">
-      <h3 className="text-lg font-bold text-gray-700 mb-4">ข้อมูลสินทรัพย์ย่อย</h3>
+      <h3 className="text-lg font-bold text-gray-700 mb-4">ข้อมูลพัสดุย่อย</h3>
       <div className="flex justify-between items-center mb-6">
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"

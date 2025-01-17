@@ -5,6 +5,7 @@ import ShowAllAsset from "./ShowAllAsset";
 import ManageAsset from "./ManageAsset";
 import Login from "./Login";
 import Dashboard from "./Dashboard";
+import Permissions from "./Permissions";
 
 
 const App = () => {
@@ -16,6 +17,7 @@ const App = () => {
         <Route path="/manage-asset" element={<ManageAsset />} />
         <Route path="/add-asset" element={<AddAsset />} />
         <Route path="/show-asset" element={<ShowAllAsset/>}/>
+        <Route path="/permissions" element={<Permissions />} />
       </Routes>
     </Router>
   );
