@@ -26,7 +26,7 @@ const DataTable = () => {
       type_price:"เงินได้"
     },
     {
-      id: 1,
+      id: 3,
       itemCode: "สมอ.12060100-001-0015/61",
       assetCode: "1000000000003",
       category: "คอมพิวเตอร์",

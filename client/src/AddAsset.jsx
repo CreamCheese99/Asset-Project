@@ -18,10 +18,10 @@ const AddAsset = () => {
   };
 
   return (
-    <div>
-      <Header />
-      <NavBar/>
-      <Breadcrumb />
+    // <div>
+    //   <Header />
+    //   <NavBar/>
+    //   <Breadcrumb />
       <div className="container mx-auto p-4">
         <AssetForm />
         <AcquisitionInfo />
@@ -29,7 +29,7 @@ const AddAsset = () => {
         <AssetInfoSection />
         <ActionButtons2 onSave={handleSave} onCancel={handleCancel} />
       </div>
-    </div>
+    // </div>
   );
 };
 

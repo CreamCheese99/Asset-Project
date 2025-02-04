@@ -7,8 +7,8 @@ const Dashboard = () => {
 
   return (
     <div>
-    <Header />
-    <NavBar />
+    {/* <Header />
+    <NavBar /> */}
     <Dashboardpage />
   </div>
   );

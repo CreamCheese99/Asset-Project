@@ -8,8 +8,8 @@ const ShowAllAsset = () => {
 
   return (
     <div style={{ backgroundColor: '#f1f8e9' }} className=" min-h-screen font-sans">
-      <Header />
-      <NavBar/>
+      {/* <Header />
+      <NavBar/> */}
       <Breadcrumb3 />
       <div className="container mx-auto p-4">
         <h1 className="text-lg font-bold mb-4">ข้อมูลสรุปรายการพัสดุ</h1>

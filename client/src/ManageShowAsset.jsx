@@ -18,17 +18,17 @@ const ManageShowAsset = () => {
   };
 
   return (
-    <div>
-      <Header />
-      <NavBar/>
-      <Breadcrumb />
+    // <div>
+    //   <Header />
+    //   <NavBar/>
+    //   <Breadcrumb />
       <div className="container mx-auto p-4">
         <AssetForm />
         <AcquisitionInfo />
         <AssetDetails />
         <ActionButtons3 />
       </div>
-    </div>
+    // </div>
   );
 };
 

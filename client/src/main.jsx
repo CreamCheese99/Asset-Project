@@ -14,10 +14,8 @@ import ShowAllAsset from './ShowAllAsset.jsx';
 import ManageAsset from './ManageAsset.jsx';
 import Login from './Login.jsx';
 import Dashboard from './Dashboard.jsx';
-import Permissions from './Permissions.jsx';
-import UserPage from './UserPage.jsx';
-import AdminPage from './AdminPage.jsx';
 import ManageShowAsset from './ManageShowAsset.jsx';
+// import ManageRoleUser from './ManageRoleUser.js';
 
 
 // สร้าง router สำหรับจัดการเส้นทาง
@@ -44,23 +42,15 @@ const router = createBrowserRouter([
     path: "/show-asset",  
     element: <ShowAllAsset />,  
   },
-  {
-    path: "/permissions",  
-    element:  <Permissions />,  
-    
-  },
-  {
-    path: "/usepage",  
-    element: <UserPage />,  
-  },
-  {
-    path: "/admin",  
-    element: <AdminPage />,  
-  },
+  
   {
     path: "/manage-show-asset",  
     element: < ManageShowAsset />,  
   },
+  // {
+  //   path: "/manage-role-user",  
+  //   element: < ManageRoleUser />,  
+  // }
  
 ]);
 
