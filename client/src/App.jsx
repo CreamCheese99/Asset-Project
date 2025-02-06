@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import ManageAssets from './pages/ManageAssets'
 import ManagePermissions from './pages/ManagePermissions'
 import AssetList from './pages/AssetList'
+import AddAsset from './pages/AddAsset' 
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="manage-assets" element={<ManageAssets />} />
           <Route path="manage-permissions" element={<ManagePermissions />} />
           <Route path="asset-list" element={<AssetList />} />
+          <Route path="add-asset" element={<AddAsset />} /> 
         </Route>
       </Routes>
     </Router>
