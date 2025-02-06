@@ -2,6 +2,8 @@
 import React from "react";
 import logo from '../image/logo.svg';
 
+import { Link } from 'react-router-dom' ;//add new
+
 const Header = () => {
   return (
     // <div style={{ backgroundColor: '#8bc34a' }} className="text-white px-4 py-3 rounded-md">

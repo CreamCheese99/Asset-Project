@@ -1,24 +1,23 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AddAsset from "./AddAsset";
-import ShowAllAsset from "./ShowAllAsset";
-import ManageAsset from "./ManageAsset";
-import Login from "./Login";
-import Dashboard from "./Dashboard";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Layout from './components/layout/Layout'
+import Home from './pages/Home'
+import ManageAssets from './pages/ManageAssets'
+import ManagePermissions from './pages/ManagePermissions'
+import AssetList from './pages/AssetList'
 
-
-const App = () => {
+function App() {
   return (
     <Router>
       <Routes>
-      <Route path="/" element={<Dashboard/>}/>
-        <Route path="/login" element={<Login />} />
-        <Route path="/manage-asset" element={<ManageAsset />} />
-        <Route path="/add-asset" element={<AddAsset />} />
-        <Route path="/show-asset" element={<ShowAllAsset/>}/>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="manage-assets" element={<ManageAssets />} />
+          <Route path="manage-permissions" element={<ManagePermissions />} />
+          <Route path="asset-list" element={<AssetList />} />
+        </Route>
       </Routes>
     </Router>
-  );
-};
+  )
+}
 
-export default App;
+export default App
