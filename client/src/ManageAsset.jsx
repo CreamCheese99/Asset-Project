@@ -10,18 +10,17 @@ import DataTable from "./components/DataTable";
 const ManageAsset = () => {
 
     return (
-    <div style={{ backgroundColor: '#f1f8e9' }} className="min-h-screen font-sans">
-        <Header />
-        <NavBar />
-        <Breadcrumb2 />
+    // <div style={{ backgroundColor: '#f1f8e9' }} className="min-h-screen font-sans">
+    //     {/* <Header />
+    //     <NavBar /> */}
+    //     <Breadcrumb2 />
         <div className="container mx-auto p-4">
-            <h1 className="text-lg font-bold mb-4">รายการพัสดุ</h1>
+            <h1 className="text-lg font-bold mb-4">จัดการข้อมูลพัสดุ</h1>
             <SearchForm />
             <ActionButtons />
             <DataTable />
-            
         </div>
-    </div>
+    // </div>
     );
   };
   

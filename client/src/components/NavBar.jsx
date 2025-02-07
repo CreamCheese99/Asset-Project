@@ -17,7 +17,7 @@ function NavBar()  {
                   <div className="font-prompt ml-10 flex items-baseline space-x-4 list-none">
                     <NavBarLink name="หน้าหลัก" to="/" />
                     <NavBarLink name="จัดการพัสดุ" to="/manage-asset" />
-                    <NavBarLink name="จัดการสิทธิ์" to="/manage-role" />
+                    <NavBarLink name="จัดการสิทธิ์" to="/permissions" />
                     <NavBarLink name="รายการพัสดุ" to="/show-asset" />
                   </div>
                 </div>

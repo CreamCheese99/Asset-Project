@@ -85,21 +85,9 @@ const Dashboardpage = () => {
           </div>
         </div>
 
-        {/* Card "จัดการข้อมูลพัสดุ" */}
-        <div className="flex justify-center mb-6">
-          <Link to="/manage-asset"> {/* ลิงก์ไปยังหน้า /manage-asset */}
-            <div
-              className="modern-card bg-gradient-to-r from-purple-300 to-purple-600 p-4 rounded-lg shadow-lg cursor-pointer hover:scale-105 transition-all duration-300 text-center"
-              id="card4"
-            >
-              <div className="modern-card-icon">
-                <i className="fas fa-cogs text-2xl text-white"></i>
-              </div>
-              <div className="modern-card-text text-base text-white">จัดการข้อมูลพัสดุ</div>
-              <div className="modern-card-value text-sm text-white">สำหรับ เจ้าหน้าที่ภาควิชา, อาจารย์ประจำภาควิชา, เจ้าหน้าที่พัสดุประจำคณะ</div>
-            </div>
-          </Link>
-        </div>
+
+        
+        
 
         {/* Graph and Sidebar Section */}
         <div className="grid grid-cols-2 gap-6">

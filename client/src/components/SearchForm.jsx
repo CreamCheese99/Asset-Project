@@ -15,19 +15,19 @@ const SearchForm = () => {
           </select>
         </div>
         <div>
-          <label className="block text-gray-700 text-sm mb-2">หมวดหมู่ครุภัณฑ์</label>
+          <label className="block text-gray-700 text-sm mb-2">ประเภทพัสดุ</label>
           <select className="w-full border-2 border-blue-100 rounded-md">
-            <option>หมวดหมู่ครุภัณฑ์1</option>
-            <option>หมวดหมู่ครุภัณฑ์2</option>
-            <option>หมวดหมู่ครุภัณฑ์3</option>
+            <option>ประเภทพัสดุ1</option>
+            <option>ประเภทพัสดุ2</option>
+            <option>ประเภทพัสดุ3</option>
           </select>
         </div>
         <div>
-          <label className="block text-gray-700 text-sm mb-2">ประเภทครุภัณฑ์</label>
+          <label className="block text-gray-700 text-sm mb-2">ประเภทเงิน</label>
           <select className="w-full border-2 border-blue-100 rounded-md">
-            <option>ประเภทครุภัณฑ์1</option>
-            <option>ประเภทครุภัณฑ์2</option>
-            <option>ประเภทครุภัณฑ์3</option>
+            <option>เงินรายได้</option>
+            <option>เงินงบประมาณ</option>
+            <option>เงินสะสมคลัง</option>
           </select>
         </div>
         <div>

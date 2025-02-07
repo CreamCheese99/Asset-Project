@@ -5,10 +5,10 @@ import AssetForm from "./components/AssetForm";
 import AcquisitionInfo from "./components/AcquisitionInfo";
 import ActionButtons2 from "./components/ActionButtons2";
 import AssetDetails from "./components/AssetDetails";
-import AssetInfoSection from "./components/AssetInfoSection";
 import NavBar from "./components/NavBar";
+import ActionButtons3 from "./components/ActionButtons3";
 
-const AddAsset = () => {
+const ManageShowAsset = () => {
   const handleSave = () => {
     alert("บันทึกข้อมูลสำเร็จ!");
   };
@@ -26,11 +26,10 @@ const AddAsset = () => {
         <AssetForm />
         <AcquisitionInfo />
         <AssetDetails />
-        <AssetInfoSection />
-        <ActionButtons2 onSave={handleSave} onCancel={handleCancel} />
+        <ActionButtons3 />
       </div>
     // </div>
   );
 };
 
-export default AddAsset;
+export default ManageShowAsset;

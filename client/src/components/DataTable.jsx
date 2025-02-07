@@ -1,36 +1,3 @@
-// import React from 'react';
-// import TableRow from './TableRow';
-
-// function DataTable() {
-//   return (
-//     <div className="font-prompt md:container md:mx-auto w-1/2 p-8 text-left">
-//       <h2 className="text-lg font-semibold mb-4 text-gray-700">ข้อมูลพัสดุย่อย</h2>
-//       <table className="border-collapse table-auto w-full border border-gray-300 rounded-lg text-center bg-white">
-//         <thead className="bg-gray-100 rounded-t-lg">
-//           <tr>
-//             <th className="p-3 border text-base border-gray-300 text-gray-700">ลำดับ</th>
-//             <th className="p-3 border text-base border-gray-300 text-gray-700">รหัสพัสดุย่อย</th>
-//             <th className="p-3 border text-base border-gray-300 text-gray-700">พัสดุหลัก</th>
-//             <th className="p-3 border text-base border-gray-300 text-gray-700">จำนวนพัสดุย่อย</th>
-//             <th className="p-3 border text-base border-gray-300 text-gray-700">สถานที่ใช้งาน</th>
-//             <th className="p-3 border text-base border-gray-300 text-gray-700">สภาพใช้งาน</th>
-//             <th className="p-3 border text-base border-gray-300 text-gray-700">ราคา/หน่วย</th>
-//             <th className="p-3 border text-base border-gray-300 text-gray-700">อายุการใช้งาน</th>
-//             <th className="p-3 border text-base border-gray-300 text-gray-700">สาเหตุเลิกใช้งาน</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {/* Example row, replace with dynamic rows */}
-//           <TableRow index={1} subCode="SC001" mainItem="พัสดุหลัก 1" quantity={10} location="อาคาร A" condition="ดี" price={500} lifespan="5 ปี" reason="ไม่มีการใช้งาน" />
-//           {/* Add more TableRow components as needed or dynamically generate them */}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// }
-
-// export default DataTable;
-
 
 import React from "react";
 
@@ -45,6 +12,7 @@ const DataTable = () => {
       department: "ครุศาสตร์อุตสาหกรรม",
       status: "ใช้งานได้",
       value: 50,
+      type_price:"เงินได้"
     },
     {
       id: 2,
@@ -55,9 +23,10 @@ const DataTable = () => {
       department: "ครุศาสตร์อุตสาหกรรม",
       status: "ใช้งานได้",
       value: 50,
+      type_price:"เงินได้"
     },
     {
-      id: 1,
+      id: 3,
       itemCode: "สมอ.12060100-001-0015/61",
       assetCode: "1000000000003",
       category: "คอมพิวเตอร์",
@@ -65,6 +34,7 @@ const DataTable = () => {
       department: "ครุศาสตร์อุตสาหกรรม",
       status: "ใช้งานได้",
       value: 100,
+      type_price:"เงินได้"
     },
     // เพิ่มข้อมูลอื่นๆ ได้ที่นี่
   ];
@@ -76,7 +46,8 @@ const DataTable = () => {
         <tr className="bg-gray-200 text-gray-700">
           <th className="border px-4 py-2">รหัสทรัพย์สิน</th>
           {/* <th className="border px-4 py-2 hidden md:table-cell">รหัสทรัพย์สิน</th> */}
-          <th className="border px-4 py-2 hidden lg:table-cell">ประเภทครุภัณฑ์</th>
+          <th className="border px-4 py-2 hidden lg:table-cell">ประเภทพัสดุ</th>
+          <th className="border px-4 py-2 hidden lg:table-cell">ประเภทเงิน</th>
           <th className="border px-4 py-2">ภาควิชา</th>
           <th className="border px-4 py-2 hidden sm:table-cell">จำนวน</th> 
           <th className="border px-4 py-2 hidden lg:table-cell">หน่วยนับ</th>    
@@ -90,6 +61,7 @@ const DataTable = () => {
             <td className="border px-4 py-2">{item.itemCode}</td>
             {/* <td className="border px-4 py-2 hidden md:table-cell">{item.assetCode}</td> */}
             <td className="border px-4 py-2 hidden lg:table-cell">{item.category}</td>
+            <td className="border px-4 py-2 hidden lg:table-cell">{item.type_price}</td>
             <td className="border px-4 py-2">{item.department}</td>
             <td className="border px-4 py-2 hidden sm:table-cell">
               {item.value.toFixed()}
