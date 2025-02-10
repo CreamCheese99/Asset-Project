@@ -12,7 +12,7 @@ const DataTable = () => {
       department: "ครุศาสตร์อุตสาหกรรม",
       status: "ใช้งานได้",
       value: 50,
-      type_price:"เงินได้"
+      type_price:"เงินรายได้"
     },
     {
       id: 2,
@@ -23,7 +23,7 @@ const DataTable = () => {
       department: "ครุศาสตร์อุตสาหกรรม",
       status: "ใช้งานได้",
       value: 50,
-      type_price:"เงินได้"
+      type_price:"เงินรายได้"
     },
     {
       id: 3,
@@ -34,7 +34,7 @@ const DataTable = () => {
       department: "ครุศาสตร์อุตสาหกรรม",
       status: "ใช้งานได้",
       value: 100,
-      type_price:"เงินได้"
+      type_price:"เงินรายได้"
     },
     // เพิ่มข้อมูลอื่นๆ ได้ที่นี่
   ];
@@ -51,7 +51,7 @@ const DataTable = () => {
           <th className="border px-4 py-2">ภาควิชา</th>
           <th className="border px-4 py-2 hidden sm:table-cell">จำนวน</th> 
           <th className="border px-4 py-2 hidden lg:table-cell">หน่วยนับ</th>    
-          <th className="border px-4 py-2">สถานะ</th>
+          <th className="border px-4 py-2">สภาพการครุภัณฑ์</th>
           <th className="border px-4 py-2">จัดการ</th>
         </tr>
       </thead>

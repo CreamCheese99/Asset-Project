@@ -26,10 +26,14 @@ const AssetForm = () => {
             <input type="text" className="w-full border-2 border-blue-100 rounded-md" />
           </div> */}
           <div>
-            <label className="block text-gray-700 text-sm mb-2">สถานะ</label>
+            <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
             <select className="w-full border-2 border-blue-100 rounded-md">
-              <option>ใช้งานได้</option>
-              <option>เสียหาย</option>
+              <option>ใช้งาน</option>
+              <option>ส่งซ่อม</option>
+              <option>ชำรุด</option>
+              <option>บริจาค/โอน</option>
+              <option>รับโอน</option>
+              <option>จำหน่าย</option>
             </select>
           </div>
         </div>

@@ -19,7 +19,7 @@ const mockUsers = [
   { id: 5, name: 'สมปอง ตั้งใจ', email: 'sompong@org.com', department: 'Sales', role: 'general', status: 'active' },
 ];
 
-const UserRoleManagement = () => {
+const ManageRoleUser = () => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('all');
@@ -189,3 +189,4 @@ const UserRoleManagement = () => {
 };
 
 export default ManageRoleUser;
+

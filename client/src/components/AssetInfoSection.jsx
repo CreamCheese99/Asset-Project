@@ -29,7 +29,7 @@ const AssetInfoSection = () => {
       <h3 className="text-lg font-bold text-gray-700 mb-4">ข้อมูลพัสดุย่อย</h3>
       <div className="flex justify-between items-center mb-6">
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={handleButtonClick}
         >
           + เพิ่ม
@@ -71,7 +71,25 @@ const AssetInfoSection = () => {
               </div>
               <div>
                 <label className="block text-gray-700 text-sm mb-2">หน่วยนับ</label>
-                <input type="text" className="w-full border-2 border-blue-100 rounded-md" />
+                <select className="w-full border-2 border-blue-100 rounded-md">
+                  <option>ใช้งานได้</option>
+                  <option>เสียหาย</option>
+                  <option>เครื่อง</option>
+                  <option>เตียง</option>
+                  <option>แผ่น</option>
+                  <option>โหล</option>
+                  <option>ใบ</option>
+                  <option>คัน</option>
+                  <option>ขด</option>
+                  <option>ชุด</option>
+                  <option>ตัว</option>
+                  <option>ตู้</option>
+                  <option>บาน</option>
+                  <option>ผืน</option>
+                  <option>ระบบ</option>
+                  <option>หลัง</option>
+                  <option>หลัง</option>
+                </select>
               </div>
               <div>
                 <label className="block text-gray-700 text-sm mb-2">การใช้งาน</label>

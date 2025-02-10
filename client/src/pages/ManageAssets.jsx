@@ -11,7 +11,6 @@ const ManageAssets = () => {
             <SearchForm />
             <ActionButtons />
             <DataTable />
-            
         </div>
     </div>
     )

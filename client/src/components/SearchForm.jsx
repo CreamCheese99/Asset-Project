@@ -17,9 +17,25 @@ const SearchForm = () => {
         <div>
           <label className="block text-gray-700 text-sm mb-2">ประเภทพัสดุ</label>
           <select className="w-full border-2 border-blue-100 rounded-md">
-            <option>ประเภทพัสดุ1</option>
-            <option>ประเภทพัสดุ2</option>
-            <option>ประเภทพัสดุ3</option>
+            <option>ครุภัณฑ์สำนักงาน</option>
+            <option>ครุภัณฑ์ยานพาหนะและขนส่ง</option>
+            <option>ครุภัณฑ์ไฟฟ้าและวิทยุ</option>
+            <option>ครุภัณฑ์ไฟฟ้าและวิทยุ-เครื่องกำเนิดไฟฟ้า</option>
+            <option>ครุภัณฑ์เขียนและเผยแพร่</option>
+            <option>ครุภัณฑ์การเกษตร-เครื่องมืออุปกรณ์</option>
+            <option>ครุภัณฑ์การเกษตร-เครื่องจักรกล</option>
+            <option>ครุภัณฑ์โรงงาน-เครื่องมืออุปกรณ์</option>
+            <option>ครุภัณฑ์โรงงาน-เครื่องจักรกล</option>
+            <option>ครุภัณฑ์ก่อสร้าง-เครื่องมือและอุปกรณ์</option>
+            <option>ครุภัณฑ์ก่อสร้าง-เครื่องจักรกล</option>
+            <option>ครุภัณฑ์วิทยาศาสตร์และการแพทย์</option>
+            <option>ครุภัณฑ์คอมพิวเตอร์</option>
+            <option>ครุภัณฑ์กีฬา-กายภาพ</option>
+            <option>ครุภัณฑ์สนาม</option>
+            <option>ครุภัณฑ์งานบ้านงานครัว</option>
+            <option>ครุภัณฑ์การศึกษา</option>
+            <option>ครุภัณฑ์ศิลปะ-นาฏศิลป์</option>
+            <option>ครุภัณฑ์อาวุธ</option>
           </select>
         </div>
         <div>
@@ -28,14 +44,19 @@ const SearchForm = () => {
             <option>เงินรายได้</option>
             <option>เงินงบประมาณ</option>
             <option>เงินสะสมคลัง</option>
+            <option>เงินกันเหลือมปี</option>
+            
           </select>
         </div>
         <div>
-          <label className="block text-gray-700 text-sm mb-2">สถานะ</label>
+          <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
           <select className="w-full border-2 border-blue-100 rounded-md">
-            <option>สถานะ1</option>
-            <option>สถานะ2</option>
-            <option>สถานะ3</option>
+            <option>ใช้งาน</option>
+            <option>ส่งซ่อม</option>
+            <option>ชำรุด</option>
+            <option>บริจาค/โอน</option>
+            <option>รับโอน</option>
+            <option>จำหน่าย</option>
           </select>
         </div>
         <div className="col-span-2">
