@@ -1,7 +1,7 @@
 const Breadcrumb4 = () => {
     return (
       <div className="mt-4 text-gray-600">
-        <p>ครุภัณฑ์ &gt;   <span className="text-blue-600">จัดการสิทธิ์</span></p>
+        <p>จัดการสิทธิ์ &gt;   <span className="text-blue-600">จัดการสิทธิ์ผู้ใช้งาน</span></p>
       </div>
     );
   };

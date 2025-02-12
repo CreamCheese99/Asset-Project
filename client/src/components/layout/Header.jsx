@@ -10,13 +10,13 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           <img src={logo} alt="logo" className="h-10 w-auto" />
           <div>
-            <span className="font-prompt text-xl font-bold block">ระบบพัสดุ</span>
+            <span className=" text-xl font-bold block">ระบบพัสดุ</span>
             <p className="text-sm">คณะครุศาสตร์อุตสาหกรรมและเทคโนโลยี</p>
           </div>
         </div>
         <button className="flex items-center space-x-2 hover:text-gray-200">
           <UserCircle size={24} />
-          <span>โปรไฟล์</span>
+          <Link to="/login" className="hover:text-gray-300">โปรไฟล์</Link>
         </button>
       </div>
       
@@ -25,9 +25,9 @@ const Header = () => {
         <div className="container mx-auto flex justify-center space-x-6">
           <Link to="/" className="hover:text-gray-300">หน้าหลัก</Link>
           <Link to="/manage-assets" className="hover:text-gray-300">จัดการพัสดุ</Link>
-          <Link to="/manage-permissions" className="hover:text-gray-300">จัดการสิทธิ์</Link>
           <Link to="/asset-list" className="hover:text-gray-300">รายการพัสดุ</Link>
-          <Link to="/" className="hover:text-gray-300">ข้อมูลทั่วไป</Link>
+          <Link to="/manage-personal-info" className="hover:text-gray-300">ข้อมูลทั่วไป</Link>
+          <Link to="/manage-permissions" className="hover:text-gray-300">จัดการสิทธิ์</Link>
         </div>
       </nav>
     </header>

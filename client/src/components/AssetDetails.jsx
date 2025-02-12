@@ -53,36 +53,7 @@ const AssetDetails = () => {
           + เพิ่มรูป
         </button>
         </div>
-
-        
-
-        {/* <div>
-          <label className="block text-sm text-gray-700 mb-2">มูลค่า (บาท)</label>
-          <input
-            type="number"
-            className="w-full border-2 border-blue-100 rounded-md"
-            placeholder="0.00"
-          />
-        </div>
-        <div>
-          <label className="block text-sm text-gray-700 mb-2">อายุการใช้งาน (ปี)</label>
-          <select className="w-full border-2 border-blue-100 rounded-md">
-            <option>กรุณาเลือก</option>
-            <option>1 ปี</option>
-            <option>2 ปี</option>
-          </select>
-        </div> */}
-
-      </div>
-      {/* <div className="mt-4">
-        <label className="block text-sm text-gray-700 mb-2">รายละเอียดเพิ่มเติม</label>
-        <textarea
-          className="w-full border-2 border-blue-100 rounded-md"
-          rows="4"
-          placeholder="กรอกรายละเอียด"
-        ></textarea>
-      </div> */}
-      
+      </div>  
     </div>
   );
 };
