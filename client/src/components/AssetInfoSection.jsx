@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const AssetInfoSection = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -29,7 +30,7 @@ const AssetInfoSection = () => {
       <h3 className="text-lg font-bold text-gray-700 mb-4">ข้อมูลพัสดุย่อย</h3>
       <div className="flex justify-between items-center mb-6">
         <button
-          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-700"
+          className="bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-700"
           onClick={handleButtonClick}
         >
           + เพิ่ม
@@ -100,12 +101,12 @@ const AssetInfoSection = () => {
               </div>
               <div className="flex justify-end mt-4">
                 <button
-                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700 mr-2"
+                  className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-700 mr-2"
                   onClick={handleClosePopup}
                 >
                   ยกเลิก
                 </button>
-                <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                <button className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-700">
                   บันทึก
                 </button>
               </div>
@@ -140,10 +141,10 @@ const AssetInfoSection = () => {
               <td className="border px-4 py-2">{item.status}</td>
               <td className="border px-4 py-2 flex justify-center space-x-2">
                 <button className="text-blue-500 hover:text-blue-700 bg-gray-200 rounded-lg px-3 py-1">
-                  ดู
+                  <Link to= "/show-info" >ดู</Link>
                 </button>
                 <button className="text-yellow-500 hover:text-yellow-700 bg-gray-200 rounded-lg px-3 py-1">
-                  แก้ไข
+                  <Link to="/add-asset">แก้ไข</Link>
                 </button>
                 <button className="text-red-500 hover:text-red-700 bg-gray-200 rounded-lg px-3 py-1">
                   ลบ

@@ -44,14 +44,14 @@ const SearchForm = () => {
             <option>เงินรายได้</option>
             <option>เงินงบประมาณ</option>
             <option>เงินสะสมคลัง</option>
-            <option>เงินกันเหลือมปี</option>
+            <option>เงินกันเหลือบปี</option>
             
           </select>
         </div>
         <div>
           <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
           <select className="w-full border-2 border-blue-100 rounded-xl">
-            <option>ใช้งาน</option>
+            <option >ใช้งาน</option>
             <option>ซ่อม</option>
             <option>ชำรุด</option>
             <option>บริจาค/โอน</option>

@@ -12,7 +12,7 @@ const ActionButtons = () => {
   return (
     <div className="mt-4 flex space-x-4">
       <button
-        className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+        className="bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600"
         onClick={handleAddClick}
       >
         เพิ่ม

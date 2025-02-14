@@ -20,7 +20,7 @@ const AcquisitionInfo = () => {
             <option>เงินรายได้</option>
             <option>เงินงบประมาณ</option>
             <option>เงินสะสมคลัง</option>
-            <option>เงินกันเหลือมปี</option>
+            <option>เงินกันเหลือบปี</option>
             </select>
             
           </div>

@@ -48,7 +48,7 @@ const AssetDetails = () => {
         <div>
         <label className="block text-sm text-gray-700 mb-2">เพิ่มรูปภาพ</label>
         <button
-          className="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-700"
+          className="bg-green-500 text-white px-4 py-1 rounded-xl hover:bg-green-700"
         >
           + เพิ่มรูป
         </button>

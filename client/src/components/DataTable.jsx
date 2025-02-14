@@ -1,6 +1,6 @@
 
 import React from "react";
-
+import { Link } from "react-router-dom";
 const DataTable = () => {
   const data = [
     {
@@ -38,7 +38,14 @@ const DataTable = () => {
     },
     // เพิ่มข้อมูลอื่นๆ ได้ที่นี่
   ];
-
+  
+  const handleDelete = (id) => {
+    if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?")) {
+      setData(data.filter(item => item.id !== id));
+      console.log("ลบรายการที่มี ID:", id);
+    }
+  };
+  
   return (
     <div className="bg-white mt-4 p-4 rounded-md shadow-md overflow-x-auto">
     <table className="table-auto w-full border-collapse text-sm">
@@ -70,12 +77,12 @@ const DataTable = () => {
             <td className="border px-4 py-2">{item.status}</td>
             <td className="border px-4 py-2 flex justify-center space-x-2">
               <button className="text-blue-500 hover:text-blue-700 bg-gray-200 rounded-lg px-3 py-1">
-                ดู
+                <Link to= "/show-info" >ดู</Link>
               </button>
               <button className="text-yellow-500 hover:text-yellow-700 bg-gray-200 rounded-lg px-3 py-1">
-                แก้ไข
+                <Link to="/add-asset">แก้ไข</Link>
               </button>
-              <button className="text-red-500 hover:text-red-700 bg-gray-200 rounded-lg px-3 py-1">
+              <button className="text-red-500 hover:text-red-700 bg-gray-200 rounded-lg px-3 py-1" onClick={() => handleDelete(item.id)}>
                 ลบ
               </button>
             </td>
