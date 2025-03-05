@@ -1,7 +1,27 @@
 {
   "dependencies": {
     "@tailwindcss/vite": "^4.0.4",
+    "express": "^4.21.2",
+    "ldapjs": "^3.0.7",
     "lucide-react": "^0.474.0",
     "tailwindcss": "^4.0.4"
-  }
+  },
+  "name": "asset-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CreamCheese99/Asset-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CreamCheese99/Asset-Project/issues"
+  },
+  "homepage": "https://github.com/CreamCheese99/Asset-Project#readme",
+  "description": ""
 }
