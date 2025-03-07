@@ -1,17 +1,18 @@
-import React from "react";
-
-const ActionButtons2 = () => {
+const ActionButtons2 = ({ onSave, onCancel }) => {
   return (
-    <div className="mt-4 flex space-x-4">
-      <button className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-700">
+    <div className="flex justify-end space-x-4 mt-4">
+      <button
+        onClick={onSave} // กดแล้วเรียก handleSave
+        className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+      >
         บันทึก
       </button>
-
-      <button className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-700">
-        ยกเลิก 
+      <button
+        onClick={onCancel} // กดแล้วเรียก handleCancel
+        className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+      >
+        ยกเลิก
       </button>
-
-
     </div>
   );
 };
