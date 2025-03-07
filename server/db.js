@@ -6,7 +6,7 @@ const {Pool} = require("pg"); //Pool คือคลาสที่ใช้ใ�
 const pool = new Pool({
     user: 'postgres',      
     host: 'localhost',         
-    database: 'Inventory2',   
+    database: 'assets',   
     password: '1234',  
     port: 5432,                 
   });
