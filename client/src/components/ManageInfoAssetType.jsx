@@ -44,7 +44,7 @@ const ManageAssetTypes = () => {
         onClick={() => setIsModalOpen(true)}
       >
         <FaPlus className="mr-2" />
-        เพิ่มประเภทสินทรัพย์
+        เพิ่ม
       </button>
       
       <table className="w-full border-collapse border-t border-gray-300">

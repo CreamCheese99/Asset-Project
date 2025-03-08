@@ -1,45 +1,94 @@
-const AssetForm = () => {
-    return (
+// const AssetForm = () => {
+//     return (
 
-      <div className="bg-white mt-4 p-4 rounded-md shadow-md">
-        <h3 className="text-lg font-bold text-gray-700 mb-4">ข้อมูลครุภัณฑ์</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน</label>
-            <input
-              type="text"
-              className="w-full border-2 border-blue-100 rounded-md "
-              placeholder="สมอ.xxx-xxx-xxxx/61"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 text-sm mb-2">ภาควิชา</label>
-            <select className="w-full border-2 border-blue-100 rounded-md">
-                <option>ครุศาสตร์อุตสาหกรรม</option>
-                <option>ครุศาสตร์สถาปัตยกรรมเเละการออกแบบ</option>
-                <option>ครุศาสตร์วิศวกรรม</option>
-                <option>ครุศาสตร์การเกษาตร</option>
-            </select>
-          </div>
-          {/* <div>
-            <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน </label>
-            <input type="text" className="w-full border-2 border-blue-100 rounded-md" />
-          </div> */}
-          <div>
-            <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
-            <select className="w-full border-2 border-blue-100 rounded-md">
-              <option>ใช้งาน</option>
-              <option>ส่งซ่อม</option>
-              <option>ชำรุด</option>
-              <option>บริจาค/โอน</option>
-              <option>รับโอน</option>
-              <option>จำหน่าย</option>
-            </select>
-          </div>
+//       <div className="bg-white mt-4 p-4 rounded-md shadow-md">
+//         <h3 className="text-lg font-bold text-gray-700 mb-4">ข้อมูลครุภัณฑ์</h3>
+//         <div className="grid grid-cols-2 gap-4">
+//           <div>
+//             <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน</label>
+//             <input
+//               type="text"
+//               className="w-full border-2 border-blue-100 rounded-md "
+//               placeholder="สมอ.xxx-xxx-xxxx/61"
+//             />
+//           </div>
+//           <div>
+//             <label className="block text-gray-700 text-sm mb-2">ภาควิชา</label>
+//             <select className="w-full border-2 border-blue-100 rounded-md">
+//                 <option>ครุศาสตร์อุตสาหกรรม</option>
+//                 <option>ครุศาสตร์สถาปัตยกรรมเเละการออกแบบ</option>
+//                 <option>ครุศาสตร์วิศวกรรม</option>
+//                 <option>ครุศาสตร์การเกษาตร</option>
+//             </select>
+//           </div>
+//           <div>
+//             <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
+//             <select className="w-full border-2 border-blue-100 rounded-md">
+//               <option>ใช้งาน</option>
+//               <option>ส่งซ่อม</option>
+//               <option>ชำรุด</option>
+//               <option>บริจาค/โอน</option>
+//               <option>รับโอน</option>
+//               <option>จำหน่าย</option>
+//             </select>
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   };
+  
+//   export default AssetForm;
+
+
+
+const AssetForm = ({ value, onChange }) => {
+  return (
+    <div className="bg-white mt-4 p-4 rounded-md shadow-md">
+      <h3 className="text-lg font-bold text-gray-700 mb-4">ข้อมูลครุภัณฑ์</h3>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน</label>
+          <input
+            type="text"
+            className="w-full border-2 border-blue-100 rounded-md"
+            placeholder="สมอ.xxx-xxx-xxxx/61"
+            value={value.main_asset_ID} // ค่า value มาจาก Parent
+            onChange={(e) => onChange('main_asset_ID', e.target.value)} // เมื่อค่าเปลี่ยน จะส่งกลับไปยัง Parent
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 text-sm mb-2">ภาควิชา</label>
+          <select
+            className="w-full border-2 border-blue-100 rounded-md"
+            value={value.department} // ค่า value มาจาก Parent
+            onChange={(e) => onChange('department', e.target.value)} // เมื่อค่าเปลี่ยน จะส่งกลับไปยัง Parent
+          >
+            <option>ครุศาสตร์อุตสาหกรรม</option>
+            <option>ครุศาสตร์สถาปัตยกรรมเเละการออกแบบ</option>
+            <option>ครุศาสตร์วิศวกรรม</option>
+            <option>ครุศาสตร์การเกษาตร</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
+          <select
+            className="w-full border-2 border-blue-100 rounded-md"
+            value={value.status} // ค่า value มาจาก Parent
+            onChange={(e) => onChange('status', e.target.value)} // เมื่อค่าเปลี่ยน จะส่งกลับไปยัง Parent
+          >
+            <option>ใช้งาน</option>
+            <option>ส่งซ่อม</option>
+            <option>ชำรุด</option>
+            <option>บริจาค/โอน</option>
+            <option>รับโอน</option>
+            <option>จำหน่าย</option>
+          </select>
         </div>
       </div>
-    );
-  };
-  
-  export default AssetForm;
-  
+    </div>
+  );
+};
+
+export default AssetForm;
+
+
