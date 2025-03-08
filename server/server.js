@@ -42,7 +42,7 @@ app.post('/api/login', async (req, res) => {
 // API: เพิ่มข้อมูลพัสดุหลัก
 const insertAsset = async (data) => {
   if (!data.main_asset_name || !data.main_asset_id) {
-    throw new Error("Main item name and asset ID are required.");
+    throw new Error("Main asset name and asset ID are required.");
   }
   try {
     const result = await pool.query(
@@ -75,7 +75,7 @@ const insertAsset = async (data) => {
 };
 
 // API: เพิ่มข้อมูลพัสดุหลัก
-app.post('/api/mainassets', async (req, res) => {
+app.post('/api/mainasset', async (req, res) => {
   try {
     console.log(req.body);
     const insertedAsset = await insertAsset(req.body);
@@ -85,33 +85,106 @@ app.post('/api/mainassets', async (req, res) => {
   }
 });
 
-// API: ดึงข้อมูลพัสดุทั้งหมด
-app.get('/api/mainassets', async (req, res) => {
+// API: อัปเดตข้อมูลพัสดุหลัก
+const updateAsset = async (data, main_asset_id) => {
+  // ตรวจสอบข้อมูลที่สำคัญที่ต้องอัปเดต
+  if (!data.main_asset_name) {
+    throw new Error("Main asset name is required.");
+  }
+
   try {
-    const result = await pool.query('SELECT * FROM mainassets');
+    const result = await pool.query(
+      `UPDATE mainasset 
+      SET 
+        main_asset_name = $1, 
+        status = $2, 
+        fiscal_year = $3, 
+        date_received = $4,
+        badget_limit = $5,
+        averange_price = $6,
+        budget_type = $7,
+        asset_type = $8,
+        location_use = $9,
+        location_deliver = $10,
+        usage = $11,
+        reponsible_person = $12
+      WHERE main_asset_id = $13
+      RETURNING *`,
+      [
+        data.main_asset_name,
+        data.status || null,
+        data.fiscal_year || null,
+        data.date_received || null,
+        data.badget_limit || null,
+        data.averange_price || null,
+        data.budget_type || null,
+        data.asset_type || null,
+        data.location_use || null,
+        data.location_deliver || null,
+        data.usage || null,
+        data.reponsible_person || null,
+        main_asset_id  // ใช้ main_asset_id เป็น string
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error("Asset not found");
+    }
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database update error:", error.message);
+    throw error;
+  }
+};
+
+// API: อัปเดตข้อมูลพัสดุหลัก
+app.put('/api/mainasset/:main_asset_id', async (req, res) => {
+  const { main_asset_id } = req.params;  // รับ main_asset_id จาก URL parameter
+  const data = req.body;  // รับข้อมูลจาก request body
+
+  try {
+    const updatedAsset = await updateAsset(data, main_asset_id);
+    res.status(200).json(updatedAsset);  // ส่งข้อมูลที่ถูกอัปเดตกลับ
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error.', error: error.message });
+  }
+});
+
+
+
+// API: ดึงข้อมูลพัสดุทั้งหมด
+app.get('/api/mainasset', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM mainasset');
     res.status(200).json(result.rows);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving data' });
   }
 });
 
-// API: ดึงข้อมูลพัสดุโดย `main_item_id`
-app.get('/api/mainassets/:main_item_id', async (req, res) => {
+// API: ดึงข้อมูลพัสดุโดย `main_asset_id`
+app.get('/api/mainasset/:main_asset_id', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM mainassets WHERE main_item_id = $1', [req.params.main_item_id]);
+    const mainAssetId = req.params.main_asset_id; 
+    const result = await pool.query('SELECT * FROM mainasset WHERE main_asset_id = $1', [mainAssetId]);
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Asset not found' });
     }
+
     res.status(200).json(result.rows[0]);
   } catch (error) {
+    console.error(error); 
     res.status(500).json({ error: 'Error retrieving data' });
   }
 });
 
-// API: ลบข้อมูลพัสดุโดย `main_item_id`
-app.delete('/api/mainassets/:main_item_id', async (req, res) => {
+
+// API: ลบข้อมูลพัสดุโดย `main_asset_id`
+app.delete('/api/mainasset/:main_asset_id', async (req, res) => {
   try {
-    const result = await pool.query('DELETE FROM mainassets WHERE main_item_id = $1 RETURNING *', [req.params.main_item_id]);
+    const result = await pool.query('DELETE FROM mainasset WHERE main_asset_id = $1 RETURNING *', [req.params.main_asset_id]);
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Asset not found' });
     }
