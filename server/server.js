@@ -64,8 +64,7 @@ const insertAsset = async (data) => {
         data.location_use || null,
         data.location_deliver || null,
         data.usage || null,
-        data.reponsible_person || null,
-        // JSON.stringify(data.delivery_location) || null, 
+        data.reponsible_person || null, 
       ]
     );
     return result.rows[0];
