@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 app.use(express.json());  
 
 //*********************************************************************************** */
-app.post("/MainAsset", async (req, res) => {
+app.post("/mainasset", async (req, res) => {
   try {
     const {
       main_asset_ID,
@@ -54,7 +54,7 @@ app.post("/MainAsset", async (req, res) => {
 });
 
 // API สำหรับดึงข้อมูลทั้งหมดจากตาราง MainAsset
-app.get("/MainAsset", async (req, res) => {
+app.get("/mainasset", async (req, res) => {
   try {
     const query = 'SELECT * FROM "MainAsset"';
     const result = await pool.query(query);
@@ -67,7 +67,7 @@ app.get("/MainAsset", async (req, res) => {
 });
 
 // API สำหรับดึงข้อมูล MainAsset ตาม main_asset_ID
-app.get("/MainAsset/:main_asset_ID", async (req, res) => {
+app.get("/mainasset/:main_asset_ID", async (req, res) => {
   const { main_asset_ID } = req.params;
 
   try {
@@ -85,10 +85,90 @@ app.get("/MainAsset/:main_asset_ID", async (req, res) => {
   }
 });
 
+
+// API: อัปเดตข้อมูลพัสดุหลัก
+const updateAsset = async (data, main_asset_id) => {
+  // ตรวจสอบข้อมูลที่สำคัญที่ต้องอัปเดต
+  if (!data.main_asset_name) {
+    throw new Error("Main asset name is required.");
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE mainasset 
+      SET 
+        main_asset_name = $1, 
+        status = $2, 
+        fiscal_year = $3, 
+        date_received = $4,
+        badget_limit = $5,
+        averange_price = $6,
+        budget_type = $7,
+        asset_type = $8,
+        location_use = $9,
+        location_deliver = $10,
+        usage = $11,
+        reponsible_person = $12
+      WHERE main_asset_id = $13
+      RETURNING *`,
+      [
+        data.main_asset_name,
+        data.status || null,
+        data.fiscal_year || null,
+        data.date_received || null,
+        data.badget_limit || null,
+        data.averange_price || null,
+        data.budget_type || null,
+        data.asset_type || null,
+        data.location_use || null,
+        data.location_deliver || null,
+        data.usage || null,
+        data.reponsible_person || null,
+        main_asset_id  // ใช้ main_asset_id เป็น string
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error("Asset not found");
+    }
+
+    return result.rows[0];
+  } catch (error) {
+    console.error("Database update error:", error.message);
+    throw error;
+  }
+};
+
+// API: อัปเดตข้อมูลพัสดุหลัก
+app.put('/api/mainasset/:main_asset_id', async (req, res) => {
+  const { main_asset_id } = req.params;  // รับ main_asset_id จาก URL parameter
+  const data = req.body;  // รับข้อมูลจาก request body
+
+  try {
+    const updatedAsset = await updateAsset(data, main_asset_id);
+    res.status(200).json(updatedAsset);  // ส่งข้อมูลที่ถูกอัปเดตกลับ
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error.', error: error.message });
+  }
+});
+
+
+// API: ลบข้อมูลพัสดุโดย `main_asset_id`
+app.delete('/api/mainasset/:main_asset_id', async (req, res) => {
+  try {
+    const result = await pool.query('DELETE FROM mainasset WHERE main_asset_id = $1 RETURNING *', [req.params.main_asset_id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Asset not found' });
+    }
+    res.status(200).json({ message: 'Asset deleted successfully', deletedAsset: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting data' });
+  }
+});
 // ************************************************************************************************
 
 // API สำหรับเพิ่มข้อมูลในตาราง SubAsset
-app.post('/api/SubAsset', async (req, res) => {
+app.post('/api/subasset', async (req, res) => {
   const {
     sub_asset_ID,
     sub_asset_name,
@@ -104,7 +184,7 @@ app.post('/api/SubAsset', async (req, res) => {
   try {
     // เชื่อมต่อกับฐานข้อมูลและเพิ่มข้อมูลลงในตาราง SubAsset
     const query = `
-      INSERT INTO public."SubAsset"(
+      INSERT INTO public."subasset"(
         "sub_asset_ID", sub_asset_name, type, details, quantity, unit_price, status, counting_unit, "main_asset_ID"
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -132,7 +212,7 @@ app.post('/api/SubAsset', async (req, res) => {
 });
 
 // API สำหรับดึงข้อมูลจากตาราง SubAsset
-app.get('/api/SubAsset', async (req, res) => {
+app.get('/api/subasset', async (req, res) => {
   try {
     const query = `SELECT * FROM public."SubAsset"`;
     const result = await pool.query(query);
@@ -145,7 +225,7 @@ app.get('/api/SubAsset', async (req, res) => {
 });
 
 // API สำหรับดึงข้อมูล SubAsset โดยค้นหาตาม sub_asset_ID
-app.get('/api/SubAsset/:sub_asset_ID', async (req, res) => {
+app.get('/api/subasset/:sub_asset_ID', async (req, res) => {
   const { sub_asset_ID } = req.params;
 
   try {
@@ -164,8 +244,8 @@ app.get('/api/SubAsset/:sub_asset_ID', async (req, res) => {
 });
 //************************************************************************************************** */
 
-// API สำหรับเพิ่มข้อมูลสาขาวิชา
-app.post("/Department", async (req, res) => {
+//API สำหรับเพิ่มข้อมูลสาขาวิชา
+app.post("/department", async (req, res) => {
   const { department_ID, department_name } = req.body;
 
   if (!department_ID || !department_name) {
@@ -185,7 +265,7 @@ app.post("/Department", async (req, res) => {
 });
 
 // API สำหรับดูข้อมูลสาขาวิชา
-app.get("/Department", async (req, res) => {
+app.get("/department", async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM "Department" ORDER BY "department_ID" ASC');
     res.json(result.rows);
@@ -195,8 +275,26 @@ app.get("/Department", async (req, res) => {
   }
 });
 
+app.get("/department/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query('SELECT * FROM "Department" WHERE "department_ID" = $1', [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "ไม่พบสาขาวิชาที่ต้องการ" });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error("Database error: ", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+  }
+});
+
+
 // API สำหรับลบข้อมูลสาขาวิชา
-app.delete("/Department/:id", async (req, res) => {
+app.delete("/department/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -214,7 +312,7 @@ app.delete("/Department/:id", async (req, res) => {
 });
 
 // API สำหรับแก้ไขข้อมูลสาขาวิชา
-app.put("/Department/:id", async (req, res) => {
+app.put("/department/:id", async (req, res) => {
   const { id } = req.params;
   const { department_name } = req.body;
 
@@ -238,12 +336,109 @@ app.put("/Department/:id", async (req, res) => {
     res.status(500).json({ error: "เกิดข้อผิดพลาดในการอัปเดตข้อมูล" });
   }
 });
+//*************************************************************************************************** */
+//เพิ่มหลักสูตร
+app.post("/curriculum", async (req, res) => {
+  const { curriculum_ID, curriculum_name, department_ID } = req.body;
+
+  if (!curriculum_ID || !curriculum_name || !department_ID) {
+    return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" });
+  }
+
+  try {
+    const result = await pool.query(
+      'INSERT INTO "Curriculum" ("curriculum_ID", curriculum_name, "department_ID") VALUES ($1, $2, $3) RETURNING *',
+      [curriculum_ID, curriculum_name, department_ID]
+    );
+    res.status(201).json({ message: "เพิ่มหลักสูตรเรียบร้อย", data: result.rows[0] });
+  } catch (error) {
+    console.error("Database error: ", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการเพิ่มข้อมูล" });
+  }
+});
+
+// ดึงข้อมูลหลักสูตรทั้งหมด
+app.get("/curriculum", async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM "Curriculum"');
+    res.status(200).json({ data: result.rows });
+  } catch (error) {
+    console.error("Database error: ", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+  }
+});
+
+// ดึงข้อมูลหลักสูตรตาม ID
+app.get("/curriculum/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query('SELECT * FROM "Curriculum" WHERE "curriculum_ID" = $1', [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "ไม่พบหลักสูตรที่ต้องการ" });
+    }
+
+    res.status(200).json({ data: result.rows[0] });
+  } catch (error) {
+    console.error("Database error: ", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+  }
+});
+
+//Update ข้อมูลหลักสูตร ตาม ID
+app.put("/curriculum/:id", async (req, res) => {
+  const { id } = req.params;
+  const { curriculum_name, department_ID } = req.body;
+
+  if (!curriculum_name || !department_ID) {
+    return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" });
+  }
+
+  try {
+    const result = await pool.query(
+      'UPDATE "Curriculum" SET curriculum_name = $1, "department_ID" = $2 WHERE "curriculum_ID" = $3 RETURNING *',
+      [curriculum_name, department_ID, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "ไม่พบหลักสูตรที่ต้องการอัปเดต" });
+    }
+
+    res.status(200).json({ message: "อัปเดตหลักสูตรเรียบร้อย", data: result.rows[0] });
+  } catch (error) {
+    console.error("Database error: ", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการอัปเดตข้อมูล" });
+  }
+});
+
+//ลบข้อมูลหลักสูตรตาม ID
+app.delete("/curriculum/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      'DELETE FROM "Curriculum" WHERE "curriculum_ID" = $1 RETURNING *',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "ไม่พบหลักสูตรที่ต้องการลบ" });
+    }
+
+    res.status(200).json({ message: "ลบหลักสูตรเรียบร้อย" });
+  } catch (error) {
+    console.error("Database error: ", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการลบข้อมูล" });
+  }
+});
+
 
 //*************************************************************************************************** */
 //API จัดการสิทธิ์
 
 //เพิ่มผู้ใช้
-app.post("/User", async (req, res) => {
+app.post("/user", async (req, res) => {
   const { user_ID, user_name, user_email, department_ID, role_ID } = req.body;
 
   if (!user_ID || !user_name || !user_email || !department_ID || !role_ID) {
