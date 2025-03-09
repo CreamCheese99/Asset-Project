@@ -141,7 +141,7 @@ const updateAsset = async (data, main_asset_id) => {
 };
 
 // API: อัปเดตข้อมูลพัสดุหลัก
-app.put('/api/mainasset/:main_asset_id', async (req, res) => {
+app.put('/api/mainasset/:main_asset_ID', async (req, res) => {
   const { main_asset_id } = req.params;  // รับ main_asset_id จาก URL parameter
   const data = req.body;  // รับข้อมูลจาก request body
 
@@ -155,17 +155,24 @@ app.put('/api/mainasset/:main_asset_id', async (req, res) => {
 
 
 // API: ลบข้อมูลพัสดุโดย `main_asset_id`
-app.delete('/api/mainasset/:main_asset_id', async (req, res) => {
-  try {
-    const result = await pool.query('DELETE FROM mainasset WHERE main_asset_id = $1 RETURNING *', [req.params.main_asset_id]);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Asset not found' });
-    }
-    res.status(200).json({ message: 'Asset deleted successfully', deletedAsset: result.rows[0] });
-  } catch (error) {
-    res.status(500).json({ error: 'Error deleting data' });
-  }
+// app.delete('/api/mainasset/:main_asset_ID', async (req, res) => {
+//   try {
+//     const result = await pool.query('DELETE FROM mainasset WHERE main_asset_id = $1 RETURNING *', [req.params.main_asset_id]);
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ error: 'Asset not found' });
+//     }
+//     res.status(200).json({ message: 'Asset deleted successfully', deletedAsset: result.rows[0] });
+//   } catch (error) {
+//     res.status(500).json({ error: 'Error deleting data' });
+//   }
+// });
+
+app.delete('/mainasset/:id', (req, res) => {
+  const assetId = req.params.id;
+  // ใส่ logic ในการลบ asset ที่มี id ตามที่ระบุ
+  res.send(`ลบ asset ที่มี ID: ${assetId} แล้ว`);
 });
+
 // ************************************************************************************************
 
 // API สำหรับเพิ่มข้อมูลในตาราง SubAsset
@@ -453,7 +460,7 @@ app.post("/user", async (req, res) => {
     );
 
     await pool.query(
-      `INSERT INTO "UserRole" ("user_ID", "role_ID") VALUES ($1, $2)`,
+      `INSERT INTO "userRole" ("user_ID", "role_ID") VALUES ($1, $2)`,
       [user_ID, role_ID]
     );
 

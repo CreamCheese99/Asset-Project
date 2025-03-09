@@ -45,7 +45,6 @@ const SearchForm = () => {
             <option>เงินงบประมาณ</option>
             <option>เงินสะสมคลัง</option>
             <option>เงินกันเหลือบปี</option>
-            
           </select>
         </div>
         <div>
