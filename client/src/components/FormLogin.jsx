@@ -23,18 +23,19 @@
 
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import FormInputField from './FormInputField';
 import LogoSection from './LogoSection';
 
 function FormLogin() {
-  // สร้าง state เก็บ username & password
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const navigate = useNavigate(); 
 
-  // ฟังก์ชัน Login
   const handleLogin = async () => {
     if (!username || !password) {
-      alert("กรุณากรอก Username และ Password");
+      setError("กรุณากรอก Username และ Password");
       return;
     }
 
@@ -48,15 +49,17 @@ function FormLogin() {
       });
 
       const data = await response.json();
+
       if (data.success) {
         alert("เข้าสู่ระบบสำเร็จ!");
-        // TODO: อาจเปลี่ยนไปหน้า Dashboard หรือทำอย่างอื่น
+        localStorage.setItem("user", JSON.stringify(data.user)); // ✅ บันทึกข้อมูลผู้ใช้
+        navigate("/"); // นำทางไปหน้า Dashboard
       } else {
-        alert("Username หรือ Password ไม่ถูกต้อง");
+        setError("Username หรือ Password ไม่ถูกต้อง");
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
+      setError("เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
     }
   };
 
@@ -83,7 +86,7 @@ function FormLogin() {
           onChange={(e) => setPassword(e.target.value)}
         />
         <button
-          onClick={handleLogin} // ✅ เพิ่ม onClick ให้ปุ่ม
+          onClick={handleLogin} 
           style={{ background: '#8bc34a' }}
           className="w-full py-2 text-white text-base font-medium rounded-lg hover:bg-gray-300 transition duration-200"
         >
