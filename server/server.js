@@ -10,6 +10,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());  
 
+
 //*********************************************************************************** */
 app.post("/mainasset", async (req, res) => {
   try {
@@ -34,7 +35,7 @@ app.post("/mainasset", async (req, res) => {
     }
 
     const newAsset = await pool.query(
-      `INSERT INTO "MainAsset" (
+      `INSERT INTO "mainasset" (
         "main_asset_ID", main_asset_name, status, fiscal_year, date_received,
         badget_limit, averange_price, budget_type, asset_type,
         location_use, location_deliver, usage, reponsible_person
@@ -56,7 +57,7 @@ app.post("/mainasset", async (req, res) => {
 // API สำหรับดึงข้อมูลทั้งหมดจากตาราง MainAsset
 app.get("/mainasset", async (req, res) => {
   try {
-    const query = 'SELECT * FROM "MainAsset"';
+    const query = 'SELECT * FROM "mainasset"';
     const result = await pool.query(query);
 
     res.status(200).json(result.rows);
@@ -71,7 +72,7 @@ app.get("/mainasset/:main_asset_ID", async (req, res) => {
   const { main_asset_ID } = req.params;
 
   try {
-    const query = `SELECT * FROM "MainAsset" WHERE "main_asset_ID" = $1`;
+    const query = `SELECT * FROM "mainasset" WHERE "main_asset_ID" = $1`;
     const result = await pool.query(query, [main_asset_ID]);
 
     if (result.rows.length === 0) {
@@ -214,7 +215,7 @@ app.post('/api/subasset', async (req, res) => {
 // API สำหรับดึงข้อมูลจากตาราง SubAsset
 app.get('/api/subasset', async (req, res) => {
   try {
-    const query = `SELECT * FROM public."SubAsset"`;
+    const query = `SELECT * FROM public."subasset"`;
     const result = await pool.query(query);
 
     res.status(200).json(result.rows);
@@ -229,7 +230,7 @@ app.get('/api/subasset/:sub_asset_ID', async (req, res) => {
   const { sub_asset_ID } = req.params;
 
   try {
-    const query = `SELECT * FROM public."SubAsset" WHERE "sub_asset_ID" = $1`;
+    const query = `SELECT * FROM public."subasset" WHERE "sub_asset_ID" = $1`;
     const result = await pool.query(query, [sub_asset_ID]);
 
     if (result.rows.length === 0) {
@@ -254,7 +255,7 @@ app.post("/department", async (req, res) => {
 
   try {
     const result = await pool.query(
-      'INSERT INTO "Department" ("department_ID", department_name) VALUES ($1, $2) RETURNING *',
+      'INSERT INTO "department" ("department_ID", department_name) VALUES ($1, $2) RETURNING *',
       [department_ID, department_name]
     );
     res.status(201).json({ message: "เพิ่มภาควิชาเรียบร้อย", data: result.rows[0] });
@@ -267,7 +268,7 @@ app.post("/department", async (req, res) => {
 // API สำหรับดูข้อมูลสาขาวิชา
 app.get("/department", async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM "Department" ORDER BY "department_ID" ASC');
+    const result = await pool.query('SELECT * FROM "department" ORDER BY "department_ID" ASC');
     res.json(result.rows);
   } catch (error) {
     console.error("Database error: ", error);
@@ -279,7 +280,7 @@ app.get("/department/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await pool.query('SELECT * FROM "Department" WHERE "department_ID" = $1', [id]);
+    const result = await pool.query('SELECT * FROM "department" WHERE "department_ID" = $1', [id]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "ไม่พบสาขาวิชาที่ต้องการ" });
@@ -298,7 +299,7 @@ app.delete("/department/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await pool.query('DELETE FROM "Department" WHERE "department_ID" = $1 RETURNING *', [id]);
+    const result = await pool.query('DELETE FROM "department" WHERE "department_ID" = $1 RETURNING *', [id]);
 
     if (result.rowCount === 0) {
       return res.status(404).json({ error: "ไม่พบภาควิชาที่ต้องการลบ" });
@@ -322,7 +323,7 @@ app.put("/department/:id", async (req, res) => {
 
   try {
     const result = await pool.query(
-      'UPDATE "Department" SET department_name = $1 WHERE "department_ID" = $2 RETURNING *',
+      'UPDATE "department" SET department_name = $1 WHERE "department_ID" = $2 RETURNING *',
       [department_name, id]
     );
 
@@ -340,14 +341,14 @@ app.put("/department/:id", async (req, res) => {
 //เพิ่มหลักสูตร
 app.post("/curriculum", async (req, res) => {
   const { curriculum_ID, curriculum_name, department_ID } = req.body;
-
+  console.log("Received data:", req.body); // ตรวจสอบข้อมูลที่ได้รับ
   if (!curriculum_ID || !curriculum_name || !department_ID) {
     return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" });
   }
 
   try {
     const result = await pool.query(
-      'INSERT INTO "Curriculum" ("curriculum_ID", curriculum_name, "department_ID") VALUES ($1, $2, $3) RETURNING *',
+      'INSERT INTO "curriculum" ("curriculum_ID", curriculum_name, "department_ID") VALUES ($1, $2, $3) RETURNING *',
       [curriculum_ID, curriculum_name, department_ID]
     );
     res.status(201).json({ message: "เพิ่มหลักสูตรเรียบร้อย", data: result.rows[0] });
@@ -360,7 +361,7 @@ app.post("/curriculum", async (req, res) => {
 // ดึงข้อมูลหลักสูตรทั้งหมด
 app.get("/curriculum", async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM "Curriculum"');
+    const result = await pool.query('SELECT * FROM "curriculum"');
     res.status(200).json({ data: result.rows });
   } catch (error) {
     console.error("Database error: ", error);
@@ -373,7 +374,7 @@ app.get("/curriculum/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await pool.query('SELECT * FROM "Curriculum" WHERE "curriculum_ID" = $1', [id]);
+    const result = await pool.query('SELECT * FROM "curriculum" WHERE "curriculum_ID" = $1', [id]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "ไม่พบหลักสูตรที่ต้องการ" });
@@ -397,7 +398,7 @@ app.put("/curriculum/:id", async (req, res) => {
 
   try {
     const result = await pool.query(
-      'UPDATE "Curriculum" SET curriculum_name = $1, "department_ID" = $2 WHERE "curriculum_ID" = $3 RETURNING *',
+      'UPDATE "curriculum" SET curriculum_name = $1, "department_ID" = $2 WHERE "curriculum_ID" = $3 RETURNING *',
       [curriculum_name, department_ID, id]
     );
 
@@ -418,7 +419,7 @@ app.delete("/curriculum/:id", async (req, res) => {
 
   try {
     const result = await pool.query(
-      'DELETE FROM "Curriculum" WHERE "curriculum_ID" = $1 RETURNING *',
+      'DELETE FROM "curriculum" WHERE "curriculum_ID" = $1 RETURNING *',
       [id]
     );
 
@@ -447,7 +448,7 @@ app.post("/user", async (req, res) => {
 
   try {
     await pool.query(
-      `INSERT INTO "User" ("user_ID", user_name, user_email, "department_ID") VALUES ($1, $2, $3, $4)`,
+      `INSERT INTO "user" ("user_ID", user_name, user_email, "department_ID") VALUES ($1, $2, $3, $4)`,
       [user_ID, user_name, user_email, department_ID]
     );
 
