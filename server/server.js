@@ -86,92 +86,71 @@ app.get("/mainasset/:main_asset_ID", async (req, res) => {
   }
 });
 
-
-// API: อัปเดตข้อมูลพัสดุหลัก
-const updateAsset = async (data, main_asset_id) => {
-  // ตรวจสอบข้อมูลที่สำคัญที่ต้องอัปเดต
-  if (!data.main_asset_name) {
-    throw new Error("Main asset name is required.");
-  }
+// ลบข้อมูล MainAsset ตาม main_asset_ID
+app.delete("/mainasset/:main_asset_ID", async (req, res) => {
+  const { main_asset_ID } = req.params;
 
   try {
-    const result = await pool.query(
-      `UPDATE mainasset 
-      SET 
-        main_asset_name = $1, 
-        status = $2, 
-        fiscal_year = $3, 
-        date_received = $4,
-        badget_limit = $5,
-        averange_price = $6,
-        budget_type = $7,
-        asset_type = $8,
-        location_use = $9,
-        location_deliver = $10,
-        usage = $11,
-        reponsible_person = $12
-      WHERE main_asset_id = $13
-      RETURNING *`,
-      [
-        data.main_asset_name,
-        data.status || null,
-        data.fiscal_year || null,
-        data.date_received || null,
-        data.badget_limit || null,
-        data.averange_price || null,
-        data.budget_type || null,
-        data.asset_type || null,
-        data.location_use || null,
-        data.location_deliver || null,
-        data.usage || null,
-        data.reponsible_person || null,
-        main_asset_id  // ใช้ main_asset_id เป็น string
-      ]
-    );
+    const query = `DELETE FROM "mainasset" WHERE "main_asset_ID" = $1 RETURNING *`;
+    const result = await pool.query(query, [main_asset_ID]);
 
     if (result.rows.length === 0) {
-      throw new Error("Asset not found");
+      return res.status(404).json({ message: "MainAsset not found" });
     }
 
-    return result.rows[0];
+    res.status(200).json({ message: "Asset deleted successfully", data: result.rows[0] });
   } catch (error) {
-    console.error("Database update error:", error.message);
-    throw error;
+    console.error("Error deleting asset:", error);
+    res.status(500).json({ error: "Server Error" });
   }
-};
+});
 
-// API: อัปเดตข้อมูลพัสดุหลัก
-app.put('/api/mainasset/:main_asset_ID', async (req, res) => {
-  const { main_asset_id } = req.params;  // รับ main_asset_id จาก URL parameter
-  const data = req.body;  // รับข้อมูลจาก request body
+// อัปเดตข้อมูล MainAsset ตาม main_asset_ID
+app.put("/mainasset/:main_asset_ID", async (req, res) => {
+  const { main_asset_ID } = req.params;
+  const {
+    main_asset_name,
+    status,
+    fiscal_year,
+    date_received,
+    badget_limit,
+    averange_price,
+    budget_type,
+    asset_type,
+    location_use,
+    location_deliver,
+    usage,
+    reponsible_person
+  } = req.body;
 
   try {
-    const updatedAsset = await updateAsset(data, main_asset_id);
-    res.status(200).json(updatedAsset);  // ส่งข้อมูลที่ถูกอัปเดตกลับ
+    const query = `
+      UPDATE "mainasset"
+      SET 
+        main_asset_name = $1, status = $2, fiscal_year = $3, date_received = $4,
+        badget_limit = $5, averange_price = $6, budget_type = $7, asset_type = $8,
+        location_use = $9, location_deliver = $10, usage = $11, reponsible_person = $12
+      WHERE "main_asset_ID" = $13 RETURNING *`;
+    
+    const result = await pool.query(query, [
+      main_asset_name, status, fiscal_year, date_received,
+      badget_limit, averange_price, budget_type, asset_type,
+      location_use, location_deliver, usage, reponsible_person,
+      main_asset_ID
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "MainAsset not found" });
+    }
+
+    res.status(200).json({ message: "Asset updated successfully", data: result.rows[0] });
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error.', error: error.message });
+    console.error("Error updating asset:", error);
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
 
-// API: ลบข้อมูลพัสดุโดย `main_asset_id`
-// app.delete('/api/mainasset/:main_asset_ID', async (req, res) => {
-//   try {
-//     const result = await pool.query('DELETE FROM mainasset WHERE main_asset_id = $1 RETURNING *', [req.params.main_asset_id]);
-//     if (result.rows.length === 0) {
-//       return res.status(404).json({ error: 'Asset not found' });
-//     }
-//     res.status(200).json({ message: 'Asset deleted successfully', deletedAsset: result.rows[0] });
-//   } catch (error) {
-//     res.status(500).json({ error: 'Error deleting data' });
-//   }
-// });
-
-app.delete('/mainasset/:id', (req, res) => {
-  const assetId = req.params.id;
-  // ใส่ logic ในการลบ asset ที่มี id ตามที่ระบุ
-  res.send(`ลบ asset ที่มี ID: ${assetId} แล้ว`);
-});
 
 // ************************************************************************************************
 
@@ -227,8 +206,8 @@ app.get('/api/subasset', async (req, res) => {
 
     res.status(200).json(result.rows);
   } catch (error) {
-    console.error("Error fetching sub assets:", error);
-    res.status(500).json({ error: 'Error fetching sub assets' });
+    console.error("Error fetching subassets:", error);
+    res.status(500).json({ error: 'Error fetching subassets' });
   }
 });
 
@@ -444,32 +423,56 @@ app.delete("/curriculum/:id", async (req, res) => {
 
 //*************************************************************************************************** */
 //API จัดการสิทธิ์
+app.post('/api/user', async (req, res) => {
+  const { user_name, user_email, department_ID, role_ID, user_role_name } = req.body;
 
-//เพิ่มผู้ใช้
-app.post("/user", async (req, res) => {
-  const { user_ID, user_name, user_email, department_ID, role_ID } = req.body;
-
-  if (!user_ID || !user_name || !user_email || !department_ID || !role_ID) {
-    return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" });
+  if (!user_name || !user_email || !department_ID || !role_ID || !user_role_name) {
+    return res.status(400).json({ error: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
   }
 
+  const client = await pool.connect();
   try {
-    await pool.query(
-      `INSERT INTO "user" ("user_ID", user_name, user_email, "department_ID") VALUES ($1, $2, $3, $4)`,
-      [user_ID, user_name, user_email, department_ID]
+    await client.query('BEGIN');
+
+    // ตรวจสอบว่า role_ID มีอยู่ในตาราง Role หรือไม่
+    const roleCheck = await client.query(
+      `SELECT "role_ID" FROM public."Role" WHERE "role_ID" = $1`, [role_ID]
+    );
+    if (roleCheck.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'role_ID ไม่ถูกต้อง' });
+    }
+
+    // เพิ่มข้อมูลผู้ใช้ และให้ user_ID เป็น auto-increment (ถ้าใช้ SERIAL)
+    const userInsert = await client.query(
+      `INSERT INTO public."user" (user_name, user_email, "department_ID") 
+       VALUES ($1, $2, $3) RETURNING "user_ID"`,
+      [user_name, user_email, department_ID]
     );
 
-    await pool.query(
-      `INSERT INTO "userRole" ("user_ID", "role_ID") VALUES ($1, $2)`,
-      [user_ID, role_ID]
+    const user_ID = userInsert.rows[0].user_ID; // ดึง user_ID ที่เพิ่มมา
+
+    // เพิ่มข้อมูล UserRole
+    await client.query(
+      `INSERT INTO public."userrole" (user_role_name, "user_ID", "role_ID") 
+       VALUES ($1, $2, $3)`,
+      [user_role_name, user_ID, role_ID]
     );
 
-    res.status(201).json({ message: "เพิ่มผู้ใช้เรียบร้อย" });
+    await client.query('COMMIT');
+    res.status(201).json({ message: 'เพิ่มผู้ใช้และบทบาทเรียบร้อย', user_ID });
+
   } catch (error) {
-    console.error("Database error:", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการเพิ่มข้อมูล" });
+    await client.query('ROLLBACK');
+    console.error('Database error:', error);
+    res.status(500).json({ error: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูล' });
+  } finally {
+    client.release();
   }
 });
+
+
+
 
 
 app.listen(PORT, () => {
