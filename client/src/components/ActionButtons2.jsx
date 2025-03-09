@@ -4,7 +4,7 @@ import axios from "axios";
 const ActionButtons2 = ({ formData }) => {
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/MainAsset", formData);
+      const response = await axios.post("http://localhost:5000/mainasset", formData);
       alert("บันทึกข้อมูลสำเร็จ!");
       console.log("Response:", response.data);
     } catch (error) {

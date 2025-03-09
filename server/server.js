@@ -57,7 +57,10 @@ app.post("/mainasset", async (req, res) => {
 // API สำหรับดึงข้อมูลทั้งหมดจากตาราง MainAsset
 app.get("/mainasset", async (req, res) => {
   try {
-    const query = 'SELECT * FROM "mainasset"';
+    const query = `select mainasset."main_asset_ID",main_asset_name,mainasset.status,department_name, count(*)as subamount from mainasset  left join subasset
+on mainasset."main_asset_ID"=subasset."main_asset_ID" 
+inner join department on department."department_ID" = mainasset."department_ID"
+group by mainasset."main_asset_ID",main_asset_name,mainasset.status,department_name;`; 
     const result = await pool.query(query);
 
     res.status(200).json(result.rows);
@@ -86,24 +89,28 @@ app.get("/mainasset/:main_asset_ID", async (req, res) => {
   }
 });
 
-// ลบข้อมูล MainAsset ตาม main_asset_ID
-app.delete("/mainasset/:main_asset_ID", async (req, res) => {
-  const { main_asset_ID } = req.params;
+app.delete("/mainasset", async (req, res) => {
+  const { main_asset_ID } = req.body;
+
+  if (!main_asset_ID) {
+    return res.status(400).json({ error: "กรุณาระบุ main_asset_ID ที่ต้องการลบ" });
+  }
 
   try {
-    const query = `DELETE FROM "mainasset" WHERE "main_asset_ID" = $1 RETURNING *`;
+    const query = `DELETE FROM public.mainasset WHERE "main_asset_ID" = $1 RETURNING *`;
     const result = await pool.query(query, [main_asset_ID]);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "MainAsset not found" });
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "ไม่พบข้อมูลที่ต้องการลบ" });
     }
 
-    res.status(200).json({ message: "Asset deleted successfully", data: result.rows[0] });
+    res.status(200).json({ message: "ลบข้อมูลสำเร็จ", deletedData: result.rows[0] });
   } catch (error) {
     console.error("Error deleting asset:", error);
     res.status(500).json({ error: "Server Error" });
   }
 });
+
 
 // อัปเดตข้อมูล MainAsset ตาม main_asset_ID
 app.put("/mainasset/:main_asset_ID", async (req, res) => {
@@ -421,8 +428,8 @@ app.delete("/curriculum/:id", async (req, res) => {
 });
 
 
-//*************************************************************************************************** */
-//API จัดการสิทธิ์
+//****************************************************************************************************************** */
+//เพิ่มข้อมูลผู้ใช้
 app.post('/api/user', async (req, res) => {
   const { user_name, user_email, department_ID, role_ID, user_role_name } = req.body;
 
@@ -434,33 +441,46 @@ app.post('/api/user', async (req, res) => {
   try {
     await client.query('BEGIN');
 
-    // ตรวจสอบว่า role_ID มีอยู่ในตาราง Role หรือไม่
+    // ตรวจสอบว่า role_ID มีอยู่หรือไม่
     const roleCheck = await client.query(
-      `SELECT "role_ID" FROM public."Role" WHERE "role_ID" = $1`, [role_ID]
+      `SELECT "role_ID" FROM public."role" WHERE "role_ID" = $1`, [role_ID]
     );
     if (roleCheck.rows.length === 0) {
       await client.query('ROLLBACK');
       return res.status(400).json({ error: 'role_ID ไม่ถูกต้อง' });
     }
 
-    // เพิ่มข้อมูลผู้ใช้ และให้ user_ID เป็น auto-increment (ถ้าใช้ SERIAL)
+    // ตรวจสอบว่ามี user_email ซ้ำหรือไม่
+    const emailCheck = await client.query(
+      `SELECT "user_ID" FROM public."user" WHERE user_email = $1`, [user_email]
+    );
+    if (emailCheck.rows.length > 0) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'อีเมลนี้ถูกใช้ไปแล้ว' });
+    }
+
+    // เพิ่มข้อมูลผู้ใช้
     const userInsert = await client.query(
       `INSERT INTO public."user" (user_name, user_email, "department_ID") 
-       VALUES ($1, $2, $3) RETURNING "user_ID"`,
+       VALUES ($1, $2, $3) RETURNING "user_ID", user_name, user_email, "department_ID"`,
       [user_name, user_email, department_ID]
     );
 
     const user_ID = userInsert.rows[0].user_ID; // ดึง user_ID ที่เพิ่มมา
 
     // เพิ่มข้อมูล UserRole
-    await client.query(
+    const userRoleInsert = await client.query(
       `INSERT INTO public."userrole" (user_role_name, "user_ID", "role_ID") 
-       VALUES ($1, $2, $3)`,
+       VALUES ($1, $2, $3) RETURNING *`,
       [user_role_name, user_ID, role_ID]
     );
 
     await client.query('COMMIT');
-    res.status(201).json({ message: 'เพิ่มผู้ใช้และบทบาทเรียบร้อย', user_ID });
+    res.status(201).json({
+      message: 'เพิ่มผู้ใช้และบทบาทเรียบร้อย',
+      user: userInsert.rows[0],
+      userRole: userRoleInsert.rows[0],
+    });
 
   } catch (error) {
     await client.query('ROLLBACK');
@@ -470,8 +490,6 @@ app.post('/api/user', async (req, res) => {
     client.release();
   }
 });
-
-
 
 
 
