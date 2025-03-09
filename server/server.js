@@ -20,21 +20,45 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // กำหนดค่า LDAP
-const ldapAuth = new LdapAuth('10.252.92.100', 389, 'dc=kmitl,dc=ac,dc=th');
+// สร้างอินสแตนซ์ของ LdapAuth
+const ldapAuth = new LdapAuth('10.252.92.100', 389, 'dc=kmitl,dc=ac,dc=th'); 
 
-// Endpoint สำหรับ Login ผ่าน LDAP
+// Endpoint สำหรับตรวจสอบการเข้าสู่ระบบ
 app.post('/api/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const authResult = await ldapAuth.authenticate(username, password);
-    if (authResult) {
-      res.json({ success: true });
+  const { username, password } = req.body;
+
+  console.log('Request Body:', req.body); // แสดงค่าที่รับมาจาก frontend
+  
+  if (!username || !password) {   
+    return res.status(400).json({ message: 'Username and password are required' });
+  }
+  
+  try { 
+    const isAuthenticated = await ldapAuth.authenticate(username, password);
+    
+    console.log('Authentication result:', isAuthenticated);  // แสดงผลลัพธ์การตรวจสอบผู้ใช้
+    
+    if (isAuthenticated) {
+      const userInfo = await ldapAuth.getUserInfo(username);
+      console.log('User Info:', userInfo);  // แสดงข้อมูลผู้ใช้จาก LDAP
+
+      res.json({
+        success: true,
+        message: 'Authentication successful',
+        user: userInfo // ส่งข้อมูลผู้ใช้กลับไปยัง frontend
+      });
     } else {
-      res.status(401).json({ success: false, message: 'Invalid credentials' });
+      res.status(401).json({
+        success: false,
+        message: 'Invalid credentials'
+      });
     }
   } catch (error) {
-    console.error('Error during login authentication:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error('Error:', error);  // แสดงข้อผิดพลาดหากเกิดขึ้น
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 });
 
