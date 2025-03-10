@@ -15,7 +15,7 @@ app.use(express.json());
 app.post("/mainasset", async (req, res) => {
   try {
     const {
-      main_asset_ID,
+      main_asset_id,
       main_asset_name,
       status,
       fiscal_year,
@@ -30,18 +30,18 @@ app.post("/mainasset", async (req, res) => {
       reponsible_person
     } = req.body;
 
-    if (!main_asset_ID || !main_asset_name) {
+    if (!main_asset_id || !main_asset_name) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
     const newAsset = await pool.query(
       `INSERT INTO "mainasset" (
-        "main_asset_ID", main_asset_name, status, fiscal_year, date_received,
+        "main_asset_id", main_asset_name, status, fiscal_year, date_received,
         badget_limit, averange_price, budget_type, asset_type,
         location_use, location_deliver, usage, reponsible_person
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
       [
-        main_asset_ID, main_asset_name, status, fiscal_year, date_received,
+        main_asset_id, main_asset_name, status, fiscal_year, date_received,
         badget_limit, averange_price, budget_type, asset_type,
         location_use, location_deliver, usage, reponsible_person
       ]
@@ -57,10 +57,10 @@ app.post("/mainasset", async (req, res) => {
 // API สำหรับดึงข้อมูลทั้งหมดจากตาราง MainAsset
 app.get("/mainasset", async (req, res) => {
   try {
-    const query = `select mainasset."main_asset_ID",main_asset_name,mainasset.status,department_name, count(*)as subamount from mainasset  left join subasset
-on mainasset."main_asset_ID"=subasset."main_asset_ID" 
-inner join department on department."department_ID" = mainasset."department_ID"
-group by mainasset."main_asset_ID",main_asset_name,mainasset.status,department_name;`; 
+    const query = `select mainasset."main_asset_id",main_asset_name,mainasset.status,department_name, count(*)as subamount from mainasset  left join subasset
+on mainasset."main_asset_id"=subasset."main_asset_id" 
+inner join department on department."department_id" = mainasset."department_id"
+group by mainasset."main_asset_id",main_asset_name,mainasset.status,department_name;`; 
     const result = await pool.query(query);
 
     res.status(200).json(result.rows);
@@ -71,11 +71,11 @@ group by mainasset."main_asset_ID",main_asset_name,mainasset.status,department_n
 });
 
 // API สำหรับดึงข้อมูล MainAsset ตาม main_asset_ID
-app.get("/mainasset/:main_asset_ID", async (req, res) => {
+app.get("/mainasset/:main_asset_id", async (req, res) => {
   const { main_asset_ID } = req.params;
 
   try {
-    const query = `SELECT * FROM "mainasset" WHERE "main_asset_ID" = $1`;
+    const query = `SELECT * FROM "mainasset" WHERE "main_asset_id" = $1`;
     const result = await pool.query(query, [main_asset_ID]);
 
     if (result.rows.length === 0) {
@@ -113,11 +113,11 @@ app.get("/mainasset/:main_asset_ID", async (req, res) => {
 //   }
 // });
 
-app.delete("/mainasset/:main_asset_ID", async (req, res) => {
+app.delete("/mainasset/:main_asset_id", async (req, res) => {
   const { main_asset_ID } = req.params; // รับค่า main_asset_ID จาก URL parameter
 
   try {
-    const query = `DELETE FROM public.mainasset WHERE "main_asset_ID" = $1 RETURNING *`;
+    const query = `DELETE FROM public.mainasset WHERE "main_asset_id" = $1 RETURNING *`;
     const result = await pool.query(query, [main_asset_ID]);
 
     if (result.rowCount === 0) {
@@ -134,7 +134,7 @@ app.delete("/mainasset/:main_asset_ID", async (req, res) => {
 
 
 // อัปเดตข้อมูล MainAsset ตาม main_asset_ID
-app.put("/mainasset/:main_asset_ID", async (req, res) => {
+app.put("/mainasset/:main_asset_id", async (req, res) => {
   const { main_asset_ID } = req.params;
   const {
     main_asset_name,
@@ -185,7 +185,7 @@ app.put("/mainasset/:main_asset_ID", async (req, res) => {
 // API สำหรับเพิ่มข้อมูลในตาราง SubAsset
 app.post('/api/subasset', async (req, res) => {
   const {
-    sub_asset_ID,
+    sub_asset_id,
     sub_asset_name,
     type,
     details,
@@ -193,20 +193,20 @@ app.post('/api/subasset', async (req, res) => {
     unit_price,
     status,
     counting_unit,
-    main_asset_ID,
+    main_asset_id,
   } = req.body;
 
   try {
     // เชื่อมต่อกับฐานข้อมูลและเพิ่มข้อมูลลงในตาราง SubAsset
     const query = `
       INSERT INTO public."subasset"(
-        "sub_asset_ID", sub_asset_name, type, details, quantity, unit_price, status, counting_unit, "main_asset_ID"
+        "sub_asset_id", sub_asset_name, type, details, quantity, unit_price, status, counting_unit, "main_asset_id"
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `;
     
     const values = [
-      sub_asset_ID,
+      sub_asset_id,
       sub_asset_name,
       type,
       details,
@@ -214,7 +214,7 @@ app.post('/api/subasset', async (req, res) => {
       unit_price,
       status,
       counting_unit,
-      main_asset_ID,
+      main_asset_id,
     ];
 
     await pool.query(query, values);
@@ -240,12 +240,12 @@ app.get('/api/subasset', async (req, res) => {
 });
 
 // API สำหรับดึงข้อมูล SubAsset โดยค้นหาตาม sub_asset_ID
-app.get('/api/subasset/:sub_asset_ID', async (req, res) => {
-  const { sub_asset_ID } = req.params;
+app.get('/api/subasset/:sub_asset_id', async (req, res) => {
+  const { sub_asset_id } = req.params;
 
   try {
-    const query = `SELECT * FROM public."subasset" WHERE "sub_asset_ID" = $1`;
-    const result = await pool.query(query, [sub_asset_ID]);
+    const query = `SELECT * FROM public."subasset" WHERE "sub_asset_id" = $1`;
+    const result = await pool.query(query, [sub_asset_id]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'SubAsset not found' });
@@ -261,16 +261,16 @@ app.get('/api/subasset/:sub_asset_ID', async (req, res) => {
 
 //API สำหรับเพิ่มข้อมูลสาขาวิชา
 app.post("/department", async (req, res) => {
-  const { department_ID, department_name } = req.body;
+  const { department_id, department_name } = req.body;
 
-  if (!department_ID || !department_name) {
+  if (!department_id || !department_name) {
     return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" });
   }
 
   try {
     const result = await pool.query(
-      'INSERT INTO "department" ("department_ID", department_name) VALUES ($1, $2) RETURNING *',
-      [department_ID, department_name]
+      'INSERT INTO "department" ("department_id", department_name) VALUES ($1, $2) RETURNING *',
+      [department_id, department_name]
     );
     res.status(201).json({ message: "เพิ่มภาควิชาเรียบร้อย", data: result.rows[0] });
   } catch (error) {
@@ -282,7 +282,7 @@ app.post("/department", async (req, res) => {
 // API สำหรับดูข้อมูลสาขาวิชา
 app.get("/department", async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM "department" ORDER BY "department_ID" ASC');
+    const result = await pool.query('SELECT * FROM "department" ORDER BY "department_id" ASC');
     res.json(result.rows);
   } catch (error) {
     console.error("Database error: ", error);
@@ -294,7 +294,7 @@ app.get("/department/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await pool.query('SELECT * FROM "department" WHERE "department_ID" = $1', [id]);
+    const result = await pool.query('SELECT * FROM "department" WHERE "department_id" = $1', [id]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "ไม่พบสาขาวิชาที่ต้องการ" });
@@ -313,7 +313,7 @@ app.delete("/department/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await pool.query('DELETE FROM "department" WHERE "department_ID" = $1 RETURNING *', [id]);
+    const result = await pool.query('DELETE FROM "department" WHERE "department_id" = $1 RETURNING *', [id]);
 
     if (result.rowCount === 0) {
       return res.status(404).json({ error: "ไม่พบภาควิชาที่ต้องการลบ" });
@@ -337,7 +337,7 @@ app.put("/department/:id", async (req, res) => {
 
   try {
     const result = await pool.query(
-      'UPDATE "department" SET department_name = $1 WHERE "department_ID" = $2 RETURNING *',
+      'UPDATE "department" SET department_name = $1 WHERE "department_id" = $2 RETURNING *',
       [department_name, id]
     );
 
@@ -354,16 +354,16 @@ app.put("/department/:id", async (req, res) => {
 //*************************************************************************************************** */
 //เพิ่มหลักสูตร
 app.post("/curriculum", async (req, res) => {
-  const { curriculum_ID, curriculum_name, department_ID } = req.body;
+  const { curriculum_id, curriculum_name, department_id } = req.body;
   console.log("Received data:", req.body); // ตรวจสอบข้อมูลที่ได้รับ
-  if (!curriculum_ID || !curriculum_name || !department_ID) {
+  if (!curriculum_id || !curriculum_name || !department_id) {
     return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" });
   }
 
   try {
     const result = await pool.query(
-      'INSERT INTO "curriculum" ("curriculum_ID", curriculum_name, "department_ID") VALUES ($1, $2, $3) RETURNING *',
-      [curriculum_ID, curriculum_name, department_ID]
+      'INSERT INTO "curriculum" ("curriculum_id", curriculum_name, "department_id") VALUES ($1, $2, $3) RETURNING *',
+      [curriculum_id, curriculum_name, department_id]
     );
     res.status(201).json({ message: "เพิ่มหลักสูตรเรียบร้อย", data: result.rows[0] });
   } catch (error) {
@@ -388,7 +388,7 @@ app.get("/curriculum/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await pool.query('SELECT * FROM "curriculum" WHERE "curriculum_ID" = $1', [id]);
+    const result = await pool.query('SELECT * FROM "curriculum" WHERE "curriculum_id" = $1', [id]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "ไม่พบหลักสูตรที่ต้องการ" });
@@ -404,15 +404,15 @@ app.get("/curriculum/:id", async (req, res) => {
 //Update ข้อมูลหลักสูตร ตาม ID
 app.put("/curriculum/:id", async (req, res) => {
   const { id } = req.params;
-  const { curriculum_name, department_ID } = req.body;
+  const { curriculum_name, department_id } = req.body;
 
-  if (!curriculum_name || !department_ID) {
+  if (!curriculum_name || !department_id) {
     return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" });
   }
 
   try {
     const result = await pool.query(
-      'UPDATE "curriculum" SET curriculum_name = $1, "department_ID" = $2 WHERE "curriculum_ID" = $3 RETURNING *',
+      'UPDATE "curriculum" SET curriculum_name = $1, "department_id" = $2 WHERE "curriculum_id" = $3 RETURNING *',
       [curriculum_name, department_ID, id]
     );
 
@@ -433,7 +433,7 @@ app.delete("/curriculum/:id", async (req, res) => {
 
   try {
     const result = await pool.query(
-      'DELETE FROM "curriculum" WHERE "curriculum_ID" = $1 RETURNING *',
+      'DELETE FROM "curriculum" WHERE "curriculum_id" = $1 RETURNING *',
       [id]
     );
 
@@ -452,9 +452,9 @@ app.delete("/curriculum/:id", async (req, res) => {
 //****************************************************************************************************************** */
 //เพิ่มข้อมูลผู้ใช้
 app.post('/api/user', async (req, res) => {
-  const { user_name, user_email, department_ID, role_ID, user_role_name } = req.body;
+  const { user_name, user_email, department_id, role_id, user_role_name } = req.body;
 
-  if (!user_name || !user_email || !department_ID || !role_ID || !user_role_name) {
+  if (!user_name || !user_email || !department_id || !role_id || !user_role_name) {
     return res.status(400).json({ error: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
   }
 
@@ -464,7 +464,7 @@ app.post('/api/user', async (req, res) => {
 
     // ตรวจสอบว่า role_ID มีอยู่หรือไม่
     const roleCheck = await client.query(
-      `SELECT "role_ID" FROM public."role" WHERE "role_ID" = $1`, [role_ID]
+      `SELECT "role_id" FROM public."role" WHERE "role_id" = $1`, [role_id]
     );
     if (roleCheck.rows.length === 0) {
       await client.query('ROLLBACK');
@@ -473,7 +473,7 @@ app.post('/api/user', async (req, res) => {
 
     // ตรวจสอบว่ามี user_email ซ้ำหรือไม่
     const emailCheck = await client.query(
-      `SELECT "user_ID" FROM public."user" WHERE user_email = $1`, [user_email]
+      `SELECT "user_id" FROM public."user" WHERE user_email = $1`, [user_email]
     );
     if (emailCheck.rows.length > 0) {
       await client.query('ROLLBACK');
@@ -482,8 +482,8 @@ app.post('/api/user', async (req, res) => {
 
     // เพิ่มข้อมูลผู้ใช้
     const userInsert = await client.query(
-      `INSERT INTO public."user" (user_name, user_email, "department_ID") 
-       VALUES ($1, $2, $3) RETURNING "user_ID", user_name, user_email, "department_ID"`,
+      `INSERT INTO public."user" (user_name, user_email, "department_id") 
+       VALUES ($1, $2, $3) RETURNING "user_id", user_name, user_email, "department_id"`,
       [user_name, user_email, department_ID]
     );
 
@@ -491,7 +491,7 @@ app.post('/api/user', async (req, res) => {
 
     // เพิ่มข้อมูล UserRole
     const userRoleInsert = await client.query(
-      `INSERT INTO public."userrole" (user_role_name, "user_ID", "role_ID") 
+      `INSERT INTO public."userrole" (user_role_name, "user_id", "role_id") 
        VALUES ($1, $2, $3) RETURNING *`,
       [user_role_name, user_ID, role_ID]
     );

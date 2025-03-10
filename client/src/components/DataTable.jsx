@@ -157,7 +157,7 @@ const DataTable = () => {
             <th className="border px-4 py-2 hidden lg:table-cell">ชื่อทรัพย์สิน</th>
             <th className="border px-4 py-2">ภาควิชา</th>
             <th className="border px-4 py-2">จำนวน</th>
-            <th className="border px-4 py-2">หน่วยนับ</th>
+            {/* <th className="border px-4 py-2">หน่วยนับ</th> */}
             <th className="border px-4 py-2">สภาพการครุภัณฑ์</th>
             <th className="border px-4 py-2">จัดการ</th>
           </tr>
@@ -169,7 +169,7 @@ const DataTable = () => {
               <td className="border px-4 py-2 hidden lg:table-cell">{item.main_asset_name}</td>
               <td className="border px-4 py-2">{item.department || "-"}</td>
               <td className="border px-4 py-2">{item.subamount || 0}</td>
-              <td className="border px-4 py-2">{item.unit || "-"}</td>
+              {/* <td className="border px-4 py-2">{item.unit || "-"}</td> */}
               <td className="border px-4 py-2">{item.status}</td>
               <td className="border px-4 py-2 flex justify-center space-x-2">
                 <Link to="/show-info" className="text-blue-500 hover:text-blue-700 bg-gray-200 rounded-lg px-3 py-1">ดู</Link>
