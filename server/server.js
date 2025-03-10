@@ -57,10 +57,10 @@ app.post("/mainasset", async (req, res) => {
 // API สำหรับดึงข้อมูลทั้งหมดจากตาราง MainAsset
 app.get("/mainasset", async (req, res) => {
   try {
-    const query = `select mainasset."main_asset_id",main_asset_name,mainasset.status,department_name, count(*)as subamount from mainasset  left join subasset
-on mainasset."main_asset_id"=subasset."main_asset_id" 
-inner join department on department."department_id" = mainasset."department_id"
-group by mainasset."main_asset_id",main_asset_name,mainasset.status,department_name;`; 
+    const query = `select mainasset.main_asset_id,main_asset_name,mainasset.status,department_name, count(*)as subamount from mainasset  left join subasset
+on mainasset.main_asset_id=subasset.main_asset_id 
+inner join department on department.department_id = mainasset.department_id
+group by mainasset.main_asset_id,main_asset_name,mainasset.status,department_name;`; 
     const result = await pool.query(query);
 
     res.status(200).json(result.rows);
@@ -72,11 +72,11 @@ group by mainasset."main_asset_id",main_asset_name,mainasset.status,department_n
 
 // API สำหรับดึงข้อมูล MainAsset ตาม main_asset_ID
 app.get("/mainasset/:main_asset_id", async (req, res) => {
-  const { main_asset_ID } = req.params;
+  const { main_asset_id } = req.params;
 
   try {
     const query = `SELECT * FROM "mainasset" WHERE "main_asset_id" = $1`;
-    const result = await pool.query(query, [main_asset_ID]);
+    const result = await pool.query(query, [main_asset_id]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "MainAsset not found" });
@@ -114,11 +114,11 @@ app.get("/mainasset/:main_asset_id", async (req, res) => {
 // });
 
 app.delete("/mainasset/:main_asset_id", async (req, res) => {
-  const { main_asset_ID } = req.params; // รับค่า main_asset_ID จาก URL parameter
+  const { main_asset_id } = req.params; // รับค่า main_asset_ID จาก URL parameter
 
   try {
     const query = `DELETE FROM public.mainasset WHERE "main_asset_id" = $1 RETURNING *`;
-    const result = await pool.query(query, [main_asset_ID]);
+    const result = await pool.query(query, [main_asset_id]);
 
     if (result.rowCount === 0) {
       return res.status(404).json({ error: "ไม่พบข้อมูลที่ต้องการลบ" });
@@ -135,7 +135,7 @@ app.delete("/mainasset/:main_asset_id", async (req, res) => {
 
 // อัปเดตข้อมูล MainAsset ตาม main_asset_ID
 app.put("/mainasset/:main_asset_id", async (req, res) => {
-  const { main_asset_ID } = req.params;
+  const { main_asset_id } = req.params;
   const {
     main_asset_name,
     status,
@@ -158,13 +158,13 @@ app.put("/mainasset/:main_asset_id", async (req, res) => {
         main_asset_name = $1, status = $2, fiscal_year = $3, date_received = $4,
         badget_limit = $5, averange_price = $6, budget_type = $7, asset_type = $8,
         location_use = $9, location_deliver = $10, usage = $11, reponsible_person = $12
-      WHERE "main_asset_ID" = $13 RETURNING *`;
+      WHERE "main_asset_id" = $13 RETURNING *`;
     
     const result = await pool.query(query, [
       main_asset_name, status, fiscal_year, date_received,
       badget_limit, averange_price, budget_type, asset_type,
       location_use, location_deliver, usage, reponsible_person,
-      main_asset_ID
+      main_asset_id
     ]);
 
     if (result.rows.length === 0) {
@@ -257,87 +257,308 @@ app.get('/api/subasset/:sub_asset_id', async (req, res) => {
     res.status(500).json({ error: 'Error fetching sub asset' });
   }
 });
-//************************************************************************************************** */
+// //************************************************************************************************** */
 
-//API สำหรับเพิ่มข้อมูลสาขาวิชา
-app.post("/department", async (req, res) => {
-  const { department_id, department_name } = req.body;
+// //API สำหรับเพิ่มข้อมูลสาขาวิชา
+// app.post("/department", async (req, res) => {
+//   const { department_id, department_name } = req.body;
 
-  if (!department_id || !department_name) {
-    return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" });
-  }
+//   if (!department_id || !department_name) {
+//     return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" });
+//   }
 
-  try {
-    const result = await pool.query(
-      'INSERT INTO "department" ("department_id", department_name) VALUES ($1, $2) RETURNING *',
-      [department_id, department_name]
-    );
-    res.status(201).json({ message: "เพิ่มภาควิชาเรียบร้อย", data: result.rows[0] });
-  } catch (error) {
-    console.error("Database error: ", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการเพิ่มข้อมูล" });
-  }
-});
+//   try {
+//     const result = await pool.query(
+//       'INSERT INTO "department" ("department_id", department_name) VALUES ($1, $2) RETURNING *',
+//       [department_id, department_name]
+//     );
+//     res.status(201).json({ message: "เพิ่มภาควิชาเรียบร้อย", data: result.rows[0] });
+//   } catch (error) {
+//     console.error("Database error: ", error);
+//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการเพิ่มข้อมูล" });
+//   }
+// });
 
-// API สำหรับดูข้อมูลสาขาวิชา
+// // // API สำหรับดูข้อมูลสาขาวิชา
+// // app.get("/department", async (req, res) => {
+// //   try {
+// //     const result = await pool.query('SELECT * FROM "department" ORDER BY "department_id" ASC');
+// //     res.json(result.rows);
+// //   } catch (error) {
+// //     console.error("Database error: ", error);
+// //     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+// //   }
+// // });
+
+// //****************************************** */
+// // API ดึงข้อมูลภาควิชาและหลักสูตร
+// app.get("/department", async (req, res) => {
+//   try {
+//     const result = await pool.query(`
+//       SELECT d.department_id, d.department_name, 
+//              json_agg(c.curriculum_name) AS curriculam
+//       FROM department d
+//       LEFT JOIN curriculum c ON d.department_id = c.department_id
+//       GROUP BY d.department_id, d.department_name
+//     `);
+//     res.json(result.rows);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Database error" });
+//   }
+// });
+// //********************************************** */
+
+// app.get("/department/:id", async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     const result = await pool.query('SELECT * FROM "department" WHERE "department_id" = $1', [id]);
+
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ error: "ไม่พบสาขาวิชาที่ต้องการ" });
+//     }
+
+//     res.status(200).json(result.rows[0]);
+//   } catch (error) {
+//     console.error("Database error: ", error);
+//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+//   }
+// });
+
+
+// // API สำหรับลบข้อมูลสาขาวิชา
+// app.delete("/department/:id", async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     const result = await pool.query('DELETE FROM "department" WHERE "department_id" = $1 RETURNING *', [id]);
+
+//     if (result.rowCount === 0) {
+//       return res.status(404).json({ error: "ไม่พบภาควิชาที่ต้องการลบ" });
+//     }
+
+//     res.json({ message: "ลบภาควิชาเรียบร้อย", deletedData: result.rows[0] });
+//   } catch (error) {
+//     console.error("Database error: ", error);
+//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการลบข้อมูล" });
+//   }
+// });
+
+// // API สำหรับแก้ไขข้อมูลสาขาวิชา
+// app.put("/department/:id", async (req, res) => {
+//   const { id } = req.params;
+//   const { department_name } = req.body;
+
+//   if (!department_name) {
+//     return res.status(400).json({ error: "กรุณากรอกชื่อภาควิชาใหม่" });
+//   }
+
+//   try {
+//     const result = await pool.query(
+//       'UPDATE "department" SET department_name = $1 WHERE "department_id" = $2 RETURNING *',
+//       [department_name, id]
+//     );
+
+//     if (result.rowCount === 0) {
+//       return res.status(404).json({ error: "ไม่พบภาควิชาที่ต้องการอัปเดต" });
+//     }
+
+//     res.json({ message: "อัปเดตภาควิชาเรียบร้อย", updatedData: result.rows[0] });
+//   } catch (error) {
+//     console.error("Database error: ", error);
+//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการอัปเดตข้อมูล" });
+//   }
+// });
+// //*************************************************************************************************** */
+// //เพิ่มหลักสูตร
+// app.post("/curriculum", async (req, res) => {
+//   const { curriculum_id, curriculum_name, department_id } = req.body;
+//   console.log("Received data:", req.body); // ตรวจสอบข้อมูลที่ได้รับ
+//   if (!curriculum_id || !curriculum_name || !department_id) {
+//     return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" });
+//   }
+
+//   try {
+//     const result = await pool.query(
+//       'INSERT INTO "curriculum" ("curriculum_id", curriculum_name, "department_id") VALUES ($1, $2, $3) RETURNING *',
+//       [curriculum_id, curriculum_name, department_id]
+//     );
+//     res.status(201).json({ message: "เพิ่มหลักสูตรเรียบร้อย", data: result.rows[0] });
+//   } catch (error) {
+//     console.error("Database error: ", error);
+//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการเพิ่มข้อมูล" });
+//   }
+// });
+
+// // ดึงข้อมูลหลักสูตรทั้งหมด
+// app.get("/curriculum", async (req, res) => {
+//   try {
+//     const result = await pool.query('SELECT * FROM "curriculum"');
+//     res.status(200).json({ data: result.rows });
+//   } catch (error) {
+//     console.error("Database error: ", error);
+//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+//   }
+// });
+
+// // ดึงข้อมูลหลักสูตรตาม ID
+// app.get("/curriculum/:id", async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     const result = await pool.query('SELECT * FROM "curriculum" WHERE "curriculum_id" = $1', [id]);
+
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ error: "ไม่พบหลักสูตรที่ต้องการ" });
+//     }
+
+//     res.status(200).json({ data: result.rows[0] });
+//   } catch (error) {
+//     console.error("Database error: ", error);
+//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+//   }
+// });
+
+// //Update ข้อมูลหลักสูตร ตาม ID
+// app.put("/curriculum/:id", async (req, res) => {
+//   const { id } = req.params;
+//   const { curriculum_name, department_id } = req.body;
+
+//   if (!curriculum_name || !department_id) {
+//     return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" });
+//   }
+
+//   try {
+//     const result = await pool.query(
+//       'UPDATE "curriculum" SET curriculum_name = $1, "department_id" = $2 WHERE "curriculum_id" = $3 RETURNING *',
+//       [curriculum_name, department_id, id]
+//     );
+
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ error: "ไม่พบหลักสูตรที่ต้องการอัปเดต" });
+//     }
+
+//     res.status(200).json({ message: "อัปเดตหลักสูตรเรียบร้อย", data: result.rows[0] });
+//   } catch (error) {
+//     console.error("Database error: ", error);
+//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการอัปเดตข้อมูล" });
+//   }
+// });
+
+// //ลบข้อมูลหลักสูตรตาม ID
+// app.delete("/curriculum/:id", async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     const result = await pool.query(
+//       'DELETE FROM "curriculum" WHERE "curriculum_id" = $1 RETURNING *',
+//       [id]
+//     );
+
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ error: "ไม่พบหลักสูตรที่ต้องการลบ" });
+//     }
+
+//     res.status(200).json({ message: "ลบหลักสูตรเรียบร้อย" });
+//   } catch (error) {
+//     console.error("Database error: ", error);
+//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการลบข้อมูล" });
+//   }
+// });
+
+// //****************************************** */
+// // API ดึงข้อมูลภาควิชาและหลักสูตร
+// app.get("/department", async (req, res) => {
+//   try {
+//     const result = await pool.query(`
+//       SELECT d.department_id, d.department_name, 
+//              json_agg(c.curriculum_name) AS curriculam
+//       FROM department d
+//       LEFT JOIN curriculum c ON d.department_id = c.department_id
+//       GROUP BY d.department_id, d.department_name
+//     `);
+//     res.json(result.rows);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Database error" });
+//   }
+// });
+
+
+// ดึงข้อมูลภาควิชา พร้อมหลักสูตร
 app.get("/department", async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM "department" ORDER BY "department_id" ASC');
+    const result = await pool.query(`
+      SELECT d.department_id, d.department_name, 
+             COALESCE(json_agg(c.curriculum_name) FILTER (WHERE c.curriculum_name IS NOT NULL), '[]') AS curriculum
+      FROM department d
+      LEFT JOIN curriculum c ON d.department_id = c.department_id
+      GROUP BY d.department_id, d.department_name
+    `);
     res.json(result.rows);
-  } catch (error) {
-    console.error("Database error: ", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+  } catch (err) {
+    console.error("Database error: ", err);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลภาควิชา" });
   }
 });
 
-app.get("/department/:id", async (req, res) => {
-  const { id } = req.params;
+// เพิ่มภาควิชา พร้อมหลักสูตร
+app.post("/department", async (req, res) => {
+  const { department_id, department_name, curriculum } = req.body;
 
+  if (!department_id || !department_name) {
+    return res.status(400).json({ error: "กรุณากรอกข้อมูลภาควิชาให้ครบถ้วน" });
+  }
+
+  const client = await pool.connect();
   try {
-    const result = await pool.query('SELECT * FROM "department" WHERE "department_id" = $1', [id]);
+    await client.query("BEGIN");
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "ไม่พบสาขาวิชาที่ต้องการ" });
+    // เพิ่มภาควิชา
+    const departmentResult = await client.query(
+      `INSERT INTO department (department_id, department_name) VALUES ($1, $2) RETURNING *`,
+      [department_id, department_name]
+    );
+
+    // เพิ่มหลักสูตรที่เกี่ยวข้อง
+    if (curriculum && curriculum.length > 0) {
+      for (const curriculum_name of curriculum) {
+        await client.query(
+          `INSERT INTO curriculum (curriculum_name, department_id) VALUES ($1, $2)`,
+          [curriculum_name, department_id]
+        );
+      }
     }
 
-    res.status(200).json(result.rows[0]);
+    await client.query("COMMIT");
+
+    res.status(201).json({ message: "เพิ่มภาควิชาเรียบร้อย", data: departmentResult.rows[0] });
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error("Database error: ", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการเพิ่มข้อมูลภาควิชา" });
+  } finally {
+    client.release();
   }
 });
 
-
-// API สำหรับลบข้อมูลสาขาวิชา
-app.delete("/department/:id", async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const result = await pool.query('DELETE FROM "department" WHERE "department_id" = $1 RETURNING *', [id]);
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: "ไม่พบภาควิชาที่ต้องการลบ" });
-    }
-
-    res.json({ message: "ลบภาควิชาเรียบร้อย", deletedData: result.rows[0] });
-  } catch (error) {
-    console.error("Database error: ", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการลบข้อมูล" });
-  }
-});
-
-// API สำหรับแก้ไขข้อมูลสาขาวิชา
+// แก้ไขภาควิชา พร้อมหลักสูตร
 app.put("/department/:id", async (req, res) => {
   const { id } = req.params;
-  const { department_name } = req.body;
+  const { department_name, curriculum } = req.body;
 
   if (!department_name) {
     return res.status(400).json({ error: "กรุณากรอกชื่อภาควิชาใหม่" });
   }
 
+  const client = await pool.connect();
   try {
-    const result = await pool.query(
-      'UPDATE "department" SET department_name = $1 WHERE "department_id" = $2 RETURNING *',
+    await client.query("BEGIN");
+
+    // อัปเดตชื่อภาควิชา
+    const result = await client.query(
+      `UPDATE department SET department_name = $1 WHERE department_id = $2 RETURNING *`,
       [department_name, id]
     );
 
@@ -345,173 +566,196 @@ app.put("/department/:id", async (req, res) => {
       return res.status(404).json({ error: "ไม่พบภาควิชาที่ต้องการอัปเดต" });
     }
 
+    // ลบหลักสูตรเก่าทั้งหมดก่อน
+    await client.query(`DELETE FROM curriculum WHERE department_id = $1`, [id]);
+
+    // เพิ่มหลักสูตรใหม่
+    if (curriculum && curriculum.length > 0) {
+      for (const curriculum_name of curriculum) {
+        await client.query(
+          `INSERT INTO curriculum (curriculum_name, department_id) VALUES ($1, $2)`,
+          [curriculum_name, id]
+        );
+      }
+    }
+
+    await client.query("COMMIT");
+
     res.json({ message: "อัปเดตภาควิชาเรียบร้อย", updatedData: result.rows[0] });
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error("Database error: ", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการอัปเดตข้อมูล" });
-  }
-});
-//*************************************************************************************************** */
-//เพิ่มหลักสูตร
-app.post("/curriculum", async (req, res) => {
-  const { curriculum_id, curriculum_name, department_id } = req.body;
-  console.log("Received data:", req.body); // ตรวจสอบข้อมูลที่ได้รับ
-  if (!curriculum_id || !curriculum_name || !department_id) {
-    return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" });
-  }
-
-  try {
-    const result = await pool.query(
-      'INSERT INTO "curriculum" ("curriculum_id", curriculum_name, "department_id") VALUES ($1, $2, $3) RETURNING *',
-      [curriculum_id, curriculum_name, department_id]
-    );
-    res.status(201).json({ message: "เพิ่มหลักสูตรเรียบร้อย", data: result.rows[0] });
-  } catch (error) {
-    console.error("Database error: ", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการเพิ่มข้อมูล" });
-  }
-});
-
-// ดึงข้อมูลหลักสูตรทั้งหมด
-app.get("/curriculum", async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM "curriculum"');
-    res.status(200).json({ data: result.rows });
-  } catch (error) {
-    console.error("Database error: ", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
-  }
-});
-
-// ดึงข้อมูลหลักสูตรตาม ID
-app.get("/curriculum/:id", async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const result = await pool.query('SELECT * FROM "curriculum" WHERE "curriculum_id" = $1', [id]);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "ไม่พบหลักสูตรที่ต้องการ" });
-    }
-
-    res.status(200).json({ data: result.rows[0] });
-  } catch (error) {
-    console.error("Database error: ", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
-  }
-});
-
-//Update ข้อมูลหลักสูตร ตาม ID
-app.put("/curriculum/:id", async (req, res) => {
-  const { id } = req.params;
-  const { curriculum_name, department_id } = req.body;
-
-  if (!curriculum_name || !department_id) {
-    return res.status(400).json({ error: "กรุณากรอกข้อมูลให้ครบถ้วน" });
-  }
-
-  try {
-    const result = await pool.query(
-      'UPDATE "curriculum" SET curriculum_name = $1, "department_id" = $2 WHERE "curriculum_id" = $3 RETURNING *',
-      [curriculum_name, department_ID, id]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "ไม่พบหลักสูตรที่ต้องการอัปเดต" });
-    }
-
-    res.status(200).json({ message: "อัปเดตหลักสูตรเรียบร้อย", data: result.rows[0] });
-  } catch (error) {
-    console.error("Database error: ", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการอัปเดตข้อมูล" });
-  }
-});
-
-//ลบข้อมูลหลักสูตรตาม ID
-app.delete("/curriculum/:id", async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const result = await pool.query(
-      'DELETE FROM "curriculum" WHERE "curriculum_id" = $1 RETURNING *',
-      [id]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "ไม่พบหลักสูตรที่ต้องการลบ" });
-    }
-
-    res.status(200).json({ message: "ลบหลักสูตรเรียบร้อย" });
-  } catch (error) {
-    console.error("Database error: ", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการลบข้อมูล" });
-  }
-});
-
-
-//****************************************************************************************************************** */
-//เพิ่มข้อมูลผู้ใช้
-app.post('/api/user', async (req, res) => {
-  const { user_name, user_email, department_id, role_id, user_role_name } = req.body;
-
-  if (!user_name || !user_email || !department_id || !role_id || !user_role_name) {
-    return res.status(400).json({ error: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
-  }
-
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-
-    // ตรวจสอบว่า role_ID มีอยู่หรือไม่
-    const roleCheck = await client.query(
-      `SELECT "role_id" FROM public."role" WHERE "role_id" = $1`, [role_id]
-    );
-    if (roleCheck.rows.length === 0) {
-      await client.query('ROLLBACK');
-      return res.status(400).json({ error: 'role_ID ไม่ถูกต้อง' });
-    }
-
-    // ตรวจสอบว่ามี user_email ซ้ำหรือไม่
-    const emailCheck = await client.query(
-      `SELECT "user_id" FROM public."user" WHERE user_email = $1`, [user_email]
-    );
-    if (emailCheck.rows.length > 0) {
-      await client.query('ROLLBACK');
-      return res.status(400).json({ error: 'อีเมลนี้ถูกใช้ไปแล้ว' });
-    }
-
-    // เพิ่มข้อมูลผู้ใช้
-    const userInsert = await client.query(
-      `INSERT INTO public."user" (user_name, user_email, "department_id") 
-       VALUES ($1, $2, $3) RETURNING "user_id", user_name, user_email, "department_id"`,
-      [user_name, user_email, department_ID]
-    );
-
-    const user_ID = userInsert.rows[0].user_ID; // ดึง user_ID ที่เพิ่มมา
-
-    // เพิ่มข้อมูล UserRole
-    const userRoleInsert = await client.query(
-      `INSERT INTO public."userrole" (user_role_name, "user_id", "role_id") 
-       VALUES ($1, $2, $3) RETURNING *`,
-      [user_role_name, user_ID, role_ID]
-    );
-
-    await client.query('COMMIT');
-    res.status(201).json({
-      message: 'เพิ่มผู้ใช้และบทบาทเรียบร้อย',
-      user: userInsert.rows[0],
-      userRole: userRoleInsert.rows[0],
-    });
-
-  } catch (error) {
-    await client.query('ROLLBACK');
-    console.error('Database error:', error);
-    res.status(500).json({ error: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูล' });
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการอัปเดตข้อมูลภาควิชา" });
   } finally {
     client.release();
   }
 });
 
+// ลบภาควิชา พร้อมหลักสูตรที่เกี่ยวข้อง
+app.delete("/department/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    // ลบหลักสูตรที่เกี่ยวข้องก่อน
+    await client.query(`DELETE FROM curriculum WHERE department_id = $1`, [id]);
+
+    // ลบภาควิชา
+    const result = await client.query(`DELETE FROM department WHERE department_id = $1 RETURNING *`, [id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "ไม่พบภาควิชาที่ต้องการลบ" });
+    }
+
+    await client.query("COMMIT");
+
+    res.json({ message: "ลบภาควิชาเรียบร้อย" });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Database error: ", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการลบข้อมูลภาควิชา" });
+  } finally {
+    client.release();
+  }
+});
+
+
+//****************************************************************************************************************** */
+// //เพิ่มข้อมูลผู้ใช้
+// app.post('/api/user', async (req, res) => {
+//   const { user_name, user_email, department_id, role_id, user_role_name } = req.body;
+
+//   if (!user_name || !user_email || !department_id || !role_id || !user_role_name) {
+//     return res.status(400).json({ error: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+//   }
+
+//   const client = await pool.connect();
+//   try {
+//     await client.query('BEGIN');
+
+//     // ตรวจสอบว่า role_ID มีอยู่หรือไม่
+//     const roleCheck = await client.query(
+//       `SELECT "role_id" FROM public."role" WHERE "role_id" = $1`, [role_id]
+//     );
+//     if (roleCheck.rows.length === 0) {
+//       await client.query('ROLLBACK');
+//       return res.status(400).json({ error: 'role_ID ไม่ถูกต้อง' });
+//     }
+
+//     // ตรวจสอบว่ามี user_email ซ้ำหรือไม่
+//     const emailCheck = await client.query(
+//       `SELECT "user_id" FROM public."user" WHERE user_email = $1`, [user_email]
+//     );
+//     if (emailCheck.rows.length > 0) {
+//       await client.query('ROLLBACK');
+//       return res.status(400).json({ error: 'อีเมลนี้ถูกใช้ไปแล้ว' });
+//     }
+
+//     // เพิ่มข้อมูลผู้ใช้
+//     const userInsert = await client.query(
+//       `INSERT INTO public."user" (user_name, user_email, "department_id") 
+//        VALUES ($1, $2, $3) RETURNING "user_id", user_name, user_email, "department_id"`,
+//       [user_name, user_email, department_ID]
+//     );
+
+//     const user_ID = userInsert.rows[0].user_ID; // ดึง user_ID ที่เพิ่มมา
+
+//     // เพิ่มข้อมูล UserRole
+//     const userRoleInsert = await client.query(
+//       `INSERT INTO public."userrole" (user_role_name, "user_id", "role_id") 
+//        VALUES ($1, $2, $3) RETURNING *`,
+//       [user_role_name, user_ID, role_ID]
+//     );
+
+//     await client.query('COMMIT');
+//     res.status(201).json({
+//       message: 'เพิ่มผู้ใช้และบทบาทเรียบร้อย',
+//       user: userInsert.rows[0],
+//       userRole: userRoleInsert.rows[0],
+//     });
+
+//   } catch (error) {
+//     await client.query('ROLLBACK');
+//     console.error('Database error:', error);
+//     res.status(500).json({ error: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูล' });
+//   } finally {
+//     client.release();
+//   }
+// });
+
+
+
+// ✅ GET: ดึงข้อมูลผู้ใช้ทั้งหมด
+app.get("/user", async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM public."user"');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ✅ GET: ดึงข้อมูลผู้ใช้ตาม ID
+app.get("/user/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('SELECT * FROM public."user" WHERE user_id = $1', [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ✅ POST: เพิ่มผู้ใช้ใหม่
+app.post("/user", async (req, res) => {
+  try {
+    const { user_id, user_name, user_email, department_id } = req.body;
+    const result = await pool.query(
+      'INSERT INTO public."user" (user_id, user_name, user_email, department_id) VALUES ($1, $2, $3, $4) RETURNING *',
+      [user_id, user_name, user_email, department_id]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ✅ PUT: แก้ไขข้อมูลผู้ใช้
+app.put("/user/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { user_name, user_email, department_id } = req.body;
+    const result = await pool.query(
+      'UPDATE public."user" SET user_name = $1, user_email = $2, department_id = $3 WHERE user_id = $4 RETURNING *',
+      [user_name, user_email, department_id, id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ✅ DELETE: ลบผู้ใช้
+app.delete("/user/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('DELETE FROM public."user" WHERE user_id = $1 RETURNING *', [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ message: "User deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 app.listen(PORT, () => {

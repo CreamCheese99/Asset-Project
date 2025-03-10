@@ -165,9 +165,9 @@ const DataTable = () => {
         <tbody>
           {mergedData.map((item) => (
             <tr key={item.main_asset_ID} className="text-center">
-              <td className="border px-4 py-2">{item.main_asset_ID}</td>
+              <td className="border px-4 py-2">{item.main_asset_id}</td>
               <td className="border px-4 py-2 hidden lg:table-cell">{item.main_asset_name}</td>
-              <td className="border px-4 py-2">{item.department || "-"}</td>
+              <td className="border px-4 py-2">{item.department_name || "-"}</td>
               <td className="border px-4 py-2">{item.subamount || 0}</td>
               {/* <td className="border px-4 py-2">{item.unit || "-"}</td> */}
               <td className="border px-4 py-2">{item.status}</td>
