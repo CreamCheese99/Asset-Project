@@ -19,7 +19,7 @@ const DashboardPage = () => {
     setErrorMessage('');  // ล้างข้อความ error ก่อนการโหลดใหม่
     try {
       // ทำการร้องขอข้อมูลจากเซิร์ฟเวอร์
-      const response = await fetch('http://127.0.0.1:5000/api/getData');  // URL ของ API
+      const response = await fetch('http://localhost:5000/api/getData');  // URL ของ API
       if (!response.ok) {
         throw new Error('ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์');
       }
