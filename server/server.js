@@ -191,7 +191,7 @@ const port = 5000;
 
 // ใช้ cors โดยกำหนดให้เฉพาะโดเมนที่ต้องการเข้าถึง API ได้
 const corsOptions = {
-  origin: 'http://localhost:5175', // ระบุ URL ของฝั่ง Client ที่อนุญาตให้เข้าถึง API
+  origin: 'http://localhost:5173', // ระบุ URL ของฝั่ง Client ที่อนุญาตให้เข้าถึง API
   methods: 'GET,POST', // กำหนดวิธีการ HTTP ที่อนุญาต
   allowedHeaders: 'Content-Type', // กำหนดหัวข้อที่อนุญาต
 };

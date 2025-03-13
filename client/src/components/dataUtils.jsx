@@ -126,6 +126,7 @@
 //   return [];
 // };
 // dataUtils.js
+
 export const calculateBarData = (data, selectedDepartment, selectedFund, selectedYear) => {
     // ตรวจสอบว่ามีข้อมูลตามที่เลือกหรือไม่
     if (!data || !data[selectedDepartment] || !data[selectedDepartment][selectedFund] || !data[selectedDepartment][selectedFund][selectedYear]) {
@@ -170,4 +171,3 @@ export const calculateBarData = (data, selectedDepartment, selectedFund, selecte
       value: amount
     }));
   };
-  
