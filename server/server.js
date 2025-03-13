@@ -621,6 +621,89 @@ app.delete("/department/:id", async (req, res) => {
   }
 });
 
+/********************************************************************************************************************* */
+//ประเภทสินทรัพย์
+
+// 📌 1. ดึงข้อมูลทั้งหมด
+app.get("/api/typeasset", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM typeasset ORDER BY id ASC");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/typeasset/:id", async (req, res) => {
+  const { id } = req.params; // ดึงค่าของ id จาก URL params
+  try {
+    const result = await pool.query("SELECT * FROM typeasset WHERE id = $1", [id]); // ใช้ parameterized query เพื่อป้องกัน SQL Injection
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "ประเภทสินทรัพย์ไม่พบ" });
+    }
+    res.json(result.rows[0]); // ส่งข้อมูลของประเภทสินทรัพย์ที่ตรงกับ id
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 📌 2. เพิ่มข้อมูล
+app.post("/api/typeasset", async (req, res) => {
+  try {
+    const { typeasset_name } = req.body;
+    if (!typeasset_name) {
+      return res.status(400).json({ error: "ชื่อประเภทสินทรัพย์ห้ามว่าง" });
+    }
+
+    const result = await pool.query(
+      "INSERT INTO typeasset (typeasset_name) VALUES ($1) RETURNING *",
+      [typeasset_name]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put("/api/typeasset/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { typeasset_name } = req.body;
+
+    const result = await pool.query(
+      "UPDATE typeasset SET typeasset_name = $1 WHERE id = $2 RETURNING *",
+      [typeasset_name, id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "ไม่พบประเภทสินทรัพย์" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 📌 4. ลบข้อมูล
+app.delete("/api/typeasset/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      "DELETE FROM typeasset WHERE id = $1 RETURNING *",
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "ไม่พบประเภทสินทรัพย์" });
+    }
+
+    res.json({ message: "ลบประเภทสินทรัพย์สำเร็จ" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 //****************************************************************************************************************** */
 // //เพิ่มข้อมูลผู้ใช้

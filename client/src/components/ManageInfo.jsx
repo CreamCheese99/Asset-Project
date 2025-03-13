@@ -184,6 +184,7 @@
 // };
 
 // export default ManageInfo;
+
 import { FaPlus, FaEdit, FaSave, FaTrash } from "react-icons/fa";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
@@ -193,9 +194,7 @@ const ManageInfo = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [tempData, setTempData] = useState({ department_name: "", curriculum: [""] });
-  const [newCurriculum, setNewCurriculum] = useState("");
 
-  // ดึงข้อมูลจาก API
   useEffect(() => {
     axios
       .get("http://localhost:5000/department")
@@ -203,14 +202,12 @@ const ManageInfo = () => {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
-  // ฟังก์ชันเปิด modal แก้ไข
   const handleEdit = (id, item) => {
     setEditingId(id);
     setTempData({ ...item, curriculum: [...item.curriculum] });
     setIsModalOpen(true);
   };
 
-  // ฟังก์ชันเพิ่มข้อมูลใหม่หรือแก้ไขข้อมูล
   const handleSave = () => {
     if (editingId) {
       axios
@@ -232,7 +229,6 @@ const ManageInfo = () => {
     setEditingId(null);
   };
 
-  // ฟังก์ชันลบข้อมูล
   const handleDelete = (id) => {
     if (window.confirm("คุณต้องการลบภาควิชานี้หรือไม่?")) {
       axios
@@ -242,47 +238,51 @@ const ManageInfo = () => {
     }
   };
 
-  // ฟังก์ชันเพิ่มหลักสูตรใหม่
+  const handleCurriculumChange = (index, value) => {
+    const updatedCurriculum = [...tempData.curriculum];
+    updatedCurriculum[index] = value;
+    setTempData({ ...tempData, curriculum: updatedCurriculum });
+  };
+
   const handleAddCurriculum = () => {
-    if (newCurriculum.trim()) {
-      setTempData({ ...tempData, curriculum: [...tempData.curriculum, newCurriculum] });
-      setNewCurriculum("");
-    } else {
-      alert("กรุณากรอกหลักสูตรให้ครบถ้วน");
-    }
+    setTempData({ ...tempData, curriculum: [...tempData.curriculum, ""] });
+  };
+
+  const handleRemoveCurriculum = (index) => {
+    const updatedCurriculum = tempData.curriculum.filter((_, i) => i !== index);
+    setTempData({ ...tempData, curriculum: updatedCurriculum });
   };
 
   return (
-    <div className="container mx-auto p-4 mt-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-gray-700">ข้อมูลภาควิชา</h2>
+    <div className="container mx-auto p-6 mt-4 bg-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">ข้อมูลภาควิชา</h2>
 
-      <button className="flex items-center bg-blue-400 text-white px-4 py-2 rounded-full mb-4 hover:bg-blue-500" onClick={() => setIsModalOpen(true)}>
-        <FaPlus className="mr-2" />
-        เพิ่ม
+      <button className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-full mb-4 hover:bg-blue-600" onClick={() => setIsModalOpen(true)}>
+        <FaPlus className="mr-2" /> เพิ่ม
       </button>
 
       <table className="w-full border-collapse border-t border-gray-300">
         <thead>
-          <tr className="text-gray-500">
-            <th className="py-2 text-left">ภาควิชา</th>
-            <th className="py-2 text-left">หลักสูตร</th>
-            <th className="py-2 text-left">จัดการ</th>
+          <tr className="text-gray-600 bg-gray-100">
+            <th className="py-2 px-4 text-left">ภาควิชา</th>
+            <th className="py-2 px-4 text-left">หลักสูตร</th>
+            <th className="py-2 px-4 text-left">จัดการ</th>
           </tr>
         </thead>
         <tbody>
           {data.map((item) => (
             <tr key={item.department_id} className="border-t border-gray-300">
-              <td className="py-2">{item.department_name}</td>
-              <td className="py-2">
+              <td className="py-2 px-4">{item.department_name}</td>
+              <td className="py-2 px-4">
                 {item.curriculum.map((cur, index) => (
-                  <div key={index}>{cur}</div>
+                  <div key={index} className="bg-gray-200 p-1 rounded-lg inline-block mr-2">{cur}</div>
                 ))}
               </td>
-              <td className="py-2 flex space-x-2">
-                <button className="bg-yellow-500 text-white px-3 py-1 rounded-xl hover:bg-yellow-600 flex items-center" onClick={() => handleEdit(item.department_id, item)}>
+              <td className="py-2 px-4 flex space-x-2">
+                <button className="bg-yellow-500 text-white px-3 py-1 rounded-full hover:bg-yellow-600 flex items-center" onClick={() => handleEdit(item.department_id, item)}>
                   <FaEdit className="mr-1" /> แก้ไข
                 </button>
-                <button className="bg-red-500 text-white px-3 py-1 rounded-xl hover:bg-red-600 flex items-center" onClick={() => handleDelete(item.department_id)}>
+                <button className="bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600 flex items-center" onClick={() => handleDelete(item.department_id)}>
                   <FaTrash className="mr-1" /> ลบ
                 </button>
               </td>
@@ -291,28 +291,37 @@ const ManageInfo = () => {
         </tbody>
       </table>
 
-      {/* Modal สำหรับเพิ่มภาควิชาและหลักสูตร */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg w-96">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-96">
             <h3 className="text-lg font-semibold mb-4">{editingId ? "แก้ไขภาควิชา" : "เพิ่มภาควิชา"}</h3>
-            <input type="text" placeholder="ภาควิชา" className="w-full border p-2 rounded-xl mb-2" value={tempData.department_name} onChange={(e) => setTempData({ ...tempData, department_name: e.target.value })} />
-            
+
+            <input type="text" placeholder="ภาควิชา" className="w-full border p-2 rounded-full mb-2" value={tempData.department_name} onChange={(e) => setTempData({ ...tempData, department_name: e.target.value })} />
+
             {tempData.curriculum.map((cur, index) => (
-              <div key={index} className="flex items-center">
-                <input type="text" placeholder="หลักสูตร" className="w-full border p-2 rounded-xl mb-2" value={cur} onChange={(e) => {
-                    const updatedCurriculum = [...tempData.curriculum];
-                    updatedCurriculum[index] = e.target.value;
-                    setTempData({ ...tempData, curriculum: updatedCurriculum });
-                  }}
-                />
+              <div key={index} className="flex items-center mb-2">
+                <input type="text" placeholder="หลักสูตร" className="w-full border p-2 rounded-full" value={cur} onChange={(e) => handleCurriculumChange(index, e.target.value)} />
+                <button className="ml-2 text-red-500" onClick={() => handleRemoveCurriculum(index)}>×</button>
               </div>
             ))}
 
             <button onClick={handleAddCurriculum} className="text-blue-500">+ เพิ่มหลักสูตร</button>
             <div className="flex justify-between mt-4">
-              <button onClick={() => setIsModalOpen(false)} className="bg-gray-300 px-4 py-2 rounded-xl">✖ ยกเลิก</button>
-              <button onClick={handleSave} className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600">บันทึก</button>
+              <button onClick={() => setIsModalOpen(false)} className="bg-gray-300 px-4 py-2 rounded-full">ยกเลิก</button>
+              {/* <button onClick={handleSave} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">บันทึก</button> */}
+              
+              <button 
+                onClick={handleSave} 
+                className={`px-4 py-2 rounded-full text-white ${
+                  tempData.department_name.trim() && tempData.curriculum.some(cur => cur.trim()) 
+                    ? "bg-blue-500 hover:bg-blue-600" 
+                    : "bg-gray-400 cursor-not-allowed"
+                }`}
+                disabled={!tempData.department_name.trim() || !tempData.curriculum.some(cur => cur.trim())}
+              >
+                บันทึก
+              </button>
+
             </div>
           </div>
         </div>
