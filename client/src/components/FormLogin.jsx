@@ -55,6 +55,7 @@ function FormLogin() {
         localStorage.setItem("user", JSON.stringify(data.user)); // ✅ บันทึกข้อมูลผู้ใช้
         navigate("/"); // นำทางไปหน้า Dashboard
       } else {
+        alert("เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่อีกครั้ง!");
         setError("Username หรือ Password ไม่ถูกต้อง");
       }
     } catch (error) {
