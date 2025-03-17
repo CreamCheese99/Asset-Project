@@ -126,48 +126,47 @@
 //   return [];
 // };
 // dataUtils.js
-
 export const calculateBarData = (data, selectedDepartment, selectedFund, selectedYear) => {
-    // ตรวจสอบว่ามีข้อมูลตามที่เลือกหรือไม่
-    if (!data || !data[selectedDepartment] || !data[selectedDepartment][selectedFund] || !data[selectedDepartment][selectedFund][selectedYear]) {
-      return []; // หากข้อมูลไม่พบ ให้ส่งคืน array ว่าง
-    }
-  
-    const departmentData = data[selectedDepartment];
-    const fundData = departmentData[selectedFund];
-    const yearData = fundData[selectedYear];
-  
-    // ตรวจสอบว่า yearData เป็น array หรือไม่
-    if (!Array.isArray(yearData)) {
-      console.error('Data for the selected year is not in array format');
-      return [];
-    }
-  
-    // แปลงข้อมูลเป็นรูปแบบที่ต้องการ
-    return yearData.map((amount, index) => ({
-      label: `Category ${index + 1}`,
-      value: amount
-    }));
-  };
-  
-  export const calculatePieData = (data, selectedDepartment, selectedYear) => {
-    // ตรวจสอบว่ามีข้อมูลตามที่เลือกหรือไม่
-    if (!data || !data[selectedDepartment] || !data[selectedDepartment][selectedYear]) {
-      return []; // หากข้อมูลไม่พบ ให้ส่งคืน array ว่าง
-    }
-  
-    const departmentData = data[selectedDepartment];
-    const yearData = departmentData[selectedYear];
-  
-    // ตรวจสอบว่า yearData เป็น array หรือไม่
-    if (!Array.isArray(yearData)) {
-      console.error('Data for the selected year is not in array format');
-      return [];
-    }
-  
-    // แปลงข้อมูลเป็นรูปแบบที่ต้องการ
-    return yearData.map((amount, index) => ({
-      label: `Asset Type ${index + 1}`,
-      value: amount
-    }));
-  };
+  // ตรวจสอบว่ามีข้อมูลตามที่เลือกหรือไม่
+  if (!data || !data[selectedDepartment] || !data[selectedDepartment][selectedFund] || !data[selectedDepartment][selectedFund][selectedYear]) {
+    return []; // หากข้อมูลไม่พบ ให้ส่งคืน array ว่าง
+  }
+
+  const departmentData = data[selectedDepartment];
+  const fundData = departmentData[selectedFund];
+  const yearData = fundData[selectedYear];
+
+  // ตรวจสอบว่า yearData เป็น array หรือไม่
+  if (!Array.isArray(yearData)) {
+    console.error('Data for the selected year is not in array format');
+    return [];
+  }
+
+  // แปลงข้อมูลเป็นรูปแบบที่ต้องการ
+  return yearData.map((amount, index) => ({
+    label: `Category ${index + 1}`,
+    value: amount
+  }));
+};
+
+export const calculatePieData = (data, selectedDepartment, selectedYear) => {
+  // ตรวจสอบว่ามีข้อมูลตามที่เลือกหรือไม่
+  if (!data || !data[selectedDepartment] || !data[selectedDepartment][selectedYear]) {
+    return []; // หากข้อมูลไม่พบ ให้ส่งคืน array ว่าง
+  }
+
+  const departmentData = data[selectedDepartment];
+  const yearData = departmentData[selectedYear];
+
+  // ตรวจสอบว่า yearData เป็น array หรือไม่
+  if (!Array.isArray(yearData)) {
+    console.error('Data for the selected year is not in array format');
+    return [];
+  }
+
+  // แปลงข้อมูลเป็นรูปแบบที่ต้องการ
+  return yearData.map((amount, index) => ({
+    label: `Asset Type ${index + 1}`,
+    value: amount
+  }));
+};
