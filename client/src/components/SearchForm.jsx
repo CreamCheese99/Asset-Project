@@ -1,43 +1,75 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'; // Import axios
 
 const SearchForm = () => {
+  const [assetType, setAssetType] = useState([]); // Define state for asset types
+  const [department, setDepartment] = useState([]); // Define state for departments
+
+  // Fetch asset type data from the API using axios
+  useEffect(() => {
+    const fetchAssetType = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/asset_type');
+        if (Array.isArray(response.data)) {
+          setAssetType(response.data);
+        } else {
+          console.error("The response data is not an array:", response.data);
+        }
+      } catch (err) {
+        console.error('Error fetching Asset_Type:', err);
+      }
+    };
+
+    fetchAssetType();
+  }, []); // Empty dependency array means this effect runs once when the component mounts
+
+  // Fetch department data from the API using axios
+  useEffect(() => {
+    const fetchDepartment = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/department');
+        if (Array.isArray(response.data)) {
+          setDepartment(response.data);
+        } else {
+          console.error("The response data is not an array:", response.data);
+        }
+      } catch (err) {
+        console.error('Error fetching department:', err);
+      }
+    };
+
+    fetchDepartment();
+  }, []); // Empty dependency array means this effect runs once when the component mounts
+
   return (
     <div className="bg-white mt-4 p-4 rounded-xl shadow-md">
       <div className="grid grid-cols-4 gap-4">
         <div>
           <label className="block text-gray-700 text-sm mb-2">ภาควิชา</label>
           <select className="w-full border-2 border-blue-100 rounded-xl">
-            <option>ครุศาสตร์อุตสาหกรรม</option>
-            <option>ครุศาสตร์สถาปัตยกรรมเเละการออกแบบ</option>
-            <option>ครุศาสตร์วิศวกรรม</option>
-            <option>ครุศาสตร์การเกษตร</option>
-            
+            <option value="">-- กรุณาเลือก --</option>
+            {Array.isArray(department) &&
+              department.map((dept) => (
+                <option key={dept.department_id} value={dept.department_id}>
+                  {dept.department_name}
+                </option>
+              ))}
           </select>
         </div>
+
         <div>
           <label className="block text-gray-700 text-sm mb-2">ประเภทสินทรัพย์</label>
           <select className="w-full border-2 border-blue-100 rounded-xl">
-            <option>ครุภัณฑ์สำนักงาน</option>
-            <option>ครุภัณฑ์ยานพาหนะและขนส่ง</option>
-            <option>ครุภัณฑ์ไฟฟ้าและวิทยุ</option>
-            <option>ครุภัณฑ์ไฟฟ้าและวิทยุ-เครื่องกำเนิดไฟฟ้า</option>
-            <option>ครุภัณฑ์เขียนและเผยแพร่</option>
-            <option>ครุภัณฑ์การเกษตร-เครื่องมืออุปกรณ์</option>
-            <option>ครุภัณฑ์การเกษตร-เครื่องจักรกล</option>
-            <option>ครุภัณฑ์โรงงาน-เครื่องมืออุปกรณ์</option>
-            <option>ครุภัณฑ์โรงงาน-เครื่องจักรกล</option>
-            <option>ครุภัณฑ์ก่อสร้าง-เครื่องมือและอุปกรณ์</option>
-            <option>ครุภัณฑ์ก่อสร้าง-เครื่องจักรกล</option>
-            <option>ครุภัณฑ์วิทยาศาสตร์และการแพทย์</option>
-            <option>ครุภัณฑ์คอมพิวเตอร์</option>
-            <option>ครุภัณฑ์กีฬา-กายภาพ</option>
-            <option>ครุภัณฑ์สนาม</option>
-            <option>ครุภัณฑ์งานบ้านงานครัว</option>
-            <option>ครุภัณฑ์การศึกษา</option>
-            <option>ครุภัณฑ์ศิลปะ-นาฏศิลป์</option>
-            <option>ครุภัณฑ์อาวุธ</option>
+            <option value="">-- กรุณาเลือก --</option>
+            {Array.isArray(assetType) &&
+              assetType.map((asset) => (
+                <option key={asset.asset_type_id} value={asset.asset_type_id}>
+                  {asset.asset_type_name}
+                </option>
+              ))}
           </select>
         </div>
+
         <div>
           <label className="block text-gray-700 text-sm mb-2">ประเภทเงิน</label>
           <select className="w-full border-2 border-blue-100 rounded-xl">
@@ -47,10 +79,11 @@ const SearchForm = () => {
             <option>เงินกันเหลือบปี</option>
           </select>
         </div>
+
         <div>
           <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
           <select className="w-full border-2 border-blue-100 rounded-xl">
-            <option >ใช้งาน</option>
+            <option>ใช้งาน</option>
             <option>ซ่อม</option>
             <option>ชำรุด</option>
             <option>บริจาค/โอน</option>
@@ -58,14 +91,12 @@ const SearchForm = () => {
             <option>จำหน่าย</option>
           </select>
         </div>
+
         <div className="col-span-2">
-          <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน </label>
+          <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน</label>
           <input type="text" className="w-full border-2 border-blue-100 rounded-xl" />
         </div>
-        {/* <div className="col-span-2">
-          <label className="block text-gray-700 text-sm mb-2">หมายเลขครุภัณฑ์</label>
-          <input type="text" className="w-full border-2 border-blue-100 rounded-md" />
-        </div> */}
+
         <div className="col-span-4 flex justify-end">
           <button className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700">
             ค้นหา

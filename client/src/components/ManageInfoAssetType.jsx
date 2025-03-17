@@ -123,7 +123,7 @@ const ManageAssetTypes = () => {
 
   const fetchAssetTypes = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/typeasset");
+      const response = await axios.get("http://localhost:5000/api/asset_type");
       setData(response.data);
     } catch (error) {
       console.error("Error fetching asset types:", error);
@@ -132,7 +132,7 @@ const ManageAssetTypes = () => {
 
   const handleEdit = (id, item) => {
     setEditingId(id);
-    setTempData({ assetType: item.typeasset_name });
+    setTempData({ assetType: item.asset_type_name });
     setIsModalOpen(true);
   };
 
@@ -144,12 +144,12 @@ const ManageAssetTypes = () => {
 
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/api/typeasset/${editingId}`, {
-          typeasset_name: tempData.assetType,
+        await axios.put(`http://localhost:5000/api/asset_type/${editingId}`, {
+          asset_type_name: tempData.assetType,
         });
       } else {
-        await axios.post("http://localhost:5000/api/typeasset", {
-          typeasset_name: tempData.assetType,
+        await axios.post("http://localhost:5000/api/asset_type", {
+          asset_type_name: tempData.assetType,
         });
       }
       fetchAssetTypes();
@@ -165,7 +165,7 @@ const ManageAssetTypes = () => {
   const handleDelete = async (id) => {
     if (window.confirm("คุณต้องการลบประเภทสินทรัพย์นี้หรือไม่?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/typeasset/${id}`);
+        await axios.delete(`http://localhost:5000/api/asset_type/${id}`);
         fetchAssetTypes();
       } catch (error) {
         console.error("Error deleting asset type:", error);
@@ -196,17 +196,17 @@ const ManageAssetTypes = () => {
         </thead>
         <tbody>
           {data.map((item) => (
-            <tr key={item.typeasset_id} className="border-t border-gray-300">
-              <td className="py-2 px-4">{item.typeasset_name}</td>
+            <tr key={item.asset_type_id} className="border-t border-gray-300">
+              <td className="py-2 px-4">{item.asset_type_name}</td>
               <td className="py-2 px-4 flex space-x-2">
                 <button
-                  onClick={() => handleEdit(item.typeasset_id, item)}
+                  onClick={() => handleEdit(item.asset_type_id, item)}
                   className="bg-yellow-500 text-white px-4 py-2 rounded-full hover:bg-yellow-600 shadow-md flex items-center"
                 >
                   <FaEdit className="mr-1" /> แก้ไข
                 </button>
                 <button
-                  onClick={() => handleDelete(item.typeasset_id)}
+                  onClick={() => handleDelete(item.asset_type_id)}
                   className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 shadow-md flex items-center"
                 >
                   <FaTrash className="mr-1" /> ลบ

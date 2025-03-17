@@ -19,18 +19,17 @@ const AddAsset = () => {
     budget_limit: '',
     averange_price: '',
     budget_type: '',
-    asset_type: '',
     location_use: '',
     location_deliver: '',
     usage: '',
     responsible_person: '',
     sub_asset_name: '',
-    type: '',
+    asset_type: '',
     details: '',
     quantity: '',
     unit_price: '',
     counting_unit: '',
-    department: ''
+    department_id: ''
   });
 
   // Update asset data based on input changes
@@ -41,6 +40,8 @@ const AddAsset = () => {
     }));
   };
 
+
+  
   // Handle submit to send data to the server
   const handleSubmit = async () => {
     if (!assetData.main_asset_id) {
@@ -79,18 +80,17 @@ const AddAsset = () => {
       budget_limit: '',
       averange_price: '',
       budget_type: '',
-      asset_type: '',
       location_use: '',
       location_deliver: '',
       usage: '',
       responsible_person: '',
       sub_asset_name: '',
-      type: '',
+      asset_type: '',
       details: '',
       quantity: '',
       unit_price: '',
       counting_unit: '',
-      department: ''
+      department_id: ''
     });
   };
 
