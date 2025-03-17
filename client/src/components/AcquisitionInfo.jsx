@@ -5,18 +5,18 @@
 //         <div className="grid grid-cols-2 gap-4">
 //           <div>
 //             <label className="block text-gray-700 text-sm mb-2">ปีงบประมาณ</label>
-//             <select className="w-full border-2 border-blue-100 rounded-md">
+//             <select className="w-full border-2 border-blue-100 rounded-xl p-2">
 //               <option>2561</option>
 //             </select>
 //           </div>
         
 //           <div>
 //             <label className="block text-gray-700 text-sm mb-2">วันที่ตรวจรับ</label>
-//             <input type="date" className="w-full border-2 border-blue-100 rounded-md" />
+//             <input type="date" className="w-full border-2 border-blue-100 rounded-xl p-2" />
 //           </div>
 //           <div>
 //             <label className="block text-gray-700 text-sm mb-2">ประเภทเงิน</label>
-//             <select className="w-full border-2 border-blue-100 rounded-md">
+//             <select className="w-full border-2 border-blue-100 rounded-xl p-2">
 //             <option>เงินรายได้</option>
 //             <option>เงินงบประมาณ</option>
 //             <option>เงินสะสมคลัง</option>
@@ -26,11 +26,11 @@
 //           </div>
 //           <div>
 //             <label className="block text-gray-700 text-sm mb-2">วงเงินงบประมาณ</label>
-//             <input type="text" className="w-full border-2 border-blue-100 rounded-md" />
+//             <input type="text" className="w-full border-2 border-blue-100 rounded-xl p-2" />
 //           </div>
 //           <div>
 //             <label className="block text-gray-700 text-sm mb-2">ราคากลาง</label>
-//             <input type="text" className="w-full border-2 border-blue-100 rounded-md" />
+//             <input type="text" className="w-full border-2 border-blue-100 rounded-xl p-2" />
 //           </div>
 //         </div>
 //       </div>
@@ -49,10 +49,11 @@ const AcquisitionInfo = ({ value, onChange }) => {
         <div>
           <label className="block text-gray-700 text-sm mb-2">ปีงบประมาณ</label>
           <select
-            className="w-full border-2 border-blue-100 rounded-md"
-            value={value.fiscal_year} // แสดงค่าปัจจุบันจาก Parent
-            onChange={(e) => onChange('fiscal_year', e.target.value)} // ส่งค่ากลับไปที่ Parent
+            className="w-full border-2 border-blue-100 rounded-xl p-2 p-2"
+            value={value.fiscal_year || ''} 
+            onChange={(e) => onChange('fiscal_year', e.target.value)}
           >
+            <option value="">-- กรุณาเลือก --</option> 
             <option>2561</option>
             <option>2562</option>
             <option>2563</option>
@@ -64,19 +65,20 @@ const AcquisitionInfo = ({ value, onChange }) => {
           <label className="block text-gray-700 text-sm mb-2">วันที่ตรวจรับ</label>
           <input
             type="date"
-            className="w-full border-2 border-blue-100 rounded-md"
-            value={value.date_received} // แสดงค่าปัจจุบันจาก Parent
-            onChange={(e) => onChange('date_received', e.target.value)} // ส่งค่ากลับไปที่ Parent
+            className="w-full border-2 border-blue-100 rounded-xl p-2 p-2"
+            value={value.date_received || ''} 
+            onChange={(e) => onChange('date_received', e.target.value)}
           />
         </div>
 
         <div>
           <label className="block text-gray-700 text-sm mb-2">ประเภทเงิน</label>
           <select
-            className="w-full border-2 border-blue-100 rounded-md"
-            value={value.budget_type} // แสดงค่าปัจจุบันจาก Parent
-            onChange={(e) => onChange('budget_type', e.target.value)} // ส่งค่ากลับไปที่ Parent
+            className="w-full border-2 border-blue-100 rounded-xl p-2 p-2"
+            value={value.budget_type || ''} 
+            onChange={(e) => onChange('budget_type', e.target.value)}
           >
+            <option value="">-- กรุณาเลือก --</option> 
             <option>เงินรายได้</option>
             <option>เงินงบประมาณ</option>
             <option>เงินสะสมคลัง</option>
@@ -88,9 +90,9 @@ const AcquisitionInfo = ({ value, onChange }) => {
           <label className="block text-gray-700 text-sm mb-2">วงเงินงบประมาณ</label>
           <input
             type="text"
-            className="w-full border-2 border-blue-100 rounded-md"
-            value={value.budget_limit} // แสดงค่าปัจจุบันจาก Parent
-            onChange={(e) => onChange('budget_limit', e.target.value)} // ส่งค่ากลับไปที่ Parent
+            className="w-full border-2 border-blue-100 rounded-xl p-2 p-2"
+            value={value.budget_limit || ''} 
+            onChange={(e) => onChange('budget_limit', e.target.value)}
           />
         </div>
 
@@ -98,9 +100,9 @@ const AcquisitionInfo = ({ value, onChange }) => {
           <label className="block text-gray-700 text-sm mb-2">ราคากลาง</label>
           <input
             type="text"
-            className="w-full border-2 border-blue-100 rounded-md"
-            value={value.average_price} // แสดงค่าปัจจุบันจาก Parent
-            onChange={(e) => onChange('average_price', e.target.value)} // ส่งค่ากลับไปที่ Parent
+            className="w-full border-2 border-blue-100 rounded-xl p-2 p-2"
+            value={value.averange_price || ''} 
+            onChange={(e) => onChange('averange_price', e.target.value)}
           />
         </div>
       </div>

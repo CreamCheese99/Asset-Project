@@ -1,3 +1,19 @@
+// const express = require("express");
+// const cors = require("cors");
+// const bodyParser = require("body-parser");
+// const pool = require("./db");
+
+// const app = express();
+// const PORT = 5000;
+
+
+
+// app.use(cors());
+// app.use(bodyParser.json());
+// app.use(express.json());  
+
+
+
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -6,9 +22,12 @@ const pool = require("./db");
 const app = express();
 const PORT = 5000;
 
+// ใช้ cors สำหรับการอนุญาตให้เข้าถึง API
 app.use(cors());
-app.use(bodyParser.json());
-app.use(express.json());  
+
+// ตั้งค่าขีดจำกัดสำหรับ body-parser โดยกำหนดให้รองรับข้อมูลขนาดใหญ่
+app.use(bodyParser.json({ limit: "50mb" })); // ตั้งขีดจำกัดเป็น 50MB
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true })); // รองรับข้อมูล urlencoded ขนาดใหญ่
 
 
 //*********************************************************************************** */
@@ -20,7 +39,7 @@ app.post("/mainasset", async (req, res) => {
       status,
       fiscal_year,
       date_received,
-      badget_limit,
+      budget_limit,
       averange_price,
       budget_type,
       asset_type,
@@ -36,13 +55,23 @@ app.post("/mainasset", async (req, res) => {
 
     const newAsset = await pool.query(
       `INSERT INTO "mainasset" (
-        "main_asset_id", main_asset_name, status, fiscal_year, date_received,
-        badget_limit, averange_price, budget_type, asset_type,
-        location_use, location_deliver, usage, reponsible_person
+        "main_asset_id", 
+        main_asset_name, 
+        status, 
+        fiscal_year, 
+        date_received,
+        budget_limit, 
+        averange_price, 
+        budget_type, 
+        asset_type,
+        location_use, 
+        location_deliver, 
+        usage, 
+        reponsible_person
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
       [
         main_asset_id, main_asset_name, status, fiscal_year, date_received,
-        badget_limit, averange_price, budget_type, asset_type,
+        budget_limit, averange_price, budget_type, asset_type,
         location_use, location_deliver, usage, reponsible_person
       ]
     );
@@ -53,6 +82,7 @@ app.post("/mainasset", async (req, res) => {
     res.status(500).json({ error: "Server Error" });
   }
 });
+
 
 // API สำหรับดึงข้อมูลทั้งหมดจากตาราง MainAsset
 app.get("/mainasset", async (req, res) => {
@@ -141,7 +171,7 @@ app.put("/mainasset/:main_asset_id", async (req, res) => {
     status,
     fiscal_year,
     date_received,
-    badget_limit,
+    budget_limit,
     averange_price,
     budget_type,
     asset_type,
@@ -156,13 +186,13 @@ app.put("/mainasset/:main_asset_id", async (req, res) => {
       UPDATE "mainasset"
       SET 
         main_asset_name = $1, status = $2, fiscal_year = $3, date_received = $4,
-        badget_limit = $5, averange_price = $6, budget_type = $7, asset_type = $8,
+        budget_limit = $5, averange_price = $6, budget_type = $7, asset_type = $8,
         location_use = $9, location_deliver = $10, usage = $11, reponsible_person = $12
       WHERE "main_asset_id" = $13 RETURNING *`;
     
     const result = await pool.query(query, [
       main_asset_name, status, fiscal_year, date_received,
-      badget_limit, averange_price, budget_type, asset_type,
+      budget_limit, averange_price, budget_type, asset_type,
       location_use, location_deliver, usage, reponsible_person,
       main_asset_id
     ]);
@@ -177,6 +207,8 @@ app.put("/mainasset/:main_asset_id", async (req, res) => {
     res.status(500).json({ error: "Server Error" });
   }
 });
+
+
 
 
 
@@ -257,6 +289,8 @@ app.get('/api/subasset/:sub_asset_id', async (req, res) => {
     res.status(500).json({ error: 'Error fetching sub asset' });
   }
 });
+
+
 // //************************************************************************************************** */
 
 // //API สำหรับเพิ่มข้อมูลสาขาวิชา

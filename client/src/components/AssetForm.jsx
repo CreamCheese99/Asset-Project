@@ -8,13 +8,13 @@
 //             <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน</label>
 //             <input
 //               type="text"
-//               className="w-full border-2 border-blue-100 rounded-md "
+//               className="w-full border-2 border-blue-100 rounded-xl p-2 "
 //               placeholder="สมอ.xxx-xxx-xxxx/61"
 //             />
 //           </div>
 //           <div>
 //             <label className="block text-gray-700 text-sm mb-2">ภาควิชา</label>
-//             <select className="w-full border-2 border-blue-100 rounded-md">
+//             <select className="w-full border-2 border-blue-100 rounded-xl p-2">
 //                 <option>ครุศาสตร์อุตสาหกรรม</option>
 //                 <option>ครุศาสตร์สถาปัตยกรรมเเละการออกแบบ</option>
 //                 <option>ครุศาสตร์วิศวกรรม</option>
@@ -23,7 +23,7 @@
 //           </div>
 //           <div>
 //             <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
-//             <select className="w-full border-2 border-blue-100 rounded-md">
+//             <select className="w-full border-2 border-blue-100 rounded-xl p-2">
 //               <option>ใช้งาน</option>
 //               <option>ส่งซ่อม</option>
 //               <option>ชำรุด</option>
@@ -49,16 +49,16 @@ const AssetForm = ({ value, onChange }) => {
           <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน</label>
           <input
             type="text"
-            className="w-full border-2 border-blue-100 rounded-md p-2"
+            className="w-full border-2 border-blue-100 rounded-xl p-2 p-2"
             placeholder="สมอ.xxx-xxx-xxxx/61"
-            value={value.main_asset_ID || ''} // ✅ ป้องกัน undefined
-            onChange={(e) => onChange('main_asset_ID', e.target.value)}
+            value={value.main_asset_id || ''} // ✅ ป้องกัน undefined
+            onChange={(e) => onChange('main_asset_id', e.target.value)}
           />
         </div>
         <div>
           <label className="block text-gray-700 text-sm mb-2">ภาควิชา</label>
           <select
-            className="w-full border-2 border-blue-100 rounded-md p-2"
+            className="w-full border-2 border-blue-100 rounded-xl p-2 p-2"
             value={value.department || ''} // ✅ ป้องกัน undefined
             onChange={(e) => onChange('department', e.target.value)}
           >
@@ -72,7 +72,7 @@ const AssetForm = ({ value, onChange }) => {
         <div>
           <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
           <select
-            className="w-full border-2 border-blue-100 rounded-md p-2"
+            className="w-full border-2 border-blue-100 rounded-xl p-2 p-2"
             value={value.status || ''} // ✅ ป้องกัน undefined
             onChange={(e) => onChange('status', e.target.value)}
           >
