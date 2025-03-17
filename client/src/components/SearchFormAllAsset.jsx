@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
+import axios from 'axios'; // Import axios
 
 const SearchFormAllAsset = ({ onFilter }) => {
   const [filters, setFilters] = useState({
@@ -10,34 +11,60 @@ const SearchFormAllAsset = ({ onFilter }) => {
     budgetYear: "2566",
   });
 
-  // ตัวแปรที่เก็บข้อมูลภาควิชา (มาจากฐานข้อมูลหรือข้อมูลที่มีอยู่)
-  const [departments, setDepartments] = useState([]);
+  // State to store asset types and departments
+  const [assetType, setAssetType] = useState([]); // Asset types state
+  const [departments, setDepartments] = useState([]); // Departments state
 
-  // ฟังก์ชันดึงข้อมูลภาควิชาจากฐานข้อมูลหรือ API
+  // Fetch asset type data from the API using axios
   useEffect(() => {
-    // สมมติว่าดึงข้อมูลภาควิชาจาก API หรือฐานข้อมูล
-    const departmentList = [
-    "ครุศาสตร์วิศวกรรม",
-    "ครุศาสตร์เกษตร",
-    "ครุศาสตร์สถาปัตยกรรม",
-    "ครุศาสตร์การออกแบบ",
-    "ครุศาสตร์การออกแบบสภาพแวดล้อมภายใน",
-    ];
-    setDepartments(departmentList);
-  }, []);
+    const fetchAssetType = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/asset_type');
+        if (Array.isArray(response.data)) {
+          setAssetType(response.data); // Set the asset types
+        } else {
+          console.error("The response data is not an array:", response.data);
+        }
+      } catch (err) {
+        console.error('Error fetching Asset_Type:', err);
+      }
+    };
 
+    fetchAssetType();
+  }, []); // Empty dependency array means this effect runs once when the component mounts
+
+  // Fetch department data from the API using axios
+  useEffect(() => {
+    const fetchDepartment = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/department');
+        if (Array.isArray(response.data)) {
+          setDepartments(response.data); // Set the departments
+        } else {
+          console.error("The response data is not an array:", response.data);
+        }
+      } catch (err) {
+        console.error('Error fetching department:', err);
+      }
+    };
+
+    fetchDepartment();
+  }, []); // Empty dependency array means this effect runs once when the component mounts
+
+  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     const updatedFilters = { ...filters, [name]: value };
     setFilters(updatedFilters);
-    onFilter(updatedFilters);
+    onFilter(updatedFilters); // Send updated filters to the parent component
   };
 
+  // Generate the options for the budget year (current year +/- 10 years)
   const getYearOptions = () => {
     const currentYear = new Date().getFullYear();
     const years = [];
     for (let i = currentYear - 10; i <= currentYear + 10; i++) {
-      years.push(i + 543); // ปีพุทธศักราช
+      years.push(i + 543); // Convert to Thai Buddhist year
     }
     return years;
   };
@@ -62,72 +89,61 @@ const SearchFormAllAsset = ({ onFilter }) => {
             className="w-full px-4 py-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
         </div>
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-600 mb-2">
-            ประเภทสินทรัพย์
-          </label>
+        <div>
+          <label className="block text-sm font-medium text-gray-600 mb-2">ประเภทสินทรัพย์</label>
           <select
             name="assetType"
             value={filters.assetType}
             onChange={handleChange}
             className="w-full px-4 py-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           >
-            <option>ครุภัณฑ์สำนักงาน</option>
-            <option>ครุภัณฑ์ยานพาหนะและขนส่ง</option>
-            <option>ครุภัณฑ์ไฟฟ้าและวิทยุ</option>
-            <option>ครุภัณฑ์ไฟฟ้าและวิทยุ-เครื่องกำเนิดไฟฟ้า</option>
-            <option>ครุภัณฑ์เขียนและเผยแพร่</option>
-            <option>ครุภัณฑ์การเกษตร-เครื่องมืออุปกรณ์</option>
-            <option>ครุภัณฑ์การเกษตร-เครื่องจักรกล</option>
-            <option>ครุภัณฑ์โรงงาน-เครื่องมืออุปกรณ์</option>
-            <option>ครุภัณฑ์โรงงาน-เครื่องจักรกล</option>
-            <option>ครุภัณฑ์ก่อสร้าง-เครื่องมือและอุปกรณ์</option>
-            <option>ครุภัณฑ์ก่อสร้าง-เครื่องจักรกล</option>
-            <option>ครุภัณฑ์วิทยาศาสตร์และการแพทย์</option>
-            <option>ครุภัณฑ์คอมพิวเตอร์</option>
-            <option>ครุภัณฑ์กีฬา-กายภาพ</option>
-            <option>ครุภัณฑ์สนาม</option>
-            <option>ครุภัณฑ์งานบ้านงานครัว</option>
-            <option>ครุภัณฑ์การศึกษา</option>
-            <option>ครุภัณฑ์ศิลปะ-นาฏศิลป์</option>
-            <option>ครุภัณฑ์อาวุธ</option>
+            <option value="">-- กรุณาเลือก --</option>
+            {Array.isArray(assetType) &&
+              assetType.map((asset) => (
+                <option key={asset.asset_type_id} value={asset.asset_type_name}>
+                  {asset.asset_type_name}
+                </option>
+              ))}
           </select>
         </div>
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-600 mb-2">
-            ภาควิชา
-          </label>
+        <div>
+          <label className="block text-gray-700 text-sm mb-2">ภาควิชา</label>
           <select
             name="department"
             value={filters.department}
             onChange={handleChange}
             className="w-full px-4 py-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           >
-            <option value="">เลือกภาควิชา</option>
-            {departments.map((department, index) => (
-              <option key={index} value={department}>
-                {department}
-              </option>
-            ))}
+            <option value="">-- กรุณาเลือก --</option>
+            {Array.isArray(departments) &&
+              departments.map((dept) => (
+                <option key={dept.department_id} value={dept.department_id}>
+                  {dept.department_name}
+                </option>
+              ))}
           </select>
         </div>
+
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-600 mb-2">
             ประจำปีงบประมาณ
           </label>
           <select
-            name="budgetYear"
-            value={filters.budgetYear}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-          >
-            {getYearOptions().map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
+              name="budgetYear"
+              value={filters.budgetYear} // If filters.budgetYear is empty, the placeholder will be shown
+              onChange={handleChange}
+              className="w-full px-4 py-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+            >
+              <option value="">-- กรุณาเลือก --</option> {/* Placeholder option */}
+              {getYearOptions().map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+
         </div>
+        
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-600 mb-2">
             สภาพการครุภัณฑ์
@@ -138,14 +154,16 @@ const SearchFormAllAsset = ({ onFilter }) => {
             onChange={handleChange}
             className="w-full px-4 py-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           >
-            <option>ใช้งาน</option>
-            <option>ซ่อม</option>
-            <option>ชำรุด</option>
-            <option>บริจาค/โอน</option>
-            <option>รับโอน</option>
-            <option>จำหน่าย</option>
+            <option value="">-- กรุณาเลือก --</option> {/* Placeholder option */}
+            <option value="ใช้งาน">ใช้งาน</option>
+            <option value="ซ่อม">ซ่อม</option>
+            <option value="ชำรุด">ชำรุด</option>
+            <option value="บริจาค/โอน">บริจาค/โอน</option>
+            <option value="รับโอน">รับโอน</option>
+            <option value="จำหน่าย">จำหน่าย</option>
           </select>
         </div>
+
       </div>
     </div>
   );
