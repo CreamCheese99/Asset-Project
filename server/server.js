@@ -487,6 +487,15 @@ app.get('/api/subasset/:sub_asset_id', async (req, res) => {
 
 
 // ดึงข้อมูลภาควิชา พร้อมหลักสูตร
+
+
+// SELECT d.department_id, d.department_name, 
+//              COALESCE(json_agg(c.curriculum_name) FILTER (WHERE c.curriculum_name IS NOT NULL), '[]') AS curriculum
+//       FROM department d
+//       LEFT JOIN curriculum c ON d.department_id = c.department_id
+//       GROUP BY d.department_id, d.department_name
+
+
 app.get("/department", async (req, res) => {
   try {
     const result = await pool.query(`
@@ -503,37 +512,43 @@ app.get("/department", async (req, res) => {
   }
 });
 
-// เพิ่มภาควิชา พร้อมหลักสูตร
 app.post("/department", async (req, res) => {
-  const { department_id, department_name, curriculum } = req.body;
+  const { department_name, curriculum } = req.body;
 
-  if (!department_id || !department_name) {
-    return res.status(400).json({ error: "กรุณากรอกข้อมูลภาควิชาให้ครบถ้วน" });
+  if (!department_name) {
+    return res.status(400).json({ error: "กรุณากรอกชื่อภาควิชา" });
   }
 
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
 
-    // เพิ่มภาควิชา
+    // เพิ่มภาควิชา (ไม่ใส่ department_id เพราะเป็น SERIAL)
     const departmentResult = await client.query(
-      `INSERT INTO department (department_id, department_name) VALUES ($1, $2) RETURNING *`,
-      [department_id, department_name]
+      `INSERT INTO department (department_name) VALUES ($1) RETURNING department_id, department_name`,
+      [department_name]
     );
+
+    const newDepartmentId = departmentResult.rows[0].department_id; // ดึงค่า ID ที่เพิ่มมาใหม่
 
     // เพิ่มหลักสูตรที่เกี่ยวข้อง
     if (curriculum && curriculum.length > 0) {
       for (const curriculum_name of curriculum) {
-        await client.query(
-          `INSERT INTO curriculum (curriculum_name, department_id) VALUES ($1, $2)`,
-          [curriculum_name, department_id]
-        );
+        if (curriculum_name.trim() !== "") {
+          await client.query(
+            `INSERT INTO curriculum (curriculum_name, department_id) VALUES ($1, $2)`,
+            [curriculum_name, newDepartmentId]
+          );
+        }
       }
     }
 
     await client.query("COMMIT");
 
-    res.status(201).json({ message: "เพิ่มภาควิชาเรียบร้อย", data: departmentResult.rows[0] });
+    res.status(201).json({
+      message: "เพิ่มภาควิชาเรียบร้อย",
+      data: departmentResult.rows[0],
+    });
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("Database error: ", error);
@@ -542,6 +557,7 @@ app.post("/department", async (req, res) => {
     client.release();
   }
 });
+
 
 // แก้ไขภาควิชา พร้อมหลักสูตร
 app.put("/department/:id", async (req, res) => {
@@ -591,7 +607,6 @@ app.put("/department/:id", async (req, res) => {
   }
 });
 
-// ลบภาควิชา พร้อมหลักสูตรที่เกี่ยวข้อง
 app.delete("/department/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -599,13 +614,14 @@ app.delete("/department/:id", async (req, res) => {
   try {
     await client.query("BEGIN");
 
-    // ลบหลักสูตรที่เกี่ยวข้องก่อน
-    await client.query(`DELETE FROM curriculum WHERE department_id = $1`, [id]);
-
-    // ลบภาควิชา
-    const result = await client.query(`DELETE FROM department WHERE department_id = $1 RETURNING *`, [id]);
+    // ✅ ลบภาควิชา (curriculum จะถูกลบอัตโนมัติ เพราะใช้ ON DELETE CASCADE)
+    const result = await client.query(
+      `DELETE FROM department WHERE department_id = $1 RETURNING *`, 
+      [id]
+    );
 
     if (result.rowCount === 0) {
+      await client.query("ROLLBACK");
       return res.status(404).json({ error: "ไม่พบภาควิชาที่ต้องการลบ" });
     }
 
@@ -627,7 +643,7 @@ app.delete("/department/:id", async (req, res) => {
 // 📌 1. ดึงข้อมูลทั้งหมด
 app.get("/api/typeasset", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM typeasset ORDER BY id ASC");
+    const result = await pool.query("SELECT * FROM typeasset ORDER BY typeasset_id ASC");
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -637,7 +653,7 @@ app.get("/api/typeasset", async (req, res) => {
 app.get("/api/typeasset/:id", async (req, res) => {
   const { id } = req.params; // ดึงค่าของ id จาก URL params
   try {
-    const result = await pool.query("SELECT * FROM typeasset WHERE id = $1", [id]); // ใช้ parameterized query เพื่อป้องกัน SQL Injection
+    const result = await pool.query("SELECT * FROM typeasset WHERE typeasset_id = $1", [id]); // ใช้ parameterized query เพื่อป้องกัน SQL Injection
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "ประเภทสินทรัพย์ไม่พบ" });
     }
@@ -671,7 +687,7 @@ app.put("/api/typeasset/:id", async (req, res) => {
     const { typeasset_name } = req.body;
 
     const result = await pool.query(
-      "UPDATE typeasset SET typeasset_name = $1 WHERE id = $2 RETURNING *",
+      "UPDATE typeasset SET typeasset_name = $1 WHERE typeasset_id = $2 RETURNING *",
       [typeasset_name, id]
     );
 
@@ -691,7 +707,7 @@ app.delete("/api/typeasset/:id", async (req, res) => {
     const { id } = req.params;
 
     const result = await pool.query(
-      "DELETE FROM typeasset WHERE id = $1 RETURNING *",
+      "DELETE FROM typeasset WHERE typeasset_id = $1 RETURNING *",
       [id]
     );
 

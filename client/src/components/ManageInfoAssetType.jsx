@@ -107,7 +107,6 @@
 // export default ManageAssetTypes;
 
 
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
@@ -133,7 +132,7 @@ const ManageAssetTypes = () => {
 
   const handleEdit = (id, item) => {
     setEditingId(id);
-    setTempData({ ...item });
+    setTempData({ assetType: item.typeasset_name });
     setIsModalOpen(true);
   };
 
@@ -197,17 +196,17 @@ const ManageAssetTypes = () => {
         </thead>
         <tbody>
           {data.map((item) => (
-            <tr key={item.id} className="border-t border-gray-300">
+            <tr key={item.typeasset_id} className="border-t border-gray-300">
               <td className="py-2 px-4">{item.typeasset_name}</td>
               <td className="py-2 px-4 flex space-x-2">
                 <button
-                  onClick={() => handleEdit(item.id, item)}
+                  onClick={() => handleEdit(item.typeasset_id, item)}
                   className="bg-yellow-500 text-white px-4 py-2 rounded-full hover:bg-yellow-600 shadow-md flex items-center"
                 >
                   <FaEdit className="mr-1" /> แก้ไข
                 </button>
                 <button
-                  onClick={() => handleDelete(item.id)}
+                  onClick={() => handleDelete(item.typeasset_id)}
                   className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 shadow-md flex items-center"
                 >
                   <FaTrash className="mr-1" /> ลบ
