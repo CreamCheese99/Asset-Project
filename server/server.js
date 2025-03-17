@@ -217,9 +217,7 @@ app.put("/mainasset/:main_asset_id", async (req, res) => {
 // API สำหรับเพิ่มข้อมูลในตาราง SubAsset
 app.post('/api/subasset', async (req, res) => {
   const {
-    sub_asset_id,
     sub_asset_name,
-    type,
     details,
     quantity,
     unit_price,
@@ -229,18 +227,16 @@ app.post('/api/subasset', async (req, res) => {
   } = req.body;
 
   try {
-    // เชื่อมต่อกับฐานข้อมูลและเพิ่มข้อมูลลงในตาราง SubAsset
+    // คำสั่ง SQL ที่ถูกต้องโดยไม่ต้องส่งค่า sub_asset_id เนื่องจากจะถูกสร้างอัตโนมัติ
     const query = `
       INSERT INTO public."subasset"(
-        "sub_asset_id", sub_asset_name, type, details, quantity, unit_price, status, counting_unit, "main_asset_id"
+        sub_asset_name, details, quantity, unit_price, status, counting_unit, main_asset_id
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
     `;
     
     const values = [
-      sub_asset_id,
       sub_asset_name,
-      type,
       details,
       quantity,
       unit_price,
@@ -257,36 +253,76 @@ app.post('/api/subasset', async (req, res) => {
     res.status(500).json({ error: 'Error adding sub asset' });
   }
 });
-
-// API สำหรับดึงข้อมูลจากตาราง SubAsset
+// API สำหรับดึงข้อมูล SubAsset ทั้งหมด
 app.get('/api/subasset', async (req, res) => {
   try {
-    const query = `SELECT * FROM public."subasset"`;
-    const result = await pool.query(query);
-
+    const result = await pool.query('SELECT * FROM public."subasset"');
     res.status(200).json(result.rows);
   } catch (error) {
-    console.error("Error fetching subassets:", error);
-    res.status(500).json({ error: 'Error fetching subassets' });
+    console.error("Error fetching sub assets:", error);
+    res.status(500).json({ error: 'Error fetching sub assets' });
   }
 });
 
-// API สำหรับดึงข้อมูล SubAsset โดยค้นหาตาม sub_asset_ID
-app.get('/api/subasset/:sub_asset_id', async (req, res) => {
-  const { sub_asset_id } = req.params;
-
+// API สำหรับดึงข้อมูล SubAsset โดยใช้ sub_asset_id
+app.get('/api/subasset/:id', async (req, res) => {
+  const { id } = req.params;
   try {
-    const query = `SELECT * FROM public."subasset" WHERE "sub_asset_id" = $1`;
-    const result = await pool.query(query, [sub_asset_id]);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'SubAsset not found' });
+    const result = await pool.query('SELECT * FROM public."subasset" WHERE sub_asset_id = $1', [id]);
+    if(result.rows.length === 0){
+      return res.status(404).json({ error: 'Sub asset not found' });
     }
-
     res.status(200).json(result.rows[0]);
   } catch (error) {
     console.error("Error fetching sub asset:", error);
     res.status(500).json({ error: 'Error fetching sub asset' });
+  }
+});
+
+// API สำหรับลบ SubAsset โดยใช้ sub_asset_id
+app.delete('/api/subasset/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('DELETE FROM public."subasset" WHERE sub_asset_id = $1', [id]);
+    if(result.rowCount === 0){
+      return res.status(404).json({ error: 'Sub asset not found' });
+    }
+    res.status(200).json({ message: 'Sub asset deleted successfully' });
+  } catch (error) {
+    console.error("Error deleting sub asset:", error);
+    res.status(500).json({ error: 'Error deleting sub asset' });
+  }
+});
+
+// API สำหรับอัปเดตข้อมูล SubAsset โดยใช้ sub_asset_id
+app.put('/api/subasset/:id', async (req, res) => {
+  const { id } = req.params;
+  const { sub_asset_name, details, quantity, unit_price, status, counting_unit, main_asset_id } = req.body;
+  
+  try {
+    const query = `
+      UPDATE public."subasset"
+      SET sub_asset_name = $1,
+          details = $2,
+          quantity = $3,
+          unit_price = $4,
+          status = $5,
+          counting_unit = $6,
+          main_asset_id = $7
+      WHERE sub_asset_id = $8
+      RETURNING *;
+    `;
+    const values = [sub_asset_name, details, quantity, unit_price, status, counting_unit, main_asset_id, id];
+    const result = await pool.query(query, values);
+    
+    if(result.rows.length === 0){
+      return res.status(404).json({ error: 'Sub asset not found' });
+    }
+    
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error updating sub asset:", error);
+    res.status(500).json({ error: 'Error updating sub asset' });
   }
 });
 

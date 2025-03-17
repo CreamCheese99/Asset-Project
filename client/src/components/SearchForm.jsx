@@ -73,6 +73,7 @@ const SearchForm = () => {
         <div>
           <label className="block text-gray-700 text-sm mb-2">ประเภทเงิน</label>
           <select className="w-full border-2 border-blue-100 rounded-xl">
+            <option>-- กรุณาเลือก --</option>
             <option>เงินรายได้</option>
             <option>เงินงบประมาณ</option>
             <option>เงินสะสมคลัง</option>
@@ -83,6 +84,7 @@ const SearchForm = () => {
         <div>
           <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
           <select className="w-full border-2 border-blue-100 rounded-xl">
+            <option>-- กรุณาเลือก --</option>
             <option>ใช้งาน</option>
             <option>ซ่อม</option>
             <option>ชำรุด</option>
