@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 import Filters from "./Filters";
 import BarChart from "./BarChart";
 import PieChart from "./PieChart";
-import { calculateBarData, calculatePieData, summaryDepartmentDetails, summaryDepartmentAssets } from "./dataUtils";
+import { 
+  summaryDepartmentDetails, 
+  summaryDepartmentAssets,
+  summaryFilterDepartmentAssets,
+  summaryFilterDepartmentDetails
+} from "./dataUtils";
 
 const DashboardPage = () => {
   const [selectedDepartment, setSelectedDepartment] = useState("");
@@ -20,7 +25,7 @@ const DashboardPage = () => {
     setErrorMessage(""); // ล้างข้อความ error ก่อนการโหลดใหม่
     try {
       // ทำการร้องขอข้อมูลจากเซิร์ฟเวอร์
-      const response = await fetch("http://localhost:5001/api/getData"); // URL ของ API
+      const response = await fetch("http://localhost:5000/api/getData"); // URL ของ API
       if (!response.ok) {
         throw new Error("ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์");
       }
@@ -30,14 +35,12 @@ const DashboardPage = () => {
       console.log("Data received from API:", data);
 
       // คำนวณข้อมูลกราฟจากข้อมูลที่ได้รับ
-      if (
-        (selectedDepartment, selectedAssetStatus, selectedFund, selectedYear)
-      ) {
+      if (selectedDepartment || selectedAssetStatus || selectedFund || selectedYear) {
         setBarData(
-          calculateBarData(data, selectedDepartment, selectedFund, selectedYear)
+          summaryFilterDepartmentDetails(data, selectedDepartment, selectedFund, selectedYear)
         );
         setPieData(
-          calculatePieData(
+          summaryFilterDepartmentAssets(
             data,
             selectedDepartment,
             selectedAssetStatus,

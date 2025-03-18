@@ -27,8 +27,7 @@
 // export const calculateBarDataByYearOnly = () => {
 //   const datasets = [{
 //     label: "รวมทุกแหล่งเงินทุน",
-    
-    
+
 //     data: years.map(year => {
 //       return departments.reduce((sum, dept) => {
 //         return sum + fundTypes.reduce((fundSum, fund) => {
@@ -36,7 +35,7 @@
 //         }, 0);
 //       }, 0);
 //     }),
-//     backgroundColor: years.map(year => yearColors[year]), 
+//     backgroundColor: years.map(year => yearColors[year]),
 //     borderColor: years.map(year => yearColors[year].replace('0.6', '1')),
 //     borderWidth: 1,
 //   }];
@@ -46,7 +45,6 @@
 //     datasets: datasets.length ? datasets : [{ label: 'ไม่มีข้อมูล', data: [0], backgroundColor: 'gray' }]
 //   };
 // };
-
 
 // // ฟังก์ชันคำนวณข้อมูลสำหรับ BarChart
 // export const calculateBarData = (selectedDepartment, selectedFund, selectedYear) => {
@@ -69,7 +67,6 @@
 //     datasets: datasets.length ? datasets : [{ label: 'ไม่มีข้อมูล', data: [0], backgroundColor: 'gray' }],
 //   };
 // };
-
 
 // // ฟังก์ชันคำนวณข้อมูลสำหรับ PieChart
 // export const departmentAssets = {
@@ -100,18 +97,18 @@
 
 //   const data = assetStatuses.map(status =>
 //     filteredDepartments.reduce((sum, dept) =>
-//       sum + (filteredYears.reduce((acc, year) => 
+//       sum + (filteredYears.reduce((acc, year) =>
 //         acc + (departmentAssets[dept]?.[status]?.[year]?.reduce((a, b) => a + b, 0) || 0), 0)), 0)
 //   );
 
-//   return { 
-//     labels, 
+//   return {
+//     labels,
 //     datasets: [{
-//       label: 'สัดส่วนสภาพครุภัณฑ์', 
-//       data, 
+//       label: 'สัดส่วนสภาพครุภัณฑ์',
+//       data,
 //       backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-//       hoverOffset: 4 
-//     }] 
+//       hoverOffset: 4
+//     }]
 //   };
 // };
 
@@ -126,47 +123,220 @@
 //   return [];
 // };
 // dataUtils.js
-export const calculateBarData = (data, selectedDepartment, selectedFund, selectedYear) => {
-  // ตรวจสอบว่ามีข้อมูลตามที่เลือกหรือไม่
-  if (!data || !data[selectedDepartment] || !data[selectedDepartment][selectedFund] || !data[selectedDepartment][selectedFund][selectedYear]) {
-    return []; // หากข้อมูลไม่พบ ให้ส่งคืน array ว่าง
+
+export function summaryDepartmentDetails(data) {
+  const summary = {};
+  let years = []
+
+  for (const department of Object.keys(data.departmentDetails)) {
+    summary[department] = {};
+    for (const fundType of Object.keys(data.departmentDetails[department])) {
+      summary[department][fundType] = [];
+      for (const year of Object.keys(data.departmentDetails[department][fundType])) {
+        const total = data.departmentDetails[department][fundType][year].reduce((acc, val) => acc + val, 0);
+        summary[department][fundType].push({ year, total });
+        // สร้าง labels จากปี
+        years = summary[department][fundType].map(item => item.year);
+      }
+    }
+  }
+  // สีสำหรับ datasets
+  const colors = [
+    "rgba(75, 192, 192, 0.2)", "rgba(255, 159, 64, 0.2)",
+    "rgba(54, 162, 235, 0.2)", "rgba(255, 99, 132, 0.2)"
+  ];
+  const borderColors = [
+    "rgba(75, 192, 192, 1)", "rgba(255, 159, 64, 1)",
+    "rgba(54, 162, 235, 1)", "rgba(255, 99, 132, 1)"
+  ];
+
+  let colorIndex = 0;
+
+  // สร้าง datasets อัตโนมัติ
+  const datasets = Object.keys(summary).flatMap((faculty) =>
+    Object.keys(summary[faculty]).map((type) => {
+      const dataset = {
+        label: `${faculty} - ${type}`,
+        data: summary[faculty][type].map(item => item.total),
+        backgroundColor: colors[colorIndex % colors.length],
+        borderColor: borderColors[colorIndex % borderColors.length],
+        borderWidth: 1
+      };
+      colorIndex++;
+      return dataset;
+    })
+  );
+
+  const chartData = {
+    labels: years,
+    datasets: datasets
+  };
+
+  return chartData;
+}
+
+export function summaryDepartmentAssets(data) {
+  const summary = {};
+  let years = []
+
+  for (const department of Object.keys(data.departmentAssets)) {
+    summary[department] = {};
+    for (const assetStatus of Object.keys(data.departmentAssets[department])) {
+      summary[department][assetStatus] = [];
+      for (const year of Object.keys(data.departmentAssets[department][assetStatus])) {
+        const total = data.departmentAssets[department][assetStatus][year].reduce((acc, val) => acc + val, 0);
+        summary[department][assetStatus].push({ year, total });
+        // สร้าง labels จากปี
+        years = summary[department][assetStatus].map(item => item.year);
+      }
+    }
   }
 
-  const departmentData = data[selectedDepartment];
-  const fundData = departmentData[selectedFund];
-  const yearData = fundData[selectedYear];
+  // สีสำหรับ datasets
+  const colors = [
+    "rgba(75, 192, 192, 0.2)", "rgba(255, 159, 64, 0.2)",
+    "rgba(54, 162, 235, 0.2)", "rgba(255, 99, 132, 0.2)"
+  ];
+  const borderColors = [
+    "rgba(75, 192, 192, 1)", "rgba(255, 159, 64, 1)",
+    "rgba(54, 162, 235, 1)", "rgba(255, 99, 132, 1)"
+  ];
 
-  // ตรวจสอบว่า yearData เป็น array หรือไม่
-  if (!Array.isArray(yearData)) {
-    console.error('Data for the selected year is not in array format');
-    return [];
+  let colorIndex = 0;
+
+  // สร้าง datasets อัตโนมัติ
+  const datasets = Object.keys(summary).flatMap((faculty) =>
+    Object.keys(summary[faculty]).map((type) => {
+      const dataset = {
+        label: `${faculty} - ${type}`,
+        data: summary[faculty][type].map(item => item.total),
+        backgroundColor: colors[colorIndex % colors.length],
+        borderColor: borderColors[colorIndex % borderColors.length],
+        borderWidth: 1
+      };
+      colorIndex++;
+      return dataset;
+    })
+  );
+
+  const chartData = {
+    labels: years,
+    datasets: datasets
+  };
+  
+  return chartData;
+}
+
+
+export function summaryFilterDepartmentDetails(data, department = "", fundType = "", yearRange = "") {
+  const summary = {};
+  let years = [];
+
+  if (!department) {
+    department = Object.keys(data.departmentDetails)[0] || "";
   }
 
-  // แปลงข้อมูลเป็นรูปแบบที่ต้องการ
-  return yearData.map((amount, index) => ({
-    label: `Category ${index + 1}`,
-    value: amount
+  if (!data.departmentDetails[department]) {
+    return { labels: [], datasets: [] };
+  }
+
+  summary[department] = {};
+
+  const selectedFundTypes = fundType ? [fundType] : Object.keys(data.departmentDetails[department]);
+
+  selectedFundTypes.forEach((type) => {
+    if (!data.departmentDetails[department][type]) return;
+
+    summary[department][type] = [];
+
+    const availableYears = Object.keys(data.departmentDetails[department][type]);
+    let selectedYears = availableYears;
+
+    if (yearRange) {
+      const [start, end] = yearRange.split("-").map(y => y.trim());
+      selectedYears = availableYears.filter(yr => yr >= start && (!end || yr <= end));
+    }
+
+    selectedYears.forEach((yr) => {
+      const total = data.departmentDetails[department][type][yr].reduce((acc, val) => acc + val, 0);
+      summary[department][type].push({ year: yr, total });
+
+      if (!years.includes(yr)) years.push(yr);
+    });
+  });
+
+  const colors = ["rgba(75, 192, 192, 0.2)", "rgba(255, 159, 64, 0.2)"];
+  const borderColors = ["rgba(75, 192, 192, 1)", "rgba(255, 159, 64, 1)"];
+
+  let colorIndex = 0;
+
+  const datasets = Object.keys(summary[department]).map((type) => ({
+    label: `${department} - ${type}`,
+    data: summary[department][type].map((item) => item.total),
+    backgroundColor: colors[colorIndex % colors.length],
+    borderColor: borderColors[colorIndex % borderColors.length],
+    borderWidth: 1,
   }));
-};
 
-export const calculatePieData = (data, selectedDepartment, selectedYear) => {
-  // ตรวจสอบว่ามีข้อมูลตามที่เลือกหรือไม่
-  if (!data || !data[selectedDepartment] || !data[selectedDepartment][selectedYear]) {
-    return []; // หากข้อมูลไม่พบ ให้ส่งคืน array ว่าง
+  return {
+    labels: years.sort(),
+    datasets: datasets
+  };
+}
+
+
+export function summaryFilterDepartmentAssets(data, department = "", assetStatus = "", yearRange = "") {
+  const summary = {};
+  let years = [];
+
+  if (!department) {
+    department = Object.keys(data.departmentAssets)[0] || "";
   }
 
-  const departmentData = data[selectedDepartment];
-  const yearData = departmentData[selectedYear];
-
-  // ตรวจสอบว่า yearData เป็น array หรือไม่
-  if (!Array.isArray(yearData)) {
-    console.error('Data for the selected year is not in array format');
-    return [];
+  if (!data.departmentAssets[department]) {
+    return { labels: [], datasets: [] };
   }
 
-  // แปลงข้อมูลเป็นรูปแบบที่ต้องการ
-  return yearData.map((amount, index) => ({
-    label: `Asset Type ${index + 1}`,
-    value: amount
+  summary[department] = {};
+
+  const selectedAssetStatuses = assetStatus ? [assetStatus] : Object.keys(data.departmentAssets[department]);
+
+  selectedAssetStatuses.forEach((status) => {
+    if (!data.departmentAssets[department][status]) return;
+
+    summary[department][status] = [];
+
+    const availableYears = Object.keys(data.departmentAssets[department][status]);
+    let selectedYears = availableYears;
+
+    if (yearRange) {
+      const [start, end] = yearRange.split("-").map(y => y.trim());
+      selectedYears = availableYears.filter(yr => yr >= start && (!end || yr <= end));
+    }
+
+    selectedYears.forEach((yr) => {
+      const total = data.departmentAssets[department][status][yr].reduce((acc, val) => acc + val, 0);
+      summary[department][status].push({ year: yr, total });
+
+      if (!years.includes(yr)) years.push(yr);
+    });
+  });
+
+  const colors = ["rgba(54, 162, 235, 0.2)", "rgba(255, 99, 132, 0.2)"];
+  const borderColors = ["rgba(54, 162, 235, 1)", "rgba(255, 99, 132, 1)"];
+
+  let colorIndex = 0;
+
+  const datasets = Object.keys(summary[department]).map((status) => ({
+    label: `${department} - ${status}`,
+    data: summary[department][status].map((item) => item.total),
+    backgroundColor: colors[colorIndex % colors.length],
+    borderColor: borderColors[colorIndex % borderColors.length],
+    borderWidth: 1,
   }));
-};
+
+  return {
+    labels: years.sort(),
+    datasets: datasets
+  };
+}
