@@ -1,28 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-const Filters = ({ selectedDepartment, setSelectedDepartment, selectedFund, setSelectedFund, selectedYear, handleYearChange, errorMessage }) => {
+const Filters = ({
+  selectedDepartment,
+  setSelectedDepartment,
+  selectedAssetStatus,
+  setSelectedAssetStatus,
+  selectedFund,
+  setSelectedFund,
+  selectedYear,
+  handleYearChange,
+  errorMessage,
+}) => {
   const [departments, setDepartments] = useState([]);
+  const [assetStatus, setAssetStatus] = useState([]);
   const [fundTypes, setFundTypes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [apiError, setApiError] = useState('');
+  const [apiError, setApiError] = useState("");
 
   // ดึงข้อมูลภาควิชาและแหล่งทุนจาก API
   useEffect(() => {
     const fetchData = async () => {
       try {
         // ดึงข้อมูลจาก API ของเซิร์ฟเวอร์
-        const response = await fetch('/api/getData'); // เปลี่ยน URL เป็น '/api/getData'
-        if (!response.ok) throw new Error('ไม่สามารถดึงข้อมูลได้');
-        
-        const data = await response.json(); // ดึงข้อมูล JSON
+        const response = await fetch("http://localhost:5001/api/getData"); // เปลี่ยน URL เป็น '/api/getData'
+        if (!response.ok) throw new Error("ไม่สามารถดึงข้อมูลได้");
 
+        const data = await response.json(); // ดึงข้อมูล JSON
+        
         // ตั้งค่าข้อมูลภาควิชาและแหล่งทุน
         setDepartments(data.departments);
         setFundTypes(data.fundTypes);
+        setAssetStatus(data.assetStatuses);
 
         setLoading(false); // เปลี่ยนสถานะการโหลด
       } catch (error) {
-        setApiError('เกิดข้อผิดพลาดในการดึงข้อมูล');
+        setApiError("เกิดข้อผิดพลาดในการดึงข้อมูล");
         setLoading(false);
       }
     };
@@ -35,25 +47,65 @@ const Filters = ({ selectedDepartment, setSelectedDepartment, selectedFund, setS
   }
 
   return (
-    <div style={{ background: '#f9f9f9', padding: '15px', borderRadius: '10px', marginBottom: '20px', display: 'grid', gap: '10px', gridTemplateColumns: '1fr 1fr 1fr' }}>
-      {apiError && <div style={{ color: 'red', gridColumn: 'span 3' }}>{apiError}</div>}
-      
+    <div
+      style={{
+        background: "#f9f9f9",
+        padding: "15px",
+        borderRadius: "10px",
+        marginBottom: "20px",
+        display: "grid",
+        gap: "10px",
+        gridTemplateColumns: "1fr 1fr 1fr",
+      }}
+    >
+      {apiError && (
+        <div style={{ color: "red", gridColumn: "span 3" }}>{apiError}</div>
+      )}
+
       <div>
         <label>ภาควิชา:</label>
-        <select value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} style={{ width: '100%', padding: '5px' }}>
+        <select
+          value={selectedDepartment}
+          onChange={(e) => setSelectedDepartment(e.target.value)}
+          style={{ width: "100%", padding: "5px" }}
+        >
           <option value="">-- ทุกภาควิชา --</option>
           {departments.map((dept) => (
-            <option key={dept} value={dept}>{dept}</option>
+            <option key={dept} value={dept}>
+              {dept}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label>สถานะสินทรัพย์:</label>
+        <select
+          value={selectedAssetStatus}
+          onChange={(e) => setSelectedAssetStatus(e.target.value)}
+          style={{ width: "100%", padding: "5px" }}
+        >
+          <option value="">-- ทุกสถานะสินทรัพย์ --</option>
+          {assetStatus.map((status) => (
+            <option key={status} value={status}>
+              {status}
+            </option>
           ))}
         </select>
       </div>
 
       <div>
         <label>แหล่งเงิน:</label>
-        <select value={selectedFund} onChange={(e) => setSelectedFund(e.target.value)} style={{ width: '100%', padding: '5px' }}>
+        <select
+          value={selectedFund}
+          onChange={(e) => setSelectedFund(e.target.value)}
+          style={{ width: "100%", padding: "5px" }}
+        >
           <option value="">-- ทุกแหล่งทุน --</option>
           {fundTypes.map((fund) => (
-            <option key={fund} value={fund}>{fund}</option>
+            <option key={fund} value={fund}>
+              {fund}
+            </option>
           ))}
         </select>
       </div>
@@ -65,9 +117,11 @@ const Filters = ({ selectedDepartment, setSelectedDepartment, selectedFund, setS
           value={selectedYear}
           onChange={handleYearChange}
           placeholder="2565 หรือ 2565-2568"
-          style={{ width: '100%', padding: '5px' }}
+          style={{ width: "100%", padding: "5px" }}
         />
-        {errorMessage && <div style={{ color: 'red', marginTop: '5px' }}>{errorMessage}</div>}
+        {errorMessage && (
+          <div style={{ color: "red", marginTop: "5px" }}>{errorMessage}</div>
+        )}
       </div>
     </div>
   );
