@@ -1,6 +1,14 @@
-import React from 'react';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { useState, useEffect } from "react";
 
 // ลงทะเบียนประเภทกราฟที่ต้องการ
 ChartJS.register(
@@ -12,34 +20,46 @@ ChartJS.register(
   Legend
 );
 
+// eslint-disable-next-line react/prop-types
 const BarChart = ({ data }) => {
-  // กำหนดการตั้งค่าเพิ่มเติมสำหรับการปรับสีกราฟแท่ง
-  const chartData = {
-    labels: data.labels,  // แท็กบนแกน x
-    datasets: [
-      {
-        label: 'ข้อมูลกราฟ',
-        data: data.values,  // ค่าของข้อมูลกราฟ
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',  // สีของแท่งกราฟ (สามารถเปลี่ยนเป็นสีที่ต้องการ)
-        borderColor: 'rgba(75, 192, 192, 1)',  // สีของขอบแท่งกราฟ
-        borderWidth: 1
-      }
-    ]
-  };
+  const [chartData, setChartData] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    // eslint-disable-next-line react/prop-types
+    if (data && data.labels && data.datasets) {
+      setChartData(data);
+    } else {
+      setErrorMessage("ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์");
+    }
+  }, [data]);
+
+  if (errorMessage) {
+    return <p>{errorMessage}</p>;
+  }
 
   return (
-    <div style={{ background: '#fff', padding: '10px', borderRadius: '10px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+    <div
+      style={{
+        background: "#fff",
+        padding: "10px",
+        borderRadius: "10px",
+        boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+      }}
+    >
       {/* <h3 style={{ textAlign: 'center', marginBottom: '10px' }}>กราฟแท่ง</h3> */}
-      <Bar 
-        data={chartData} 
-        options={{ 
-          plugins: { 
-            legend: { 
-              position: 'top' 
+      {chartData && (
+        <Bar
+          data={chartData}
+          options={{
+            plugins: {
+              legend: {
+                position: "top",
+              },
             },
-          },
-        }} 
-      />
+          }}
+        />
+      )}
     </div>
   );
 };
