@@ -37,11 +37,13 @@ const AssetForm = ({ value, onChange }) => {
             onChange={(e) => onChange('main_asset_id', e.target.value)}
           />
         </div>
+      
+
         <div>
           <label className="block text-gray-700 text-sm mb-2">ภาควิชา</label>
           <select
             className="w-full border-2 border-blue-100 rounded-xl p-2 p-2"
-            value={value.department_id || ''} 
+            value={value.department_id} 
             onChange={(e) => onChange('department_id', e.target.value)} 
           >
             <option value="">-- กรุณาเลือก --</option>
@@ -52,6 +54,7 @@ const AssetForm = ({ value, onChange }) => {
             ))}
           </select>
         </div>
+
         <div>
           <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
           <select

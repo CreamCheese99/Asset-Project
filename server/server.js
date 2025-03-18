@@ -46,7 +46,8 @@ app.post("/mainasset", async (req, res) => {
       location_use,
       location_deliver,
       usage,
-      responsible_person
+      responsible_person,
+      department_id
     } = req.body;
 
     if (!main_asset_id || !main_asset_name) {
@@ -67,12 +68,13 @@ app.post("/mainasset", async (req, res) => {
         location_use, 
         location_deliver, 
         usage, 
-        responsible_person
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
+        responsible_person,
+        department_id
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *`,
       [
         main_asset_id, main_asset_name, status, fiscal_year, date_received,
         budget_limit, averange_price, budget_type, asset_type,
-        location_use, location_deliver, usage, responsible_person
+        location_use, location_deliver, usage, responsible_person, department_id
       ]
     );
 
@@ -347,15 +349,23 @@ app.get("/department", async (req, res) => {
     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลภาควิชา" });
   }
 });
-
-
 app.get('/api/department', async (req, res) => {
   try {
-    const result = await pool.query('SELECT department_name,department_id FROM department');
-    res.json(result.rows); // Send data as a JSON array
+    // ดึงข้อมูลจากฐานข้อมูล โดยจัดเรียงตาม department_id
+    const result = await pool.query('SELECT * FROM department ORDER BY department_id ASC');
+    
+    // ถ้าไม่มีข้อมูลในตาราง department
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'No departments found' }); // ส่ง 404 ถ้าไม่มีข้อมูล
+    }
+
+    // ส่งข้อมูลกลับในรูปแบบ JSON
+    res.status(200).json(result.rows); // ส่งข้อมูลพร้อมสถานะ 200 OK
+
   } catch (err) {
-    console.error('Error fetching department:', err);
-    res.status(500).send('Server error');
+    console.error('Error fetching department:', err); // log ข้อผิดพลาดในเซิร์ฟเวอร์
+    // ส่งข้อความข้อผิดพลาดในรูปแบบ JSON
+    res.status(500).json({ error: 'Server error, please try again later' }); // ส่ง 500 เมื่อเกิดข้อผิดพลาดที่เซิร์ฟเวอร์
   }
 });
 
