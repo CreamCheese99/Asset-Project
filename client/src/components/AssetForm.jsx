@@ -6,6 +6,7 @@ const AssetForm = ({ value, onChange }) => {
 
   useEffect(() => {
     // Fetch department data from the API using axios
+    
     const fetchDepartment = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/department');
@@ -20,7 +21,7 @@ const AssetForm = ({ value, onChange }) => {
       }
     };
 
-    fetchDepartment();
+    fetchDepartment();  
   }, []); // Empty dependency array ensures this runs once on mount
 
   return (

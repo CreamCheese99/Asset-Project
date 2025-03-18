@@ -172,7 +172,12 @@ const DataTable = () => {
               {/* <td className="border px-4 py-2">{item.unit || "-"}</td> */}
               <td className="border px-4 py-2">{item.status}</td>
               <td className="border px-4 py-2 flex justify-center space-x-2">
-                <Link to="/show-info" className="text-blue-500 hover:text-blue-700 bg-gray-200 rounded-lg px-3 py-1">ดู</Link>
+              <Link 
+                  to={`/show-info/${item.main_asset_id}`} 
+                  className="text-blue-500 hover:text-blue-700 bg-gray-200 rounded-lg px-3 py-1"
+                >
+                  ดู
+                </Link>
                 <Link to="/add-asset" className="text-yellow-500 hover:text-yellow-700 bg-gray-200 rounded-lg px-3 py-1">แก้ไข</Link>
                 <button className="text-red-500 hover:text-red-700 bg-gray-200 rounded-lg px-3 py-1" onClick={() => handleDelete(item.main_asset_ID)}>ลบ</button>
               </td>

@@ -102,24 +102,46 @@ group by mainasset.main_asset_id,main_asset_name,mainasset.status,department_nam
   }
 });
 
-// API สำหรับดึงข้อมูล MainAsset ตาม main_asset_ID
-app.get("/mainasset/:main_asset_id", async (req, res) => {
-  const { main_asset_id } = req.params;
+
+
+app.get("/mainasset/:id", async (req, res) => {
+  const { id } = req.params;
+  console.log("Received ID:", id);  // log the received ID for debugging
 
   try {
-    const query = `SELECT * FROM "mainasset" WHERE "main_asset_id" = $1`;
-    const result = await pool.query(query, [main_asset_id]);
+    // Query to get the main asset
+    const mainAssetQuery = `
+      SELECT * 
+      FROM public.mainasset 
+      WHERE main_asset_id = $1
+    `;
+    const mainAssetResult = await pool.query(mainAssetQuery, [id]);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "MainAsset not found" });
+    // If main asset is not found, return a 404 error
+    if (mainAssetResult.rows.length === 0) {
+      return res.status(404).json({ message: "Main asset not found" });
     }
 
-    res.status(200).json(result.rows[0]);
+    const mainAsset = mainAssetResult.rows[0];
+
+    // Query to get sub assets related to the main asset
+    const subAssetQuery = `
+      SELECT * 
+      FROM public.subasset 
+      WHERE main_asset_id = $1
+    `;
+    const subAssetResult = await pool.query(subAssetQuery, [id]);
+
+    res.json({
+      mainAsset: mainAsset,
+      subAssets: subAssetResult.rows,
+    });
   } catch (error) {
-    console.error("Error fetching asset:", error);
-    res.status(500).json({ error: "Server Error" });
+    console.error("Error fetching data:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 // app.delete("/mainasset/:main_asset_ID", async (req, res) => {
 //   const { main_asset_ID } = req.body;
@@ -255,6 +277,9 @@ app.post('/api/subasset', async (req, res) => {
     res.status(500).json({ error: 'Error adding sub asset' });
   }
 });
+
+
+
 // API สำหรับดึงข้อมูล SubAsset ทั้งหมด
 app.get('/api/subasset', async (req, res) => {
   try {

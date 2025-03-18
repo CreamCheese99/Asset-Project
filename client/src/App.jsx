@@ -20,7 +20,7 @@ function App() {
           <Route path="add-asset" element={<AddAsset />} /> 
           <Route path="manage-personal-info" element={<ManagePerInfo/>} />
           <Route path="login" element={<Login/>}/>
-          <Route path="show-info" element={<ShowInfo/>}/>
+          <Route path="/show-info/:id" element={<ShowInfo/>}/>
         </Route>
       </Routes>
     </Router>
