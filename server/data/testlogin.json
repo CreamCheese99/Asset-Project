@@ -1,7 +1,32 @@
-{
-    "mail": "65030027@kmitl.ac.th",
+[
+  {
     "uid": "65030027",
-    "employeeType": "Bachelor Degrees",
-    "cn": "Khemmasedth Limwattanochai"
-}
-
+    "cn": "Khemmasedth",
+    "mail": "65030027@kmitl.ac.th",
+    "o": "1"
+  },
+  {
+    "uid": "65030000",
+    "cn": "No",
+    "mail": "65030000@kmitl.ac.th",
+    "o": "2"
+  },
+  {
+    "uid": "65030099",
+    "cn": "Thanchira",
+    "mail": "65030099@kmitl.ac.th",
+    "o": "3"
+  },
+  {
+    "uid": "650300130",
+    "cn": "Nitiphom",
+    "mail": "65030130@kmitl.ac.th",
+    "o": "4"
+  },
+  {
+    "uid": "65030121",
+    "cn": "Natthamon",
+    "mail": "65030027@kmitl.ac.th",
+    "o": "1"
+  }
+]
