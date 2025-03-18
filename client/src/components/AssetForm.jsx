@@ -41,8 +41,8 @@ const AssetForm = ({ value, onChange }) => {
           <label className="block text-gray-700 text-sm mb-2">ภาควิชา</label>
           <select
             className="w-full border-2 border-blue-100 rounded-xl p-2 p-2"
-            value={value.department_id || ''} // Ensure department_id is used
-            onChange={(e) => onChange('department_id', e.target.value)} // Send department_id to onChange
+            value={value.department_id || ''} 
+            onChange={(e) => onChange('department_id', e.target.value)} 
           >
             <option value="">-- กรุณาเลือก --</option>
             {Array.isArray(department) && department.map((dept) => (

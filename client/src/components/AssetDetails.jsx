@@ -59,7 +59,7 @@ const AssetDetails = ({ value, onChange }) => {
           >
             <option value="">-- กรุณาเลือก --</option>
             {Array.isArray(asset_type) && asset_type.map((dept) => (
-              <option key={dept.asset_type_id} value={dept.asset_type_id}>
+              <option key={dept.asset_type_id} value={dept.asset_type_name}>
                 {dept.asset_type_name}
               </option>
             ))}
