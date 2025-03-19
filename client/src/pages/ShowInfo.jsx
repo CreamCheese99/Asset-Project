@@ -197,11 +197,15 @@ const ShowInfo = () => {
   const [data, setData] = useState(null); // เริ่มต้นด้วย null
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const encodedId = encodeURIComponent(id);
+
 
   useEffect(() => {
+    console.log("Fetching asset data for ID:", id); // Debug log
+  
     const fetchAssetData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/mainasset/${id}`);
+        const response = await axios.get(`http://localhost:5000/mainasset/${encodeURIComponent(id)}`);
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -210,10 +214,10 @@ const ShowInfo = () => {
         setLoading(false);
       }
     };
-
-    fetchAssetData();
-  }, [id]); // ถ้า `id` เปลี่ยน จะทำการโหลดข้อมูลใหม่
-
+  
+    if (id) fetchAssetData(); // ตรวจสอบว่า `id` มีค่าก่อนเรียก API
+  }, [id]); 
+  
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" }).format(value);
   };
@@ -397,8 +401,8 @@ const ShowInfo = () => {
               </tr>
             </thead>
             <tbody>
-              {data.subassets?.length > 0 ? (
-                data.subassets.map((item) => (
+              {data.subAssets?.length > 0 ? (
+                data.subAssets.map((item) => (
                   <tr key={item.sub_asset_id} className="text-center">
                     <td className="border px-4 py-2">{item.sub_asset_name}</td>
                     <td className="border px-4 py-2">{item.details}</td>
