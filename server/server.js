@@ -154,30 +154,31 @@ app.get('/api/subasset/main/:mainId', async (req, res) => {
   }
 });
 
+// API สำหรับลบข้อมูลใน mainasset และ subasset ตาม main_asset_id
+app.delete('/api/mainasset/:id', async (req, res) => {
+  const mainAssetId = req.params.id;
 
-// app.delete("/mainasset/:main_asset_ID", async (req, res) => {
-//   const { main_asset_ID } = req.body;
+  try {
+    // เริ่มการทำงานใน transaction
+    await pool.query('BEGIN');
 
-//   if (!main_asset_ID) {
-//     return res.status(400).json({ error: "กรุณาระบุ main_asset_ID ที่ต้องการลบ" });
-//   }
+    // ลบข้อมูลใน subasset ที่มี main_asset_id ตรงกับที่เลือก
+    await pool.query('DELETE FROM public.subasset WHERE main_asset_id = $1', [mainAssetId]);
 
-//   try {
-//     const query = `DELETE FROM public.mainasset WHERE "main_asset_ID" = $1 RETURNING *`;
-//     console.log(query,req.body)
-//     const result = await pool.query(query, [main_asset_ID]);
+    // ลบข้อมูลใน mainasset ที่มี main_asset_id ตรงกับที่เลือก
+    await pool.query('DELETE FROM public.mainasset WHERE main_asset_id = $1', [mainAssetId]);
 
+    // ยืนยันการทำงาน
+    await pool.query('COMMIT');
+    res.status(200).send({ message: 'ลบข้อมูลสำเร็จ' });
+  } catch (err) {
+    // ยกเลิกการทำงานหากเกิดข้อผิดพลาด
+    await pool.query('ROLLBACK');
+    console.error('Error deleting asset:', err);
+    res.status(500).send({ message: 'เกิดข้อผิดพลาดในการลบข้อมูล' });
+  }
+});
 
-//     if (result.rowCount === 0) {
-//       return res.status(404).json({ error: "ไม่พบข้อมูลที่ต้องการลบ" });
-//     }
-
-//     res.status(200).json({ message: "ลบข้อมูลสำเร็จ", deletedData: result.rows[0] });
-//   } catch (error) {
-//     console.error("Error deleting asset:", error);
-//     res.status(500).json({ error: "Server Error" });
-//   }
-// });
 
 app.delete("/mainasset/:main_asset_id", async (req, res) => {
   const { main_asset_id } = req.params; // รับค่า main_asset_ID จาก URL parameter

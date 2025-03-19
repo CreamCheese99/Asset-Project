@@ -123,22 +123,21 @@ const DataTable = () => {
     fetchData();
   }, []);
   
-
   const handleDelete = (id) => {
     if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?")) {
       axios
         .delete(`http://localhost:5000/api/mainasset/${id}`)
         .then(() => {
-          setMainAssetData((prevData) => prevData.filter((item) => item.main_asset_ID !== id));
-          setSubAssetData((prevData) => prevData.filter((item) => item.main_asset_ID !== id));
+          setMainAssetData((prevData) => prevData.filter((item) => item.main_asset_id !== id));
+          setSubAssetData((prevData) => prevData.filter((item) => item.main_asset_id !== id));
         })
         .catch((error) => console.error("Error deleting asset:", error));
     }
   };
 
-  // 🔹 รวมข้อมูล mainasset + subasset (เชื่อมโยงด้วย main_asset_ID)
+  // 🔹 รวมข้อมูล mainasset + subasset (เชื่อมโยงด้วย main_asset_id)
   const mergedData = mainAssetData.map((main) => {
-    const relatedSubassets = subAssetData.filter((sub) => sub.main_asset_ID === main.main_asset_ID);
+    const relatedSubassets = subAssetData.filter((sub) => sub.main_asset_id === main.main_asset_id);
     
     return {
       ...main,
@@ -164,7 +163,7 @@ const DataTable = () => {
         </thead>
         <tbody>
           {mergedData.map((item) => (
-            <tr key={item.main_asset_ID} className="text-center">
+            <tr key={item.main_asset_id} className="text-center">
               <td className="border px-4 py-2">{item.main_asset_id}</td>
               <td className="border px-4 py-2 hidden lg:table-cell">{item.main_asset_name}</td>
               <td className="border px-4 py-2">{item.department_name || "-"}</td>
@@ -179,7 +178,7 @@ const DataTable = () => {
                   ดู
                 </Link>
                 <Link to="/add-asset" className="text-yellow-500 hover:text-yellow-700 bg-gray-200 rounded-lg px-3 py-1">แก้ไข</Link>
-                <button className="text-red-500 hover:text-red-700 bg-gray-200 rounded-lg px-3 py-1" onClick={() => handleDelete(item.main_asset_ID)}>ลบ</button>
+                <button className="text-red-500 hover:text-red-700 bg-gray-200 rounded-lg px-3 py-1" onClick={() => handleDelete(item.main_asset_id)}>ลบ</button>
               </td>
             </tr>
           ))}
