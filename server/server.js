@@ -152,28 +152,78 @@ app.get("/mainasset/:id", async (req, res) => {
   }
 });
 
-// //shoeInfo page เมื่อคลิกดู
-// // API สำหรับดึงข้อมูล SubAsset โดยใช้ main_asset_id
-// app.get('/api/subasset/main/:mainId', async (req, res) => {
-//   const { mainId } = req.params;
-//   console.log("Received main_asset_id:", mainId);
+app.put("/mainasset/:main_asset_id", async (req, res) => {
+  try {
+    const { main_asset_id } = req.params;  // รับ main_asset_id จาก URL
+    const {
+      main_asset_name,
+      status,
+      fiscal_year,
+      date_received,
+      budget_limit,
+      averange_price,
+      budget_type,
+      asset_type,
+      location_use,
+      location_deliver,
+      usage,
+      responsible_person,
+      department_id
+    } = req.body;
 
-//   try {
-//     // ดึงข้อมูล SubAsset ทั้งหมดที่มี main_asset_id ตรงกับ mainId
-//     const result = await pool.query('SELECT * FROM public.subasset WHERE main_asset_id = $1', [mainId]);
+    // ตรวจสอบข้อมูลที่จำเป็น
+    if (!main_asset_name) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
 
-//     console.log("Sub-assets found:", result.rows);
+    // ทำการอัพเดตข้อมูลในฐานข้อมูล
+    const updatedAsset = await pool.query(
+      `UPDATE "mainasset" SET 
+        main_asset_name = $1, 
+        status = $2, 
+        fiscal_year = $3, 
+        date_received = $4,
+        budget_limit = $5, 
+        averange_price = $6, 
+        budget_type = $7, 
+        asset_type = $8, 
+        location_use = $9, 
+        location_deliver = $10, 
+        usage = $11, 
+        responsible_person = $12, 
+        department_id = $13
+      WHERE main_asset_id = $14
+      RETURNING *`,
+      [
+        main_asset_name,
+        status,
+        fiscal_year,
+        date_received,
+        budget_limit,
+        averange_price,
+        budget_type,
+        asset_type,
+        location_use,
+        location_deliver,
+        usage,
+        responsible_person,
+        department_id,
+        main_asset_id  // ใช้ main_asset_id สำหรับการอัพเดต
+      ]
+    );
 
-//     if (result.rows.length === 0) {
-//       return res.status(404).json({ error: 'No sub-assets found for this main asset' });
-//     }
+    // ตรวจสอบว่าได้ทำการอัพเดตจริงหรือไม่
+    if (updatedAsset.rows.length === 0) {
+      return res.status(404).json({ error: "Asset not found" });
+    }
 
-//     res.status(200).json(result.rows);
-//   } catch (error) {
-//     console.error("Error fetching sub-assets:", error);
-//     res.status(500).json({ error: 'Error fetching sub-assets' });
-//   }
-// });
+    res.status(200).json({ message: "Asset updated successfully", data: updatedAsset.rows[0] });
+  } catch (error) {
+    console.error("Error updating asset:", error);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
 
 
 

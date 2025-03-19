@@ -79,8 +79,14 @@ const DataTable = () => {
                 >
                   ดู
                 </Link>
-                <Link to="/add-asset" className="text-yellow-500 hover:text-yellow-700 bg-gray-200 rounded-lg px-3 py-1">แก้ไข</Link>
-                <button className="text-red-500 hover:text-red-700 bg-gray-200 rounded-lg px-3 py-1" onClick={() => handleDelete(item.main_asset_id)}>ลบ</button>
+                <Link 
+                  to={`/edit-info/${item.main_asset_id}`} 
+                  className="text-yellow-500 hover:text-yellow-700 bg-gray-200 rounded-lg px-3 py-1">
+                  แก้ไข
+                </Link>
+                <button className="text-red-500 hover:text-red-700 bg-gray-200 rounded-lg px-3 py-1" 
+                  onClick={() => 
+                  handleDelete(item.main_asset_id)}>ลบ</button>
               </td>
             </tr>
           ))}
