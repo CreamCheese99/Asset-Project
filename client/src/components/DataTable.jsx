@@ -84,6 +84,7 @@ const DataTable = () => {
                   className="text-yellow-500 hover:text-yellow-700 bg-gray-200 rounded-lg px-3 py-1">
                   แก้ไข
                 </Link>
+
                 <button className="text-red-500 hover:text-red-700 bg-gray-200 rounded-lg px-3 py-1" 
                   onClick={() => 
                   handleDelete(item.main_asset_id)}>ลบ</button>

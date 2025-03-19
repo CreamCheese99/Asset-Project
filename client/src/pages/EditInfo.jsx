@@ -1,251 +1,559 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Breadcrumb7 from '../components/Breadcrumb7';
 
 const EditInfo = () => {
-  const { main_asset_id } = useParams(); // ดึง main_asset_id จาก URL
-  const history = useHistory(); // สำหรับการนำทางหลังจากการบันทึกข้อมูล
-  const [assetData, setAssetData] = useState({
-    main_asset_id: '',
-    main_asset_name: '',
-    status: '',
-    fiscal_year: '',
-    date_received: '',
-    budget_limit: '',
-    averange_price: '',
-    budget_type: '',
-    location_use: '',
-    location_deliver: '',
-    usage: '',
-    responsible_person: '',
-    sub_asset_name: '',
-    asset_type: '',
-    details: '',
-    quantity: '',
-    unit_price: '',
-    counting_unit: '',
-    department_id: ''
-  });
+  const { id } = useParams();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [updatedData, setUpdatedData] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
+
+  // State สำหรับจัดการ subasset (เพิ่ม, แก้ไข, ลบ)
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [newSubasset, setNewSubasset] = useState("");
+  const [newDetail, setNewDetail] = useState("");
+  const [newPrice, setNewPrice] = useState("");
+  const [newQuantity, setNewQuantity] = useState("");
+  const [newUnit, setNewUnit] = useState("");
+  const [newStatus, setNewStatus] = useState("");
 
   useEffect(() => {
-    // ฟังก์ชันสำหรับดึงข้อมูล asset ที่จะทำการแก้ไข
-    const fetchAssetData = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/mainasset/${main_asset_id}`);
-        setAssetData(response.data);
-      } catch (error) {
-        console.error('Error fetching asset data:', error);
-      }
-    };
-    fetchAssetData();
-  }, [main_asset_id]);
-
-  // ฟังก์ชันอัปเดตค่าใน state
-  const handleAssetChange = (field, value) => {
-    setAssetData((prevData) => ({
-      ...prevData,
-      [field]: value
-    }));
-  };
-
-  // ฟังก์ชันแจ้งเตือน
-  const handleAlert = (message, type = "error") => {
-    alert(message); // ใช้ alert เพื่อแสดงข้อความ
-  };
-
-  const handleSubmit = async () => {
-    // ตรวจสอบว่า main_asset_id มีค่าหรือไม่
-    if (!assetData.main_asset_id) {
-      handleAlert('กรุณากรอก main_asset_id');
+    if (!id) {
+      setError("ไม่พบรหัสทรัพย์สิน");
+      setLoading(false);
       return;
     }
 
-    try {
-      // อัปเดตข้อมูล Main Asset
-      const mainAssetResponse = await axios.put(`http://localhost:5000/mainasset/${main_asset_id}`, assetData);
-      console.log('อัปเดตข้อมูล mainasset สำเร็จ:', mainAssetResponse.data);
+    const fetchAssetData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/mainasset/${encodeURIComponent(id)}`);
+        setData(response.data);
 
-      // อัปเดตข้อมูล Sub Asset (ถ้ามี)
-      if (assetData.sub_asset_name) {
-        const subAssetData = {
-          sub_asset_name: assetData.sub_asset_name,
-          quantity: assetData.quantity,
-          unit_price: assetData.unit_price,
-          counting_unit: assetData.counting_unit,
-          details: assetData.details,
-          main_asset_id: assetData.main_asset_id, // การเชื่อมโยงกับ main asset
-        };
-
-        const subAssetResponse = await axios.put(`http://localhost:5000/api/subasset/${assetData.main_asset_id}`, subAssetData);
-        console.log('อัปเดตข้อมูล subasset สำเร็จ:', subAssetResponse.data);
+        if (response.data?.mainAsset) {
+          setUpdatedData({ mainAsset: { ...response.data.mainAsset } });
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError("ไม่สามารถโหลดข้อมูลได้");
+      } finally {
+        setLoading(false);
       }
+    };
 
-      handleAlert('อัปเดตข้อมูลสำเร็จ!', "success");
-      history.push(`/asset/${main_asset_id}`); // นำทางไปยังหน้ารายละเอียดของ asset
+    fetchAssetData();
+  }, [id]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (!updatedData || !updatedData.mainAsset) return;
+
+    setUpdatedData((prevData) => ({
+      ...prevData,
+      mainAsset: {
+        ...prevData.mainAsset,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await axios.put(`http://localhost:5000/mainasset/${id}`, updatedData);
+      setIsEditing(false); // ปิดโหมดการแก้ไข
+      setData(response.data); // อัปเดตข้อมูลที่ดึงมาใหม่
+      setSuccessMessage("บันทึกการเปลี่ยนแปลงสำเร็จ");
+      setErrorMessage('');
     } catch (error) {
-      console.error('เกิดข้อผิดพลาด:', error);
-      handleAlert('เกิดข้อผิดพลาดในการอัปเดตข้อมูล!');
+      setErrorMessage("ไม่สามารถบันทึกข้อมูลได้");
+      setSuccessMessage('');
     }
   };
 
-  // Handle cancel (reset form)
-  const handleCancel = () => {
-    setAssetData({
-      main_asset_id: '',
-      main_asset_name: '',
-      status: '',
-      fiscal_year: '',
-      date_received: '',
-      budget_limit: '',
-      averange_price: '',
-      budget_type: '',
-      location_use: '',
-      location_deliver: '',
-      usage: '',
-      responsible_person: '',
-      sub_asset_name: '',
-      asset_type: '',
-      details: '',
-      quantity: '',
-      unit_price: '',
-      counting_unit: '',
-      department_id: ''
-    });
+  /*****************subasset************* */
+  const handleButtonClick = (item = null) => {
+    resetForm();
+    setEditMode(!!item);
+    if (item) {
+      setEditId(item.sub_asset_id);
+      setNewSubasset(item.sub_asset_name);
+      setNewDetail(item.details);
+      setNewPrice(item.unit_price.toString());
+      setNewQuantity(item.quantity.toString());
+      setNewUnit(item.counting_unit);
+      setNewStatus(item.status);
+    }
+    setIsPopupOpen(true);
   };
+
+  // ปรับปรุงการตรวจสอบ subasset
+  const subassets = Array.isArray(data?.subasset) ? data.subasset : [];
+
+  subassets.forEach(sub => {
+    console.log(sub); // ทำงานกับค่าได้อย่างปลอดภัย
+  });
+
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+    setEditMode(false);
+  };
+
+  const handleDelete = (subId) => {
+    if (data && Array.isArray(data.subasset)) {
+      setData({
+        ...data,
+        subasset: data.subasset.filter((item) => item.sub_asset_id !== subId),
+      });
+    }
+  };
+
+  const resetForm = () => {
+    setNewSubasset("");
+    setNewDetail("");
+    setNewPrice("");
+    setNewQuantity("");
+    setNewUnit("");
+    setNewStatus("");
+  };
+
+  const handleSaveSubasset = async () => {
+    if (!newSubasset || !newDetail || !newPrice || !newQuantity || !newUnit || !newStatus) {
+      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+      return;
+    }
+
+    console.log("Data received:", data);
+
+    // ตรวจสอบว่า data.subasset มีค่าหรือไม่ ถ้าไม่มีให้กำหนดเป็นอาร์เรย์เปล่า
+    const subassets = Array.isArray(data?.subasset) ? data.subasset : [];
+
+    subassets.forEach((item) => {
+      console.log("Processing item:", item);
+    });
+
+    const subAssetData = {
+      sub_asset_name: newSubasset,
+      details: newDetail,
+      quantity: parseInt(newQuantity),
+      unit_price: parseFloat(newPrice),
+      counting_unit: newUnit,
+      status: newStatus,
+      main_asset_id: data?.mainAsset?.main_asset_id,
+    };
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/subasset", subAssetData);
+      console.log("บันทึกข้อมูลสำเร็จ:", response.data);
+
+      if (editMode) {
+        setData({
+          ...data,
+          subasset: subassets.map((item) =>
+            item.sub_asset_id === editId ? { ...item, ...subAssetData } : item
+          ),
+        });
+      } else {
+        setData({
+          ...data,
+          subasset: [...subassets, { ...subAssetData, sub_asset_id: response.data.sub_asset_id }],
+        });
+      }
+
+      setIsPopupOpen(false);
+      resetForm();
+    } catch (error) {
+      console.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล:", error);
+      alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล!");
+    }
+  };
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" }).format(value);
+  };
+
+  if (loading) return <div className="text-center py-10">Loading...</div>;
+  if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
+
   return (
     <div style={{ backgroundColor: "#f1f8e9" }} className="min-h-screen font-sans">
       <Breadcrumb7 />
       <div className="container mx-auto p-4">
+        {/* ข้อความตอบกลับ */}
+        {successMessage && <div className="text-green-500 py-2">{successMessage}</div>}
+        {errorMessage && <div className="text-red-500 py-2">{errorMessage}</div>}
 
-        {/* Form for editing asset */}
+
+        {/* ข้อมูลครุภัณฑ์ */}
         <div className="bg-white mt-4 p-4 rounded-md shadow-md">
           <h3 className="text-lg font-bold text-gray-700 mb-4">ข้อมูลครุภัณฑ์</h3>
-
-          <form onSubmit={handleSubmit}>
-            {/* Asset Information */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน</label>
-                <input
-                  type="text"
-                  className="w-full border-2 border-blue-100 rounded-xl p-2"
-                  value={value.main_asset_id || ''}
-                  onChange={(e) => onChange('main_asset_id', e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 text-sm mb-2">ภาควิชา</label>
-                <select
-                  className="w-full border-2 border-blue-100 rounded-xl p-2"
-                  value={value.department_id || ''}
-                  onChange={(e) => onChange('department_id', e.target.value)}
-                >
-                  <option value="">-- กรุณาเลือก --</option>
-                  {Array.isArray(data.departments) && data.departments.map((dept) => (
-                    <option key={dept.department_id} value={dept.department_id}>
-                      {dept.department_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
-                <select
-                  className="w-full border-2 border-blue-100 rounded-xl p-2"
-                  value={value.status || ''}
-                  onChange={(e) => onChange('status', e.target.value)}
-                >
-                  <option value="">-- กรุณาเลือก --</option>
-                  <option>ใช้งาน</option>
-                  <option>ส่งซ่อม</option>
-                  <option>ชำรุด</option>
-                  <option>บริจาค/โอน</option>
-                  <option>รับโอน</option>
-                  <option>จำหน่าย</option>
-                </select>
-              </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน</label>
+              <input
+                type="text"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 bg-yellow-100"
+                value={updatedData?.mainAsset?.main_asset_id || ''}
+                readOnly={!isEditing}
+                onChange={handleChange}
+                name="main_asset_id"
+              />
             </div>
-
-            {/* Additional fields */}
-            <div className="bg-white mt-4 p-4 rounded-md shadow-md">
-              <h3 className="text-lg font-bold text-gray-700 mb-4">วิธีการได้มา</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-gray-700 text-sm mb-2">ปีงบประมาณ</label>
-                  <select
-                    className="w-full border-2 border-blue-100 rounded-xl p-2"
-                    value={value.fiscal_year || ''}
-                    onChange={(e) => onChange('fiscal_year', e.target.value)}
-                  >
-                    <option value="">-- กรุณาเลือก --</option>
-                    <option>2561</option>
-                    <option>2562</option>
-                    <option>2563</option>
-                    <option>2564</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 text-sm mb-2">วันที่ตรวจรับ</label>
-                  <input
-                    type="date"
-                    className="w-full border-2 border-blue-100 rounded-xl p-2"
-                    value={value.date_received || ''}
-                    onChange={(e) => onChange('date_received', e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 text-sm mb-2">ประเภทเงิน</label>
-                  <select
-                    className="w-full border-2 border-blue-100 rounded-xl p-2"
-                    value={value.budget_type || ''}
-                    onChange={(e) => onChange('budget_type', e.target.value)}
-                  >
-                    <option value="">-- กรุณาเลือก --</option>
-                    <option>เงินรายได้</option>
-                    <option>เงินงบประมาณ</option>
-                    <option>เงินสะสมคลัง</option>
-                    <option>เงินกันเหลือบปี</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 text-sm mb-2">วงเงินงบประมาณ</label>
-                  <input
-                    type="text"
-                    className="w-full border-2 border-blue-100 rounded-xl p-2"
-                    value={value.budget_limit || ''}
-                    onChange={(e) => onChange('budget_limit', e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 text-sm mb-2">ราคากลาง</label>
-                  <input
-                    type="text"
-                    className="w-full border-2 border-blue-100 rounded-xl p-2"
-                    value={value.averange_price || ''}
-                    onChange={(e) => onChange('averange_price', e.target.value)}
-                  />
-                </div>
-              </div>
+            <div>
+              <label className="block text-gray-700 text-sm mb-2">ภาควิชา</label>
+              <input
+                type="text"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                value={updatedData?.mainAsset?.department_id || ''}
+                readOnly={!isEditing}
+                onChange={handleChange}
+                name="department_id"
+              />
             </div>
+            <div>
+              <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
+              <input
+                type="text"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                value={updatedData?.mainAsset?.status || ''}
+                readOnly={!isEditing}
+                onChange={handleChange}
+                name="status"
+              />
+            </div>
+          </div>
+        </div>
 
-            {/* Submit Button */}
-            <div className="mt-4">
-              <button
-                type="submit"
-                className="bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600"
+
+
+        {/* วิธีการได้มา */}
+        <div className="bg-white mt-4 p-4 rounded-md shadow-md">
+          <h3 className="text-lg font-bold text-gray-700 mb-4">วิธีการได้มา</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-gray-700 text-sm mb-2">ปีงบประมาณ</label>
+              <input
+                type="text"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                value={updatedData?.mainAsset?.fiscal_year || ''}
+                readOnly={!isEditing}
+                onChange={handleChange}
+                name="fiscal_year"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm mb-2">วันที่ตรวจรับ</label>
+              <input
+                type="text"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                value={updatedData?.mainAsset?.date_received || ''}
+                readOnly={!isEditing}
+                onChange={handleChange}
+                name="date_received"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm mb-2">ประเภทเงิน</label>
+              <input
+                type="text"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                value={updatedData?.mainAsset?.budget_type || ''}
+                readOnly={!isEditing}
+                onChange={handleChange}
+                name="budget_type"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm mb-2">วงเงินงบประมาณ</label>
+              <input
+                type="text"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                value={updatedData?.mainAsset?.budget_limit || ''}
+                readOnly={!isEditing}
+                onChange={handleChange}
+                name="budget_limit"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm mb-2">ราคากลาง</label>
+              <input
+                type="text"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                value={updatedData?.mainAsset?.averange_price || ''}
+                readOnly={!isEditing}
+                onChange={handleChange}
+                name="averange_price"
+              />
+            </div>
+          </div>
+        </div>
+
+
+
+        {/* รายละเอียดพัสดุ */}
+        <div className="bg-white mt-4 p-4 rounded-md shadow-md">
+          <h3 className="text-lg font-bold text-gray-700 mb-4">รายละเอียดพัสดุ</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-gray-700 mb-2">ชื่อสินทรัพย์</label>
+              <input
+                type="text"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                value={updatedData?.mainAsset?.main_asset_name || ''}
+                readOnly={!isEditing}
+                onChange={handleChange}
+                name="main_asset_name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-700 mb-2">ประเภทสินทรัพย์</label>
+              <input
+                type="text"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                value={updatedData?.mainAsset?.asset_type || ''}
+                readOnly={!isEditing}
+                onChange={handleChange}
+                name="asset_type"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-700 mb-2">สถานที่ใช้งาน</label>
+              <input
+                type="text"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                value={updatedData?.mainAsset?.location_use || ''}
+                readOnly={!isEditing}
+                onChange={handleChange}
+                name="location_use"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-700 mb-2">การใช้งาน</label>
+              <input
+                type="text"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                value={updatedData?.mainAsset?.usage || ''}
+                readOnly={!isEditing}
+                onChange={handleChange}
+                name="usage"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-700 mb-2">สถานที่ส่งมอบ</label>
+              <input
+                type="text"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                value={updatedData?.mainAsset?.location_deliver || ''}
+                readOnly={!isEditing}
+                onChange={handleChange}
+                name="location_deliver"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-700 mb-2">ผู้รับผิดชอบ</label>
+              <input
+                type="text"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                value={updatedData?.mainAsset?.responsible_person || ''}
+                readOnly={!isEditing}
+                onChange={handleChange}
+                name="responsible_person"
+              />
+            </div>
+          </div>
+        </div>
+
+
+        
+        {/* ตารางแสดงข้อมูลพัสดุย่อย */}
+        <div className="bg-white mt-4 p-4 rounded-md shadow-md overflow-x-auto">
+          <h3 className="text-lg font-bold text-gray-700 mb-4">ข้อมูลพัสดุย่อย</h3>
+          <div className="flex justify-between items-center mb-6">
+            <button
+              className="bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-700"
+              onClick={() => handleButtonClick()}
+            >
+              + เพิ่ม
+            </button>
+          </div>
+          {isPopupOpen && (
+            <div
+              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+              onClick={handleClosePopup}
+            >
+              <div
+                className="bg-white p-6 rounded-md shadow-md w-1/2"
+                onClick={(e) => e.stopPropagation()}
               >
-                อัพเดตข้อมูล
-              </button>
+                <h3 className="text-lg font-bold text-gray-700 mb-4">
+                  {editMode ? "แก้ไขข้อมูลพัสดุย่อย" : "ข้อมูลพัสดุย่อย"}
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-gray-700 text-sm mb-2">รายการพัสดุย่อย</label>
+                    <input
+                      type="text"
+                      className="w-full border-2 border-blue-100 rounded-xl p-2"
+                      placeholder="รายการพัสดุย่อย"
+                      value={newSubasset}
+                      onChange={(e) => setNewSubasset(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm mb-2">รายละเอียด</label>
+                    <input
+                      type="text"
+                      className="w-full border-2 border-blue-100 rounded-xl p-2"
+                      value={newDetail}
+                      onChange={(e) => setNewDetail(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm mb-2">ราคาต่อหน่วย</label>
+                    <input
+                      type="number"
+                      className="w-full border-2 border-blue-100 rounded-xl p-2"
+                      value={newPrice}
+                      onChange={(e) => setNewPrice(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm mb-2">จำนวน</label>
+                    <input
+                      type="number"
+                      className="w-full border-2 border-blue-100 rounded-xl p-2"
+                      value={newQuantity}
+                      onChange={(e) => setNewQuantity(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm mb-2">หน่วยนับ</label>
+                    <select
+                      className="w-full border-2 border-blue-100 rounded-xl p-2"
+                      value={newUnit}
+                      onChange={(e) => setNewUnit(e.target.value)}
+                    >
+                      <option value="">-- กรุณาเลือก --</option>
+                      <option>เครื่อง</option>
+                      <option>เตียง</option>
+                      <option>แผ่น</option>
+                      <option>โหล</option>
+                      <option>ใบ</option>
+                      <option>คัน</option>
+                      <option>ขด</option>
+                      <option>ชุด</option>
+                      <option>ตัว</option>
+                      <option>ตู้</option>
+                      <option>บาน</option>
+                      <option>ผืน</option>
+                      <option>ระบบ</option>
+                      <option>หลัง</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 text-sm mb-2">การใช้งาน</label>
+                    <select
+                      className="w-full border-2 border-blue-100 rounded-xl p-2"
+                      value={newStatus}
+                      onChange={(e) => setNewStatus(e.target.value)}
+                    >
+                      <option value="">-- กรุณาเลือก --</option>
+                      <option>ใช้งาน</option>
+                      <option>ส่งซ่อม</option>
+                      <option>ชำรุด</option>
+                      <option>บริจาค/โอน</option>
+                      <option>รับโอน</option>
+                      <option>จำหน่าย</option>
+                    </select>
+                  </div>
+                  <div className="flex justify-end mt-4">
+                    <button
+                      className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-700 mr-2"
+                      onClick={handleClosePopup}
+                    >
+                      ยกเลิก
+                    </button>
+                    <button
+                      className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-700"
+                      onClick={handleSaveSubasset}
+                      disabled={loading}
+                    >
+                      {loading ? "กำลังบันทึก..." : "บันทึก"}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
-          </form>
+          )}
+          <table className="table-auto w-full border-collapse text-sm">
+            <thead>
+              <tr className="bg-gray-200 text-gray-700">
+                <th className="border px-4 py-2">รายการพัสดุย่อย</th>
+                <th className="border px-4 py-2">รายละเอียด</th>
+                <th className="border px-4 py-2">ราคาต่อหน่วย</th>
+                <th className="border px-4 py-2">จำนวน</th>
+                <th className="border px-4 py-2">หน่วยนับ</th>
+                <th className="border px-4 py-2">การใช้งาน</th>
+                <th className="border px-4 py-2">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.subAssets?.length > 0 ? (
+                data.subAssets.map((item) => (
+                  <tr key={item.sub_asset_id} className="text-center">
+                    <td className="border px-4 py-2">{item.sub_asset_name}</td>
+                    <td className="border px-4 py-2">{item.details}</td>
+                    <td className="border px-4 py-2">{formatCurrency(item.unit_price)}</td>
+                    <td className="border px-4 py-2">{item.quantity}</td>
+                    <td className="border px-4 py-2">{item.counting_unit}</td>
+                    <td className="border px-4 py-2">{item.status}</td>
+                    <td className="border px-4 py-2">
+                      <button
+                        className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-700 mr-2"
+                        onClick={() => handleButtonClick(item)}
+                      >
+                        แก้ไข
+                      </button>
+                      <button
+                        className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-700"
+                        onClick={() => handleDelete(item.id)}
+                      >
+                        ลบ
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="text-center text-gray-500 py-4">ไม่มีข้อมูล</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        {/* ปุ่มบันทึก */}
+        <div className="mt-4 flex justify-end">
+          {isEditing ? (
+            <button
+              className="bg-green-500 text-white py-2 px-4 rounded-lg"
+              onClick={handleSave}
+            >
+              บันทึกการเปลี่ยนแปลง
+            </button>
+          ) : (
+            <button
+              className="bg-blue-500 text-white py-2 px-4 rounded-lg"
+              onClick={() => setIsEditing(true)}
+            >
+              แก้ไข
+            </button>
+          )}
         </div>
       </div>
     </div>

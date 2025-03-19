@@ -152,77 +152,6 @@ app.get("/mainasset/:id", async (req, res) => {
   }
 });
 
-app.put("/mainasset/:main_asset_id", async (req, res) => {
-  try {
-    const { main_asset_id } = req.params;  // รับ main_asset_id จาก URL
-    const {
-      main_asset_name,
-      status,
-      fiscal_year,
-      date_received,
-      budget_limit,
-      averange_price,
-      budget_type,
-      asset_type,
-      location_use,
-      location_deliver,
-      usage,
-      responsible_person,
-      department_id
-    } = req.body;
-
-    // ตรวจสอบข้อมูลที่จำเป็น
-    if (!main_asset_name) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    // ทำการอัพเดตข้อมูลในฐานข้อมูล
-    const updatedAsset = await pool.query(
-      `UPDATE "mainasset" SET 
-        main_asset_name = $1, 
-        status = $2, 
-        fiscal_year = $3, 
-        date_received = $4,
-        budget_limit = $5, 
-        averange_price = $6, 
-        budget_type = $7, 
-        asset_type = $8, 
-        location_use = $9, 
-        location_deliver = $10, 
-        usage = $11, 
-        responsible_person = $12, 
-        department_id = $13
-      WHERE main_asset_id = $14
-      RETURNING *`,
-      [
-        main_asset_name,
-        status,
-        fiscal_year,
-        date_received,
-        budget_limit,
-        averange_price,
-        budget_type,
-        asset_type,
-        location_use,
-        location_deliver,
-        usage,
-        responsible_person,
-        department_id,
-        main_asset_id  // ใช้ main_asset_id สำหรับการอัพเดต
-      ]
-    );
-
-    // ตรวจสอบว่าได้ทำการอัพเดตจริงหรือไม่
-    if (updatedAsset.rows.length === 0) {
-      return res.status(404).json({ error: "Asset not found" });
-    }
-
-    res.status(200).json({ message: "Asset updated successfully", data: updatedAsset.rows[0] });
-  } catch (error) {
-    console.error("Error updating asset:", error);
-    res.status(500).json({ error: "Server Error" });
-  }
-});
 
 
 
@@ -246,7 +175,121 @@ app.delete('/api/mainasset/:id', async (req, res) => {
   }
 });
 
+// API สำหรับการอัปเดตข้อมูล mainasset
+app.put("/mainasset/:id", async (req, res) => {
+  const { id } = req.params;
+  const {
+    main_asset_id,
+    main_asset_name,
+    status,
+    fiscal_year,
+    date_received,
+    budget_limit,
+    averange_price,
+    budget_type,
+    asset_type,
+    location_use,
+    location_deliver,
+    usage,
+    responsible_person,
+    department_id,
+  } = req.body;
 
+  try {
+    // อัปเดตข้อมูล mainasset
+    const mainAssetUpdateQuery = `
+      UPDATE public.mainasset
+      SET
+        main_asset_name = $1,
+        status = $2,
+        fiscal_year = $3,
+        date_received = $4,
+        budget_limit = $5,
+        averange_price = $6,
+        budget_type = $7,
+        asset_type = $8,
+        location_use = $9,
+        location_deliver = $10,
+        usage = $11,
+        responsible_person = $12,
+        department_id = $13
+      WHERE main_asset_id = $14
+      RETURNING *;
+    `;
+
+    const updatedMainAssetResult = await pool.query(mainAssetUpdateQuery, [
+      main_asset_name,
+      status,
+      fiscal_year,
+      date_received,
+      budget_limit,
+      averange_price,
+      budget_type,
+      asset_type,
+      location_use,
+      location_deliver,
+      usage,
+      responsible_person,
+      department_id,
+      main_asset_id || id, // ใช้ main_asset_id ที่รับจาก body หรือ id จาก params
+    ]);
+
+    if (updatedMainAssetResult.rows.length === 0) {
+      return res.status(404).json({ message: "Main asset not found" });
+    }
+
+    // อัปเดตข้อมูล subasset (ถ้ามีการส่งข้อมูล subasset มาด้วย)
+    const subAssets = req.body.subAssets || [];
+    for (const subAsset of subAssets) {
+      const {
+        sub_asset_id,
+        sub_asset_name,
+        details,
+        unit_price,
+        quantity,
+        counting_unit,
+        status: subAssetStatus,
+      } = subAsset;
+
+      const subAssetUpdateQuery = `
+        UPDATE public.subasset
+        SET
+          sub_asset_name = $1,
+          details = $2,
+          unit_price = $3,
+          quantity = $4,
+          counting_unit = $5,
+          status = $6
+        WHERE sub_asset_id = $7 AND main_asset_id = $8
+        RETURNING *;
+      `;
+
+      const updatedSubAssetResult = await pool.query(subAssetUpdateQuery, [
+        sub_asset_name,
+        details,
+        unit_price,
+        quantity,
+        counting_unit,
+        subAssetStatus,
+        sub_asset_id,
+        main_asset_id || id, // ใช้ main_asset_id ที่รับจาก body หรือ id จาก params
+      ]);
+
+      if (updatedSubAssetResult.rows.length === 0) {
+        return res.status(404).json({ message: `Sub-asset ${sub_asset_id} not found` });
+      }
+    }
+
+    res.json({
+      message: "Asset and sub-assets updated successfully",
+      mainAsset: updatedMainAssetResult.rows[0],
+      subAssets: subAssets,
+    });
+  } catch (error) {
+    console.error("Error updating data:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 // // อัปเดตข้อมูล MainAsset ตาม main_asset_ID
 // app.put("/mainasset/:main_asset_id", async (req, res) => {

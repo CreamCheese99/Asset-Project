@@ -9,6 +9,7 @@ import ManagePerInfo from './pages/ManagePerInfo'
 import Login from './pages/Login'
 import ShowInfo from './pages/ShowInfo'
 import EditInfo from './pages/EditInfo'
+
 function App() {
   return (
     <Router>
@@ -22,7 +23,7 @@ function App() {
           <Route path="manage-personal-info" element={<ManagePerInfo/>} />
           <Route path="login" element={<Login/>}/>
           <Route path="/show-info/:id" element={<ShowInfo/>}/>
-          <Route path="/edit-asset/:id" element={<EditInfo/>}/>
+          <Route path="/edit-info/:id" element={<EditInfo/>}/>
           
         </Route>
       </Routes>
