@@ -1,19 +1,3 @@
-// const express = require("express");
-// const cors = require("cors");
-// const bodyParser = require("body-parser");
-// const pool = require("./db");
-
-// const app = express();
-// const PORT = 5000;
-
-
-
-// app.use(cors());
-// app.use(bodyParser.json());
-// app.use(express.json());  
-
-
-
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -31,6 +15,7 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true })); // รอง�
 
 
 //*********************************************************************************** */
+//AddAsset page
 app.post("/mainasset", async (req, res) => {
   try {
     const {
@@ -87,6 +72,7 @@ app.post("/mainasset", async (req, res) => {
 
 
 // API สำหรับดึงข้อมูลทั้งหมดจากตาราง MainAsset
+//DataTable page
 app.get("/mainasset", async (req, res) => {
   try {
     const query = `select mainasset.main_asset_id,main_asset_name,mainasset.status,department_name, count(*)as subamount from mainasset  left join subasset
@@ -102,6 +88,9 @@ app.get("/mainasset", async (req, res) => {
   }
 });
 
+
+//shoeInfo page เมื่อคลิกดู
+// API ดึงข้อมูล mainasset และ ดึงข้อมูล subasset ตาม main_asset_id
 app.get("/mainasset/:id", async (req, res) => {
   const { id } = req.params;
   console.log("Received ID:", id);
@@ -132,47 +121,44 @@ app.get("/mainasset/:id", async (req, res) => {
   }
 });
 
-// API สำหรับดึงข้อมูล SubAsset โดยใช้ main_asset_id
-app.get('/api/subasset/main/:mainId', async (req, res) => {
-  const { mainId } = req.params;
-  console.log("Received main_asset_id:", mainId);
+// //shoeInfo page เมื่อคลิกดู
+// // API สำหรับดึงข้อมูล SubAsset โดยใช้ main_asset_id
+// app.get('/api/subasset/main/:mainId', async (req, res) => {
+//   const { mainId } = req.params;
+//   console.log("Received main_asset_id:", mainId);
 
-  try {
-    // ดึงข้อมูล SubAsset ทั้งหมดที่มี main_asset_id ตรงกับ mainId
-    const result = await pool.query('SELECT * FROM public.subasset WHERE main_asset_id = $1', [mainId]);
+//   try {
+//     // ดึงข้อมูล SubAsset ทั้งหมดที่มี main_asset_id ตรงกับ mainId
+//     const result = await pool.query('SELECT * FROM public.subasset WHERE main_asset_id = $1', [mainId]);
 
-    console.log("Sub-assets found:", result.rows);
+//     console.log("Sub-assets found:", result.rows);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'No sub-assets found for this main asset' });
-    }
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ error: 'No sub-assets found for this main asset' });
+//     }
 
-    res.status(200).json(result.rows);
-  } catch (error) {
-    console.error("Error fetching sub-assets:", error);
-    res.status(500).json({ error: 'Error fetching sub-assets' });
-  }
-});
+//     res.status(200).json(result.rows);
+//   } catch (error) {
+//     console.error("Error fetching sub-assets:", error);
+//     res.status(500).json({ error: 'Error fetching sub-assets' });
+//   }
+// });
 
+
+
+//DataTable page
 // API สำหรับลบข้อมูลใน mainasset และ subasset ตาม main_asset_id
 app.delete('/api/mainasset/:id', async (req, res) => {
   const mainAssetId = req.params.id;
 
   try {
-    // เริ่มการทำงานใน transaction
     await pool.query('BEGIN');
-
-    // ลบข้อมูลใน subasset ที่มี main_asset_id ตรงกับที่เลือก
     await pool.query('DELETE FROM public.subasset WHERE main_asset_id = $1', [mainAssetId]);
-
-    // ลบข้อมูลใน mainasset ที่มี main_asset_id ตรงกับที่เลือก
     await pool.query('DELETE FROM public.mainasset WHERE main_asset_id = $1', [mainAssetId]);
-
-    // ยืนยันการทำงาน
     await pool.query('COMMIT');
     res.status(200).send({ message: 'ลบข้อมูลสำเร็จ' });
+    
   } catch (err) {
-    // ยกเลิกการทำงานหากเกิดข้อผิดพลาด
     await pool.query('ROLLBACK');
     console.error('Error deleting asset:', err);
     res.status(500).send({ message: 'เกิดข้อผิดพลาดในการลบข้อมูล' });
@@ -180,70 +166,70 @@ app.delete('/api/mainasset/:id', async (req, res) => {
 });
 
 
-app.delete("/mainasset/:main_asset_id", async (req, res) => {
-  const { main_asset_id } = req.params; // รับค่า main_asset_ID จาก URL parameter
+// app.delete("/mainasset/:main_asset_id", async (req, res) => {
+//   const { main_asset_id } = req.params; // รับค่า main_asset_ID จาก URL parameter
 
-  try {
-    const query = `DELETE FROM public.mainasset WHERE "main_asset_id" = $1 RETURNING *`;
-    const result = await pool.query(query, [main_asset_id]);
+//   try {
+//     const query = `DELETE FROM public.mainasset WHERE "main_asset_id" = $1 RETURNING *`;
+//     const result = await pool.query(query, [main_asset_id]);
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: "ไม่พบข้อมูลที่ต้องการลบ" });
-    }
+//     if (result.rowCount === 0) {
+//       return res.status(404).json({ error: "ไม่พบข้อมูลที่ต้องการลบ" });
+//     }
 
-    res.status(200).json({ message: "ลบข้อมูลสำเร็จ", deletedData: result.rows[0] });
-  } catch (error) {
-    console.error("Error deleting asset:", error);
-    res.status(500).json({ error: "Server Error" });
-  }
-});
+//     res.status(200).json({ message: "ลบข้อมูลสำเร็จ", deletedData: result.rows[0] });
+//   } catch (error) {
+//     console.error("Error deleting asset:", error);
+//     res.status(500).json({ error: "Server Error" });
+//   }
+// });
 
 
 
-// อัปเดตข้อมูล MainAsset ตาม main_asset_ID
-app.put("/mainasset/:main_asset_id", async (req, res) => {
-  const { main_asset_id } = req.params;
-  const {
-    main_asset_name,
-    status,
-    fiscal_year,
-    date_received,
-    budget_limit,
-    averange_price,
-    budget_type,
-    asset_type,
-    location_use,
-    location_deliver,
-    usage,
-    responsible_person
-  } = req.body;
+// // อัปเดตข้อมูล MainAsset ตาม main_asset_ID
+// app.put("/mainasset/:main_asset_id", async (req, res) => {
+//   const { main_asset_id } = req.params;
+//   const {
+//     main_asset_name,
+//     status,
+//     fiscal_year,
+//     date_received,
+//     budget_limit,
+//     averange_price,
+//     budget_type,
+//     asset_type,
+//     location_use,
+//     location_deliver,
+//     usage,
+//     responsible_person
+//   } = req.body;
 
-  try {
-    const query = `
-      UPDATE "mainasset"
-      SET 
-        main_asset_name = $1, status = $2, fiscal_year = $3, date_received = $4,
-        budget_limit = $5, averange_price = $6, budget_type = $7, asset_type = $8,
-        location_use = $9, location_deliver = $10, usage = $11, responsible_person = $12
-      WHERE "main_asset_id" = $13 RETURNING *`;
+//   try {
+//     const query = `
+//       UPDATE "mainasset"
+//       SET 
+//         main_asset_name = $1, status = $2, fiscal_year = $3, date_received = $4,
+//         budget_limit = $5, averange_price = $6, budget_type = $7, asset_type = $8,
+//         location_use = $9, location_deliver = $10, usage = $11, responsible_person = $12
+//       WHERE "main_asset_id" = $13 RETURNING *`;
     
-    const result = await pool.query(query, [
-      main_asset_name, status, fiscal_year, date_received,
-      budget_limit, averange_price, budget_type, asset_type,
-      location_use, location_deliver, usage, responsible_person,
-      main_asset_id
-    ]);
+//     const result = await pool.query(query, [
+//       main_asset_name, status, fiscal_year, date_received,
+//       budget_limit, averange_price, budget_type, asset_type,
+//       location_use, location_deliver, usage, responsible_person,
+//       main_asset_id
+//     ]);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "MainAsset not found" });
-    }
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ message: "MainAsset not found" });
+//     }
 
-    res.status(200).json({ message: "Asset updated successfully", data: result.rows[0] });
-  } catch (error) {
-    console.error("Error updating asset:", error);
-    res.status(500).json({ error: "Server Error" });
-  }
-});
+//     res.status(200).json({ message: "Asset updated successfully", data: result.rows[0] });
+//   } catch (error) {
+//     console.error("Error updating asset:", error);
+//     res.status(500).json({ error: "Server Error" });
+//   }
+// });
 
 
 
@@ -303,40 +289,6 @@ app.get('/api/subasset', async (req, res) => {
     res.status(500).json({ error: 'Error fetching sub assets' });
   }
 });
-
-// // API สำหรับดึงข้อมูล SubAsset โดยใช้ sub_asset_id
-// app.get('/api/subasset/:id', async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     const result = await pool.query('SELECT * FROM public."subasset" WHERE sub_asset_id = $1', [id]);
-//     if(result.rows.length === 0){
-//       return res.status(404).json({ error: 'Sub asset not found' });
-//     }
-//     res.status(200).json(result.rows[0]);
-//   } catch (error) {
-//     console.error("Error fetching sub asset:", error);
-//     res.status(500).json({ error: 'Error fetching sub asset' });
-//   }
-// });
-
-// // API สำหรับดึงข้อมูล SubAsset โดยใช้ main_asset_id
-// app.get('/api/subasset/main/:mainId', async (req, res) => {
-//   const { mainId } = req.params; // รับค่า main_asset_id
-//   try {
-//     // ดึงข้อมูล SubAsset ทั้งหมดที่มี main_asset_id ตรงกับ mainId
-//     const result = await pool.query('SELECT * FROM public.subasset WHERE main_asset_id = $1', [mainId]);
-
-//     if (result.rows.length === 0) {
-//       return res.status(404).json({ error: 'No sub-assets found for this main asset' });
-//     }
-
-//     res.status(200).json(result.rows); // ส่งกลับข้อมูลเป็น array
-//   } catch (error) {
-//     console.error("Error fetching sub-assets:", error);
-//     res.status(500).json({ error: 'Error fetching sub-assets' });
-//   }
-// });
-
 
 // API สำหรับลบ SubAsset โดยใช้ sub_asset_id
 app.delete('/api/subasset/:id', async (req, res) => {
