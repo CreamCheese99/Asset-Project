@@ -89,6 +89,37 @@ app.get("/mainasset", async (req, res) => {
 });
 
 
+//API หน้า AllAsset
+app.get('/api/mainasset', async (req, res) => {
+  try {
+    // ตรวจสอบการเชื่อมต่อกับฐานข้อมูล
+    console.log("กำลังเชื่อมต่อกับฐานข้อมูล...");
+    
+    // คำสั่ง SQL สำหรับดึงข้อมูล
+    const query = `
+      SELECT ma.main_asset_id, ma.main_asset_name, ma.status, sa.sub_asset_id, sa.sub_asset_name, sa.status AS sub_asset_status
+      FROM mainasset ma
+      JOIN subasset sa ON ma.main_asset_id = sa.main_asset_id
+    `;
+    
+    const result = await pool.query(query);  // ส่งคำสั่ง SQL เพื่อดึงข้อมูล
+    
+    // ตรวจสอบว่ามีข้อมูลที่ดึงมา
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "ไม่พบข้อมูล" });
+    }
+
+    // ส่งข้อมูลกลับไปยังคลไคลเอนต์
+    res.json(result.rows);
+  } catch (err) {
+    // เพิ่มการแสดงข้อความข้อผิดพลาด
+    console.error("ข้อผิดพลาดในการดึงข้อมูล:", err);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลจากฐานข้อมูล", message: err.message });
+  }
+});
+
+
+
 //shoeInfo page เมื่อคลิกดู
 // API ดึงข้อมูล mainasset และ ดึงข้อมูล subasset ตาม main_asset_id
 app.get("/mainasset/:id", async (req, res) => {
@@ -164,25 +195,6 @@ app.delete('/api/mainasset/:id', async (req, res) => {
     res.status(500).send({ message: 'เกิดข้อผิดพลาดในการลบข้อมูล' });
   }
 });
-
-
-// app.delete("/mainasset/:main_asset_id", async (req, res) => {
-//   const { main_asset_id } = req.params; // รับค่า main_asset_ID จาก URL parameter
-
-//   try {
-//     const query = `DELETE FROM public.mainasset WHERE "main_asset_id" = $1 RETURNING *`;
-//     const result = await pool.query(query, [main_asset_id]);
-
-//     if (result.rowCount === 0) {
-//       return res.status(404).json({ error: "ไม่พบข้อมูลที่ต้องการลบ" });
-//     }
-
-//     res.status(200).json({ message: "ลบข้อมูลสำเร็จ", deletedData: result.rows[0] });
-//   } catch (error) {
-//     console.error("Error deleting asset:", error);
-//     res.status(500).json({ error: "Server Error" });
-//   }
-// });
 
 
 
