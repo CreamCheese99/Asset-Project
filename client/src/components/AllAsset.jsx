@@ -222,8 +222,8 @@ const AllAsset = () => {
                   <p className="text-sm text-gray-500 mb-2">{item.main_asset_id}</p>
                   <div className="text-sm text-gray-600">
                     <p>สถานะ: {item.status}</p>
-                    <p>ชื่อทรัพย์สินย่อย: {item.sub_asset_name}</p>
-                    <p>สถานะทรัพย์สินย่อย: {item.sub_asset_status}</p>
+                    <p>ชื่อทรัพย์สินย่อย: {item.main_asset_name}</p>
+                    <p>สถานะทรัพย์สินย่อย: {item.main_asset_status}</p>
                   </div>
                   <div className="mt-4">
                     <Link

@@ -315,6 +315,8 @@ const AddAsset = () => {
     unit_price: '',
     counting_unit: '',
     department_id: '',
+    note:'',
+    type_sub_asset:'',
     image: ''  // เพิ่มฟิลด์เก็บรูปภาพ
   });
 
@@ -401,7 +403,9 @@ const AddAsset = () => {
       unit_price: '',
       counting_unit: '',
       department_id: '',
-      image: ''
+      note:'',
+      type_sub_asset:'',
+      image: ''  // เพิ่มฟิลด์เก็บรูปภาพ
     });
   };
 

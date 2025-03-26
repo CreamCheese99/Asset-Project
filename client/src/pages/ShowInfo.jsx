@@ -204,23 +204,28 @@ const ShowInfo = () => {
             <thead>
               <tr className="bg-gray-200 text-gray-700">
                 <th className="border px-4 py-2">รายการพัสดุย่อย</th>
+                <th className="border px-4 py-2">ประเภทพัสดุ</th>
                 <th className="border px-4 py-2">รายละเอียด</th>
                 <th className="border px-4 py-2">ราคาต่อหน่วย</th>
                 <th className="border px-4 py-2">จำนวน</th>
                 <th className="border px-4 py-2">หน่วยนับ</th>
                 <th className="border px-4 py-2">การใช้งาน</th>
+                <th className="border px-4 py-2">หมายเหตุ</th>
+                <th className="border px-4 py-2">จัดการ</th>
               </tr>
             </thead>
             <tbody>
               {data.subAssets?.length > 0 ? (
                 data.subAssets.map((item) => (
                   <tr key={item.sub_asset_id} className="text-center">
-                    <td className="border px-4 py-2">{item.sub_asset_name}</td>
-                    <td className="border px-4 py-2">{item.details}</td>
-                    <td className="border px-4 py-2">{formatCurrency(item.unit_price)}</td>
-                    <td className="border px-4 py-2">{item.quantity}</td>
-                    <td className="border px-4 py-2">{item.counting_unit}</td>
-                    <td className="border px-4 py-2">{item.status}</td>
+                     <td className="border px-4 py-2">{item.sub_asset_name}</td>
+                      <td className="border px-4 py-2">{item.type_sub_asset}</td>
+                      <td className="border px-4 py-2">{item.details}</td>
+                      <td className="border px-4 py-2">{formatCurrency(item.unit_price)}</td>
+                      <td className="border px-4 py-2">{item.quantity}</td>
+                      <td className="border px-4 py-2">{item.counting_unit}</td>
+                      <td className="border px-4 py-2">{item.note}</td>
+                      <td className="border px-4 py-2">{item.status}</td>
                   </tr>
                 ))
               ) : (

@@ -105,6 +105,7 @@ const AcquisitionInfo = ({ value, onChange }) => {
             onChange={(e) => onChange('averange_price', e.target.value)}
           />
         </div>
+
       </div>
     </div>
   );

@@ -140,7 +140,7 @@ app.post('/mainasset', upload.single('image'), async (req, res) => {
       location_deliver,
       usage,
       responsible_person,
-      department_id,
+      department_id
     } = req.body;
 
     // ตรวจสอบการมีไฟล์ภาพ
@@ -185,7 +185,7 @@ app.post('/mainasset', upload.single('image'), async (req, res) => {
         usage,
         responsible_person,
         department_id,
-        image, // ถ้ามีไฟล์จะใช้ชื่อไฟล์ที่ถูกบันทึก
+        image // ถ้ามีไฟล์จะใช้ชื่อไฟล์ที่ถูกบันทึก
       ]
     );
 
@@ -377,6 +377,8 @@ app.put("/mainasset/:id", async (req, res) => {
         unit_price,
         quantity,
         counting_unit,
+        note,
+        type_sub_asset,
         status: subAssetStatus,
       } = subAsset;
 
@@ -388,8 +390,10 @@ app.put("/mainasset/:id", async (req, res) => {
           unit_price = $3,
           quantity = $4,
           counting_unit = $5,
-          status = $6
-        WHERE sub_asset_id = $7 AND main_asset_id = $8
+          note = $6,
+          type_sub_asset = $7,
+          status = $8
+        WHERE sub_asset_id = $9 AND main_asset_id = $10
         RETURNING *;
       `;
 
@@ -400,8 +404,10 @@ app.put("/mainasset/:id", async (req, res) => {
         quantity,
         counting_unit,
         subAssetStatus,
+        note,
+        type_sub_asset,
         sub_asset_id,
-        main_asset_id || id, // ใช้ main_asset_id ที่รับจาก body หรือ id จาก params
+        main_asset_id || id // ใช้ main_asset_id ที่รับจาก body หรือ id จาก params
       ]);
 
       if (updatedSubAssetResult.rows.length === 0) {
@@ -420,53 +426,6 @@ app.put("/mainasset/:id", async (req, res) => {
   }
 });
 
-// // อัปเดตข้อมูล MainAsset ตาม main_asset_ID
-// app.put("/mainasset/:main_asset_id", async (req, res) => {
-//   const { main_asset_id } = req.params;
-//   const {
-//     main_asset_name,
-//     status,
-//     fiscal_year,
-//     date_received,
-//     budget_limit,
-//     averange_price,
-//     budget_type,
-//     asset_type,
-//     location_use,
-//     location_deliver,
-//     usage,
-//     responsible_person
-//   } = req.body;
-
-//   try {
-//     const query = `
-//       UPDATE "mainasset"
-//       SET 
-//         main_asset_name = $1, status = $2, fiscal_year = $3, date_received = $4,
-//         budget_limit = $5, averange_price = $6, budget_type = $7, asset_type = $8,
-//         location_use = $9, location_deliver = $10, usage = $11, responsible_person = $12
-//       WHERE "main_asset_id" = $13 RETURNING *`;
-    
-//     const result = await pool.query(query, [
-//       main_asset_name, status, fiscal_year, date_received,
-//       budget_limit, averange_price, budget_type, asset_type,
-//       location_use, location_deliver, usage, responsible_person,
-//       main_asset_id
-//     ]);
-
-//     if (result.rows.length === 0) {
-//       return res.status(404).json({ message: "MainAsset not found" });
-//     }
-
-//     res.status(200).json({ message: "Asset updated successfully", data: result.rows[0] });
-//   } catch (error) {
-//     console.error("Error updating asset:", error);
-//     res.status(500).json({ error: "Server Error" });
-//   }
-// });
-
-
-
 
 
 // ************************************************************************************************
@@ -480,16 +439,19 @@ app.post('/api/subasset', async (req, res) => {
     unit_price,
     status,
     counting_unit,
-    main_asset_id,
+    note,
+    type_sub_asset,
+    main_asset_id
+
   } = req.body;
 
   try {
     // คำสั่ง SQL ที่ถูกต้องโดยไม่ต้องส่งค่า sub_asset_id เนื่องจากจะถูกสร้างอัตโนมัติ
     const query = `
       INSERT INTO public."subasset"(
-        sub_asset_name, details, quantity, unit_price, status, counting_unit, main_asset_id
+        sub_asset_name, details, quantity, unit_price, status, counting_unit, main_asset_idnote, type_sub_asset,
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      VALUES ($1, $2, $3, $4, $5, $6, $7 ,$8 ,$9)
     `;
     
     const values = [
@@ -499,7 +461,9 @@ app.post('/api/subasset', async (req, res) => {
       unit_price,
       status,
       counting_unit,
-      main_asset_id,
+      note,
+      type_sub_asset,
+      main_asset_id
     ];
 
     await pool.query(query, values);
@@ -553,8 +517,10 @@ app.put('/api/subasset/:id', async (req, res) => {
           unit_price = $4,
           status = $5,
           counting_unit = $6,
-          main_asset_id = $7
-      WHERE sub_asset_id = $8
+          note = $7,
+          type_sub_asset = $8,
+          main_asset_id = $9
+      WHERE sub_asset_id = $10
       RETURNING *;
     `;
     const values = [sub_asset_name, details, quantity, unit_price, status, counting_unit, main_asset_id, id];

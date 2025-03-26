@@ -283,10 +283,11 @@ const AssetInfoSection = ({ value, onChange }) => {
   const [newQuantity, setNewQuantity] = useState("");
   const [newUnit, setNewUnit] = useState("");
   const [newStatus, setNewStatus] = useState("");
+  const [newNote, setNewNote] = useState("");
+  const [newTypeSubAsset, setNewTypeSubAsset] = useState("");
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState([
-  
-  ]);
+  const [data, setData] = useState([ ]);
+
 
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -303,6 +304,8 @@ const AssetInfoSection = ({ value, onChange }) => {
       setNewQuantity(item.quantity.toString());
       setNewUnit(item.counting_unit);
       setNewStatus(item.status);
+      setNewNote(item.note);
+      setNewTypeSubAsset(item.type_sub_asset)
     }
     setIsPopupOpen(true);
   };
@@ -315,7 +318,7 @@ const AssetInfoSection = ({ value, onChange }) => {
 
   // ฟังก์ชันบันทึกข้อมูล
   const handleSave = async () => {
-    if (!newSubasset || !newDetail || !newPrice || !newQuantity || !newUnit || !newStatus) {
+    if (!newSubasset || !newDetail || !newPrice || !newQuantity || !newUnit || !newStatus || !newNote || !newTypeSubAsset) {
       alert("กรุณากรอกข้อมูลให้ครบถ้วน");
       return;
     }
@@ -330,6 +333,8 @@ const AssetInfoSection = ({ value, onChange }) => {
       unit_price: parseFloat(newPrice),
       counting_unit: newUnit,
       status: newStatus,
+      note:newNote,
+      type_sub_asset:newTypeSubAsset,
       main_asset_id: value.main_asset_id, // ใช้ main_asset_id จาก props
     };
 
@@ -367,6 +372,8 @@ const AssetInfoSection = ({ value, onChange }) => {
     setNewQuantity("");
     setNewUnit("");
     setNewStatus("");
+    setNewNote("");
+    setNewTypeSubAsset("")
   };
 
   // ฟังก์ชันสำหรับแปลงราคากลับเป็นรูปแบบสกุลเงิน
@@ -412,6 +419,18 @@ const AssetInfoSection = ({ value, onChange }) => {
                   onChange={(e) => setNewSubasset(e.target.value)}
                 />
               </div>
+
+              <div>
+                <label className="block text-gray-700 text-sm mb-2">ประเภทพัสดุ</label>
+                <input
+                  type="text"
+                  className="w-full border-2 border-blue-100 rounded-xl p-2"
+                  value={newTypeSubAsset}
+                  onChange={(e) => setNewTypeSubAsset(e.target.value)}
+                />
+              </div>
+
+
               <div>
                 <label className="block text-gray-700 text-sm mb-2">รายละเอียด</label>
                 <input
@@ -421,6 +440,7 @@ const AssetInfoSection = ({ value, onChange }) => {
                   onChange={(e) => setNewDetail(e.target.value)}
                 />
               </div>
+
               <div>
                 <label className="block text-gray-700 text-sm mb-2">ราคาต่อหน่วย</label>
                 <input
@@ -479,6 +499,17 @@ const AssetInfoSection = ({ value, onChange }) => {
                   <option>จำหน่าย</option>
                 </select>
               </div>
+
+              <div>
+                <label className="block text-gray-700 text-sm mb-2">หมายเหตุ</label>
+                <input
+                  type="text"
+                  className="w-full border-2 border-blue-100 rounded-xl p-2"
+                  value={newNote}
+                  onChange={(e) => setNewNote(e.target.value)}
+                />
+              </div>
+
               <div className="flex justify-end mt-4">
                 <button
                   className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-700 mr-2"
@@ -503,11 +534,13 @@ const AssetInfoSection = ({ value, onChange }) => {
         <thead>
           <tr className="bg-gray-200 text-gray-700">
             <th className="border px-4 py-2">รายการพัสดุย่อย</th>
+            <th className="border px-4 py-2">ประเภทพัสดุ</th>
             <th className="border px-4 py-2">รายละเอียด</th>
             <th className="border px-4 py-2">ราคาต่อหน่วย</th>
             <th className="border px-4 py-2">จำนวน</th>
             <th className="border px-4 py-2">หน่วยนับ</th>
             <th className="border px-4 py-2">การใช้งาน</th>
+            <th className="border px-4 py-2">หมายเหตุ</th>
             <th className="border px-4 py-2">จัดการ</th>
           </tr>
         </thead>
@@ -515,10 +548,12 @@ const AssetInfoSection = ({ value, onChange }) => {
           {data.map((item) => (
             <tr key={item.id} className="text-gray-700">
               <td className="border px-4 py-2">{item.sub_asset_name}</td>
+              <td className="border px-4 py-2">{item.type_sub_asset}</td>
               <td className="border px-4 py-2">{item.details}</td>
               <td className="border px-4 py-2">{formatCurrency(item.unit_price)}</td>
               <td className="border px-4 py-2">{item.quantity}</td>
               <td className="border px-4 py-2">{item.counting_unit}</td>
+              <td className="border px-4 py-2">{item.note}</td>
               <td className="border px-4 py-2">{item.status}</td>
               <td className="border px-4 py-2">
                 <button
