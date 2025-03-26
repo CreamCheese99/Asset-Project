@@ -243,43 +243,38 @@
 
 
 const express = require('express');
-const pool = require('./database.js'); // เชื่อมกับ database.js
+const pool = require('./database.js');
 const cors = require('cors');
-const LdapAuth = require('./LdapAuth'); // นำเข้า LDAP Authentication
+const LdapAuth = require('./LdapAuth');
 const fs = require('fs');
 const path = require('path');
 
 const app = express();
 const port = 5001;
 
-// กำหนด CORS
-const whitelist = [
-  'http://localhost:5173', // Frontend
-  'http://localhost:5001'  // Backend
-];
-
+const whitelist = ['http://localhost:5173', 'http://localhost:5001'];
 const corsOptions = {
   origin: (origin, callback) => {
-    if (whitelist.includes(origin) || !origin) {  // สำหรับ request ที่ไม่มาจาก frontend ก็อนุญาต
+    if (whitelist.includes(origin) || !origin) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true,  // ให้สามารถส่ง cookies หรือข้อมูลส่วนตัวได้
+  credentials: true,
 };
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// โหลดข้อมูลจากไฟล์ JSON (แทนการดึงข้อมูลจาก LDAP)
-const dataFilePath = path.join(__dirname, 'data', 'testlogin.json'); 
+// โหลดข้อมูลจากไฟล์ JSON
+const dataFilePath = path.join(__dirname, 'data', 'testlogin.json');
 const rawData = fs.readFileSync(dataFilePath);
 const usersData = JSON.parse(rawData);
 
-// กำหนดค่า LDAP
-const ldapAuth = new LdapAuth('10.252.92.100', 389, 'dc=kmitl,dc=ac,dc=th'); 
+// ตั้งค่า LDAP
+const ldapAuth = new LdapAuth('10.252.92.100', 389, 'dc=kmitl,dc=ac,dc=th');
 
-// Endpoint สำหรับตรวจสอบการเข้าสู่ระบบ
+// Endpoint สำหรับ Login
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -289,64 +284,55 @@ app.post('/api/login', async (req, res) => {
 
   try {
     const isAuthenticated = await ldapAuth.authenticate(username, password);
-    
+
     if (isAuthenticated) {
-      // แทนการดึงข้อมูลจาก LDAP ให้ดึงข้อมูลจากไฟล์ JSON แทน
-      const userFromJson = usersData.find(user => user.mail === username); // ใช้ username สำหรับหาข้อมูล
+      // ค้นหาข้อมูลผู้ใช้จาก JSON โดยเปรียบเทียบ `mail` กับ `username`
+      const userFromJson = usersData.find(user => user.mail.toLowerCase() === username.toLowerCase());
 
       if (!userFromJson) {
         return res.status(404).json({ success: false, message: 'User not found in JSON data' });
       }
 
-      // แสดงข้อมูลผู้ใช้ที่ดึงจาก JSON
-      console.log('User Info from JSON:', userFromJson); // เพิ่มบรรทัดนี้เพื่อแสดงข้อมูลผู้ใช้จาก JSON
+      console.log('User Info from JSON:', userFromJson);
 
-      // บันทึกข้อมูลผู้ใช้ลงในฐานข้อมูล
+      // เชื่อมต่อฐานข้อมูล และตรวจสอบว่าผู้ใช้อยู่ในระบบหรือยัง
       const client = await pool.connect();
-      const checkUserQuery = 'SELECT * FROM user WHERE user_email = $1';
-      const checkUserResult = await client.query(checkUserQuery, [userFromJson.mail]);
+      try {
+        const checkUserQuery = 'SELECT * FROM "user" WHERE "user_email" = $1';
+        const checkUserResult = await client.query(checkUserQuery, [userFromJson.mail]);
 
-      if (checkUserResult.rows.length === 0) {
-        // ถ้ายังไม่มีข้อมูล ให้เพิ่มเข้าไป
-        const insertQuery = `
-          INSERT INTO user (user_id, user_name, user_email)
-          VALUES ($1, $2, $3)
-        `;
-        await client.query(insertQuery, [
-          userFromJson.uid,        // ใช้ uid จาก JSON
-          userFromJson.cn,         // ใช้ cn จาก JSON 
-          userFromJson.mail        // ใช้ mail จาก JSON
-        ]);
+        if (checkUserResult.rows.length === 0) {
+          // เพิ่มผู้ใช้ลงฐานข้อมูล
+          const insertQuery = `
+            INSERT INTO "user" ("user_id", "user_name", "user_email")
+            VALUES ($1, $2, $3)
+            `;
 
-        console.log('New user added to database:', userFromJson.mail);
-      } else {
-        console.log('User already exists in database:', userFromJson.mail);
+          await client.query(insertQuery, [userFromJson.uid, userFromJson.cn, userFromJson.mail]);
+          console.log('New user added to database:', userFromJson.mail);
+        } else {
+          console.log('User already exists in database:', userFromJson.mail);
+        }
+      } finally {
+        client.release();
       }
-
-      client.release(); // ปล่อย connection กลับไปที่ pool
 
       // ส่งข้อมูลผู้ใช้กลับไปยัง frontend
       res.json({
         success: true,
         message: 'Authentication successful',
-        user: userFromJson // ส่งข้อมูลผู้ใช้ที่ดึงจาก JSON
+        user: userFromJson,
       });
     } else {
-      res.status(401).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
+      res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
   } catch (error) {
-    console.error('Error:', error);  // แสดงข้อผิดพลาดหากเกิดขึ้น
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+    console.error('Error:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
-// เริ่มต้นเซิร์ฟเวอร์
+// เริ่มเซิร์ฟเวอร์
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
