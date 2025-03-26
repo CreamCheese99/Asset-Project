@@ -14,9 +14,117 @@ app.use(bodyParser.json({ limit: "50mb" })); // ตั้งขีดจำก�
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true })); // รองรับข้อมูล urlencoded ขนาดใหญ่
 
 
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+
+// ตั้งค่า multer - กำหนดขนาดไฟล์ (5MB = 5 * 1024 * 1024 bytes)
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "uploads/");
+    },
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + "-" + file.originalname);
+    },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 }, // จำกัดขนาดไฟล์ 5MB
+});
+
+module.exports = upload;
+
+
+// ตั้งค่า storage ให้กับ multer
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, 'uploads');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir); // ถ้าโฟลเดอร์ uploads ไม่มี จะสร้างใหม่
+    }
+    cb(null, uploadDir); // ระบุโฟลเดอร์สำหรับเก็บไฟล์
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname)); // ตั้งชื่อไฟล์
+  }
+});
+
+
+app.post("/upload", upload.single("image"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "กรุณาอัปโหลดไฟล์รูปภาพ" });
+  }
+  res.json({ message: "อัปโหลดสำเร็จ", file: req.file });
+});
+
+// Middleware จัดการข้อผิดพลาด Multer
+app.use((err, req, res, next) => {
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({ error: "ไฟล์มีขนาดใหญ่เกินไป! (สูงสุด 5MB)" });
+  }
+  next(err);
+});
+
+
+
 //*********************************************************************************** */
 //AddAsset page
-app.post("/mainasset", async (req, res) => {
+// app.post("/mainasset", async (req, res) => {
+//   try {
+//     const {
+//       main_asset_id,
+//       main_asset_name,
+//       status,
+//       fiscal_year,
+//       date_received,
+//       budget_limit,
+//       averange_price,
+//       budget_type,
+//       asset_type,
+//       location_use,
+//       location_deliver,
+//       usage,
+//       responsible_person,
+//       department_id,
+//       image
+//     } = req.body;
+
+//     if (!main_asset_id || !main_asset_name) {
+//       return res.status(400).json({ error: "Missing required fields" });
+//     }
+
+//     const newAsset = await pool.query(
+//       `INSERT INTO "mainasset" (
+//         "main_asset_id", 
+//         main_asset_name, 
+//         status, 
+//         fiscal_year, 
+//         date_received,
+//         budget_limit, 
+//         averange_price, 
+//         budget_type, 
+//         asset_type,
+//         location_use, 
+//         location_deliver, 
+//         usage, 
+//         responsible_person,
+//         department_id,
+//         image
+//       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14 ,$15) RETURNING *`,
+//       [
+//         main_asset_id, main_asset_name, status, fiscal_year, date_received,
+//         budget_limit, averange_price, budget_type, asset_type,
+//         location_use, location_deliver, usage, responsible_person, department_id,image
+//       ]
+//     );
+
+//     res.status(201).json({ message: "Asset added successfully", data: newAsset.rows[0] });
+//   } catch (error) {
+//     console.error("Error adding asset:", error);
+//     res.status(500).json({ error: "Server Error" });
+//   }
+// });
+app.post('/mainasset', upload.single('image'), async (req, res) => {
   try {
     const {
       main_asset_id,
@@ -32,16 +140,21 @@ app.post("/mainasset", async (req, res) => {
       location_deliver,
       usage,
       responsible_person,
-      department_id
+      department_id,
     } = req.body;
 
+    // ตรวจสอบการมีไฟล์ภาพ
+    const image = req.file ? req.file.filename : null; // ถ้ามีไฟล์ให้ใช้ชื่อไฟล์
+
+    // ตรวจสอบฟิลด์ที่จำเป็น
     if (!main_asset_id || !main_asset_name) {
-      return res.status(400).json({ error: "Missing required fields" });
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    // การบันทึกข้อมูลในฐานข้อมูล
     const newAsset = await pool.query(
-      `INSERT INTO "mainasset" (
-        "main_asset_id", 
+      `INSERT INTO mainasset (
+        main_asset_id, 
         main_asset_name, 
         status, 
         fiscal_year, 
@@ -54,19 +167,35 @@ app.post("/mainasset", async (req, res) => {
         location_deliver, 
         usage, 
         responsible_person,
-        department_id
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *`,
+        department_id,
+        image
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *`,
       [
-        main_asset_id, main_asset_name, status, fiscal_year, date_received,
-        budget_limit, averange_price, budget_type, asset_type,
-        location_use, location_deliver, usage, responsible_person, department_id
+        main_asset_id,
+        main_asset_name,
+        status,
+        fiscal_year,
+        date_received,
+        budget_limit,
+        averange_price,
+        budget_type,
+        asset_type,
+        location_use,
+        location_deliver,
+        usage,
+        responsible_person,
+        department_id,
+        image, // ถ้ามีไฟล์จะใช้ชื่อไฟล์ที่ถูกบันทึก
       ]
     );
 
-    res.status(201).json({ message: "Asset added successfully", data: newAsset.rows[0] });
+    res.status(201).json({ message: 'Asset added successfully', data: newAsset.rows[0] });
   } catch (error) {
-    console.error("Error adding asset:", error);
-    res.status(500).json({ error: "Server Error" });
+    console.error('Error adding asset:', error);
+    if (error instanceof multer.MulterError) {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(500).json({ error: 'Server Error' });
   }
 });
 
