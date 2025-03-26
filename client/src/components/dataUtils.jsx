@@ -1,8 +1,6 @@
-
-
 export function summaryDepartmentDetails(data) {
   const summary = {};
-  let years = []
+  let years = new Set(); // ใช้ Set เพื่อหลีกเลี่ยงการซ้ำ
 
   for (const department of Object.keys(data.departmentDetails)) {
     summary[department] = {};
@@ -11,11 +9,14 @@ export function summaryDepartmentDetails(data) {
       for (const year of Object.keys(data.departmentDetails[department][fundType])) {
         const total = data.departmentDetails[department][fundType][year].reduce((acc, val) => acc + val, 0);
         summary[department][fundType].push({ year, total });
-        // สร้าง labels จากปี
-        years = summary[department][fundType].map(item => item.year);
+        years.add(year); // ใช้ Set เพื่อเพิ่มปี
       }
     }
   }
+
+  // สร้าง arrays จาก Set ปี
+  years = Array.from(years);
+
   // สีสำหรับ datasets
   const colors = [
     "rgba(75, 192, 192, 0.2)", "rgba(255, 159, 64, 0.2)",
@@ -53,7 +54,7 @@ export function summaryDepartmentDetails(data) {
 
 export function summaryDepartmentAssets(data) {
   const summary = {};
-  let years = []
+  let years = new Set();
 
   for (const department of Object.keys(data.departmentAssets)) {
     summary[department] = {};
@@ -62,13 +63,13 @@ export function summaryDepartmentAssets(data) {
       for (const year of Object.keys(data.departmentAssets[department][assetStatus])) {
         const total = data.departmentAssets[department][assetStatus][year].reduce((acc, val) => acc + val, 0);
         summary[department][assetStatus].push({ year, total });
-        // สร้าง labels จากปี
-        years = summary[department][assetStatus].map(item => item.year);
+        years.add(year);
       }
     }
   }
 
-  // สีสำหรับ datasets
+  years = Array.from(years);
+
   const colors = [
     "rgba(75, 192, 192, 0.2)", "rgba(255, 159, 64, 0.2)",
     "rgba(54, 162, 235, 0.2)", "rgba(255, 99, 132, 0.2)"
@@ -80,12 +81,11 @@ export function summaryDepartmentAssets(data) {
 
   let colorIndex = 0;
 
-  // สร้าง datasets อัตโนมัติ
   const datasets = Object.keys(summary).flatMap((faculty) =>
-    Object.keys(summary[faculty]).map((type) => {
+    Object.keys(summary[faculty]).map((status) => {
       const dataset = {
-        label: `${faculty} - ${type}`,
-        data: summary[faculty][type].map(item => item.total),
+        label: `${faculty} - ${status}`,
+        data: summary[faculty][status].map(item => item.total),
         backgroundColor: colors[colorIndex % colors.length],
         borderColor: borderColors[colorIndex % borderColors.length],
         borderWidth: 1
@@ -99,14 +99,13 @@ export function summaryDepartmentAssets(data) {
     labels: years,
     datasets: datasets
   };
-  
+
   return chartData;
 }
 
-
 export function summaryFilterDepartmentDetails(data, department = "", fundType = "", yearRange = "") {
   const summary = {};
-  let years = [];
+  let years = new Set();
 
   if (!department) {
     department = Object.keys(data.departmentDetails)[0] || "";
@@ -137,9 +136,11 @@ export function summaryFilterDepartmentDetails(data, department = "", fundType =
       const total = data.departmentDetails[department][type][yr].reduce((acc, val) => acc + val, 0);
       summary[department][type].push({ year: yr, total });
 
-      if (!years.includes(yr)) years.push(yr);
+      years.add(yr);
     });
   });
+
+  years = Array.from(years);
 
   const colors = ["rgba(75, 192, 192, 0.2)", "rgba(255, 159, 64, 0.2)"];
   const borderColors = ["rgba(75, 192, 192, 1)", "rgba(255, 159, 64, 1)"];
@@ -160,10 +161,9 @@ export function summaryFilterDepartmentDetails(data, department = "", fundType =
   };
 }
 
-
 export function summaryFilterDepartmentAssets(data, department = "", assetStatus = "", yearRange = "") {
   const summary = {};
-  let years = [];
+  let years = new Set();
 
   if (!department) {
     department = Object.keys(data.departmentAssets)[0] || "";
@@ -194,9 +194,11 @@ export function summaryFilterDepartmentAssets(data, department = "", assetStatus
       const total = data.departmentAssets[department][status][yr].reduce((acc, val) => acc + val, 0);
       summary[department][status].push({ year: yr, total });
 
-      if (!years.includes(yr)) years.push(yr);
+      years.add(yr);
     });
   });
+
+  years = Array.from(years);
 
   const colors = ["rgba(54, 162, 235, 0.2)", "rgba(255, 99, 132, 0.2)"];
   const borderColors = ["rgba(54, 162, 235, 1)", "rgba(255, 99, 132, 1)"];
