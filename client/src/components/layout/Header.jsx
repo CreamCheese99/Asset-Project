@@ -21,14 +21,21 @@ const Header = () => {
       </div>
       
       {/* Navigation Menu */}
-      <nav style={{ backgroundColor: '#aed581' }} className="rounded-b-md shadow-lg py-2">
-        <div className="container mx-auto flex justify-center space-x-6">
-          <Link to="/" className="hover:text-gray-300">หน้าหลัก</Link>
-          <Link to="/manage-assets" className="hover:text-gray-300">จัดการพัสดุ</Link>
-          <Link to="/asset-list" className="hover:text-gray-300">รายการพัสดุ</Link>
-          <Link to="/manage-personal-info" className="hover:text-gray-300">ข้อมูลทั่วไป</Link>
-          <Link to="/manage-permissions" className="hover:text-gray-300">จัดการสิทธิ์</Link>
+      <nav style={{ backgroundColor: '#aed581' }} className="rounded-b-md shadow-lg py-4">
+        <div className="container mx-auto flex justify-center space-x-8">
+          <Link to="/" className="hover:text-gray-700 transition duration-300">หน้าหลัก</Link>
+          <Link to="/manage-assets" className="hover:text-gray-700 transition duration-300">จัดการพัสดุ</Link>
+          <Link to="/asset-list" className="hover:text-gray-700 transition duration-300">รายการพัสดุ</Link>
+          <Link to="/manage-personal-info" className="hover:text-gray-700 transition duration-300">ข้อมูลทั่วไป</Link>
+          <Link to="/manage-permissions" className="hover:text-gray-700 transition duration-300">จัดการสิทธิ์</Link>
+          <Link to="/guidebook"className=" hover:text-gray-700 transition duration-300 " >คู่มือการใช้งานระบบ</Link>
+          
+          {/* <div className="container mx-auto flex justify-end space-x-6">
+            <Link to="/guidebook"className="hover:text-gray-300" >คู่มือการใช้งานระบบ</Link>
+
+          </div> */}
         </div>
+       
       </nav>
     </header>
   );

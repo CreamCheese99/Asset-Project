@@ -794,29 +794,33 @@ app.delete("/api/asset_type/:id", async (req, res) => {
 
 //****************************************************************************************************************** */
 // //เพิ่มข้อมูลผู้ใช้
-
 // Endpoint สำหรับเพิ่มผู้ใช้ใหม่
 app.post("/api/users", async (req, res) => {
-  const { user_id, user_name, user_email, department_id, role_name } = req.body;
+  const { user_id, user_name, user_email, department_id, role } = req.body; // รับ role_name จาก body
   try {
-    // เพิ่มข้อมูลผู้ใช้ใหม่
-    const userResult = await pool.query(`
-      INSERT INTO "user" (user_id, user_name, user_email, department_id)
-      VALUES ($1, $2, $3, $4) RETURNING user_id
-    `, [user_id, user_name, user_email, department_id]);
-
-    const userId = userResult.rows[0].user_id;
+    // ตรวจสอบว่า role มีค่าเป็น 'choose' หรือไม่
+    if (role === "choose") {
+      return res.status(400).json({ error: "กรุณาเลือกบทบาท" });
+    }
 
     // ดึงข้อมูล role_id จาก role_name
     const roleResult = await pool.query(`
       SELECT role_id FROM role WHERE role_name = $1
-    `, [role_name]);
+    `, [role]);
 
     if (roleResult.rows.length === 0) {
       return res.status(400).json({ error: "Invalid role name" });
     }
 
     const roleId = roleResult.rows[0].role_id;
+
+    // เพิ่มข้อมูลผู้ใช้ใหม่
+    const userResult = await pool.query(`
+      INSERT INTO "user" (user_id, user_name, user_email, department_id, role_id)
+      VALUES ($1, $2, $3, $4, $5) RETURNING user_id
+    `, [user_id, user_name, user_email, department_id, roleId]);
+
+    const userId = userResult.rows[0].user_id;
 
     // เพิ่มบทบาทให้กับผู้ใช้
     await pool.query(`
@@ -830,6 +834,52 @@ app.post("/api/users", async (req, res) => {
     res.status(500).json({ error: "Failed to create user" });
   }
 });
+
+
+
+app.get("/api/users", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        u.user_id, 
+        u.user_name, 
+        u.user_email, 
+        d.department_name, 
+        r.role_name 
+      FROM "user" u
+      LEFT JOIN department d ON u.department_id = d.department_id
+      LEFT JOIN userrole ur ON u.user_id = ur.user_id
+      LEFT JOIN role r ON ur.role_id = r.role_id
+      ORDER BY u.user_id ASC
+    `);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
+
+app.delete("/users/:user_id", async (req, res) => {
+  const { user_id } = req.params;
+  console.log("🔹 ลบผู้ใช้:", user_id); // ตรวจสอบค่าที่รับมา
+  
+  try {
+    const result = await pool.query('DELETE FROM "user" WHERE user_id = $1 RETURNING *', [user_id]);
+
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "ไม่พบผู้ใช้ที่ต้องการลบ" });
+    }
+
+    res.json({ message: "ลบผู้ใช้สำเร็จ", deletedUser: result.rows[0] });
+  } catch (err) {
+    console.error("Error deleting user:", err);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการลบผู้ใช้" });
+  }
+});
+
+
 
 
 // API สำหรับดึงข้อมูลบทบาททั้งหมด

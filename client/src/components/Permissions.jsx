@@ -135,19 +135,19 @@
 //                     <FaSave className="mr-1" /> บันทึก
 //                   </button>
 //                 ) : (
-//                   <button 
-//                     onClick={() => handleEdit(user.id, user.role)} 
-//                     className="bg-yellow-500 text-white px-3 py-1 rounded-xl hover:bg-yellow-600 flex items-center"
-//                   >
-//                     <FaEdit className="mr-1" /> แก้ไข
-//                   </button>
-//                 )}
-//                 <button 
-//                   onClick={() => handleDelete(user.id)} 
-//                   className="bg-red-500 text-white px-3 py-1 rounded-xl hover:bg-red-600 flex items-center"
-//                 >
-//                   <FaTrash className="mr-1" /> ลบ
-//                 </button>
+                //   <button 
+                //     onClick={() => handleEdit(user.id, user.role)} 
+                //     className="bg-yellow-500 text-white px-3 py-1 rounded-xl hover:bg-yellow-600 flex items-center"
+                //   >
+                //     <FaEdit className="mr-1" /> แก้ไข
+                //   </button>
+                // )}
+                // <button 
+                //   onClick={() => handleDelete(user.id)} 
+                //   className="bg-red-500 text-white px-3 py-1 rounded-xl hover:bg-red-600 flex items-center"
+                // >
+                //   <FaTrash className="mr-1" /> ลบ
+                // </button>
 //               </td>
 //             </tr>
 //           ))}
@@ -232,14 +232,13 @@ const Permissions = () => {
     user_email: "",
     role: "choose",
     department_id: "",
-    user_id: "", // เพิ่มฟิลด์สำหรับรหัสประจำตัว
+    user_id: "",
   });
 
   const [department, setDepartment] = useState([]);
   const [roles, setRoles] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // ฟังก์ชันดึงข้อมูลผู้ใช้จาก API
   useEffect(() => {
     const fetchUsers = async () => {
       setIsLoading(true);
@@ -254,7 +253,6 @@ const Permissions = () => {
     fetchUsers();
   }, []);
 
-  // ฟังก์ชันดึงข้อมูลภาควิชาจาก API
   useEffect(() => {
     const fetchDepartment = async () => {
       setIsLoading(true);
@@ -273,12 +271,10 @@ const Permissions = () => {
     fetchDepartment();
   }, []);
 
-  // ฟังก์ชันดึงข้อมูลบทบาทจาก API
   useEffect(() => {
     const fetchRole = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/role");
-        // ตรวจสอบว่าข้อมูลที่ได้รับมีค่าหรือไม่
         if (response.data && Array.isArray(response.data)) {
           setRoles(response.data);
         } else {
@@ -291,7 +287,6 @@ const Permissions = () => {
     fetchRole();
   }, []);
 
-  // ฟังก์ชันสำหรับเปลี่ยนสถานะผู้ใช้งาน
   const toggleStatus = async (id) => {
     const updatedUsers = users.map(user =>
       user.id === id ? { ...user, status: user.status === "active" ? "inactive" : "active" } : user
@@ -304,15 +299,13 @@ const Permissions = () => {
     }
   };
 
-  // ฟังก์ชันเริ่มแก้ไขบทบาท
   const handleEdit = (id, currentRole) => {
     setEditingId(id);
     setTempRole({ ...tempRole, [id]: currentRole });
   };
 
-  // ฟังก์ชันบันทึกบทบาทที่แก้ไข
   const handleSave = async (id) => {
-    setUsers(users.map(user => 
+    setUsers(users.map(user =>
       user.id === id ? { ...user, role: tempRole[id] } : user
     ));
     setEditingId(null);
@@ -323,47 +316,56 @@ const Permissions = () => {
     }
   };
 
-  // ฟังก์ชันลบผู้ใช้
-  const handleDelete = async (id) => {
-    if (window.confirm("คุณต้องการลบผู้ใช้นี้หรือไม่?")) {
-      setUsers(users.filter(user => user.id !== id));
-      try {
-        await axios.delete(`http://localhost:5000/api/users/${id}`);
-      } catch (err) {
-        console.error("Error deleting user:", err);
-      }
+  const handleDelete = async (userId) => {
+    try {
+      await axios.delete(`http://localhost:5000/users/${userId}`);
+      alert("ลบผู้ใช้สำเร็จ");
+    } catch (error) {
+      console.error("เกิดข้อผิดพลาดในการลบผู้ใช้:", error);
     }
   };
-
-  const handleAddUser = async () => {
-    if (newUser.name && newUser.email && newUser.role !== "choose" && newUser.department_id && newUser.id) {
-      const newUserData = {
-        user_id: newUser.id, // ระบุ user_id เอง
-        user_name: newUser.name,
-        user_email: newUser.email,
-        department_id: newUser.department_id,
-        role: newUser.role, 
-      };
   
+  
+  
+  
+
+  const [successMessage, setSuccessMessage] = useState(""); // state สำหรับข้อความสำเร็จ
+
+  
+  const handleAddUser = async () => {
+    if (newUser.user_name && newUser.user_email && newUser.role !== "choose" && newUser.department_id && newUser.user_id) {
+      const newUserData = {
+        user_id: newUser.user_id,
+        user_name: newUser.user_name,
+        user_email: newUser.user_email,
+        department_id: newUser.department_id,
+        role: newUser.role,
+      };
+
       try {
         const response = await axios.post('http://localhost:5000/api/users', newUserData);
-        setUsers([...users, response.data]);
-        setIsModalOpen(false);
-        setNewUser({ name: "", email: "", role: "choose", department_id: "", id: "" });
+        setSuccessMessage("เพิ่มผู้ใช้งานสำเร็จ!");
+        setIsModalOpen(false); // ปิด modal หลังจากเพิ่มสำเร็จ
+        setNewUser({
+          user_name: "",
+          user_email: "",
+          role: "choose",
+          department_id: "",
+          user_id: "",
+        });
       } catch (err) {
         console.error("Error adding new user:", err);
+        alert("เกิดข้อผิดพลาดในการเพิ่มผู้ใช้งาน");
       }
     } else {
       alert("กรุณากรอกข้อมูลให้ครบถ้วน");
     }
   };
-  
 
   return (
     <div className="container mx-auto p-4 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4 text-gray-700">จัดการสิทธิ์ผู้ใช้งาน</h2>
-
-      <button 
+      <button
         className="flex items-center bg-blue-400 text-white px-4 py-2 rounded-full mb-4 hover:bg-blue-500"
         onClick={() => setIsModalOpen(true)}
       >
@@ -378,6 +380,7 @@ const Permissions = () => {
           <thead>
             <tr className="text-gray-500">
               <th className="py-2 text-left">ผู้ใช้งาน</th>
+              <th className="py-2 text-left">รหัสประจำตัว</th>
               <th className="py-2 text-left">อีเมล</th>
               <th className="py-2 text-left">ภาควิชา</th>
               <th className="py-2 text-left">บทบาท</th>
@@ -388,9 +391,27 @@ const Permissions = () => {
           <tbody>
             {users.map((user) => (
               <tr key={user.id} className="border-t border-gray-300">
-                <td className="py-2">{user.name}</td>
-                <td className="py-2">{user.email}</td>
-                <td className="py-2">{user.role}</td>
+                <td className="py-2">{user.user_name}</td>
+                <td className="py-2">{user.user_id}</td>
+                <td className="py-2">{user.user_email}</td>
+                <td className="py-2">{user.department_name}</td>
+                <td className="py-2">
+                  {editingId === user.id ? (
+                    <select
+                      value={tempRole[user.id]}
+                      onChange={(e) => setTempRole({ ...tempRole, [user.id]: e.target.value })}
+                      className="border p-1 rounded-md"
+                    >
+                      {roles.map(role => (
+                        <option key={role.role_id} value={role.role_name}>
+                          {role.role_name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    user.role_name
+                  )}
+                </td>
                 <td className="py-2">
                   <button
                     onClick={() => toggleStatus(user.id)}
@@ -400,18 +421,28 @@ const Permissions = () => {
                   </button>
                 </td>
                 <td className="py-2 flex space-x-2">
-                  <button 
-                    onClick={() => handleEdit(user.id, user.role)} 
-                    className="bg-yellow-500 text-white px-3 py-1 rounded-xl hover:bg-yellow-600"
-                  >
-                    <FaEdit className="mr-1" /> แก้ไข
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(user.id)} 
-                    className="bg-red-500 text-white px-3 py-1 rounded-xl hover:bg-red-600"
-                  >
-                    <FaTrash className="mr-1" /> ลบ
-                  </button>
+                  {editingId === user.id ? (
+                    <button
+                      onClick={() => handleSave(user.user_id)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded-xl hover:bg-blue-600"
+                    >
+                      <FaSave className="mr-1" /> บันทึก
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleEdit(user.id, user.role)}
+                      className="bg-yellow-500 text-white px-3 py-1 rounded-xl hover:bg-yellow-600"
+                    >
+                      <FaEdit className="mr-1" /> แก้ไข
+                    </button>
+                  )}
+                    <button
+                      onClick={() => handleDelete(user.user_id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded-xl hover:bg-red-600"
+                    >
+                      <FaTrash className="mr-1" /> ลบ
+                    </button>
+
                 </td>
               </tr>
             ))}
@@ -427,37 +458,24 @@ const Permissions = () => {
               type="text"
               placeholder="ชื่อผู้ใช้งาน"
               className="w-full border p-2 rounded-xl mb-2"
-              value={newUser.name}
-              onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+              value={newUser.user_name || ""}
+              onChange={(e) => setNewUser({ ...newUser, user_name: e.target.value })}
             />
             <input
               type="number"
               placeholder="รหัสประจำตัว"
               className="w-full border p-2 rounded-xl mb-2"
-              value={newUser.id}
-              onChange={(e) => setNewUser({ ...newUser, id: e.target.value })}
-              required // กำหนดให้ฟิลด์รหัสประจำตัวเป็นฟิลด์ที่จำเป็นต้องกรอก
+              value={newUser.user_id}
+              onChange={(e) => setNewUser({ ...newUser, user_id: e.target.value })}
+              required
             />
             <input
               type="email"
               placeholder="อีเมล"
               className="w-full border p-2 rounded-xl mb-2"
-              value={newUser.email}
-              onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+              value={newUser.user_email}
+              onChange={(e) => setNewUser({ ...newUser, user_email: e.target.value })}
             />
-            <select
-              className="w-full border p-2 rounded-xl mb-4"
-              value={newUser.department_id}
-              onChange={(e) => setNewUser({ ...newUser, department_id: e.target.value })}
-            >
-              <option value="">เลือกภาควิชา</option>
-              {department.map((dept) => (
-                <option key={dept.department_id} value={dept.department_id}>
-                  {dept.department_name}
-                </option>
-              ))}
-            </select>
-
             <select
               className="w-full border p-2 rounded-xl mb-4"
               value={newUser.role}
@@ -470,15 +488,33 @@ const Permissions = () => {
                 </option>
               ))}
             </select>
-
+            <select
+              className="w-full border p-2 rounded-xl mb-4"
+              value={newUser.department_id}
+              onChange={(e) => setNewUser({ ...newUser, department_id: e.target.value })}
+            >
+              <option value="">เลือกภาควิชา</option>
+              {department.map((dept) => (
+                <option key={dept.department_id} value={dept.department_id}>
+                  {dept.department_name}
+                </option>
+              ))}
+            </select>
             <div className="flex justify-between">
-              <button onClick={() => setIsModalOpen(false)} className="bg-gray-300 px-4 py-2 rounded-xl">
-                ยกเลิก
-              </button>
-              <button onClick={handleAddUser} className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600">
-                บันทึก
-              </button>
-            </div>
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="bg-gray-300 px-4 py-2 rounded-xl"
+            >
+              ปิด
+            </button>
+            <button
+              onClick={handleAddUser}
+              className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600"
+            >
+              เพิ่มผู้ใช้งาน
+            </button>
+          </div>
+
           </div>
         </div>
       )}
@@ -487,3 +523,5 @@ const Permissions = () => {
 };
 
 export default Permissions;
+
+
