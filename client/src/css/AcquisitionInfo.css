@@ -1,0 +1,33 @@
+.acquisition-container {
+  background-color: white;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.acquisition-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #4a4a4a;
+  margin-bottom: 1rem;
+}
+
+.acquisition-label {
+  font-size: 0.875rem;
+  color: #4a4a4a;
+  margin-bottom: 0.5rem;
+}
+
+.acquisition-input, .acquisition-select {
+  width: 100%;
+    border: 1px solid #bfe2ff; /* Light blue */
+    border-radius: 1rem; /* 16px */
+    padding: 0.5rem; /* 8px */
+}
+
+.grid-2-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}

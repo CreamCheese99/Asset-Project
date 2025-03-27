@@ -417,16 +417,18 @@ const AddAsset = () => {
         <AssetForm value={assetData} onChange={handleAssetChange} />
         <AcquisitionInfo value={assetData} onChange={handleAssetChange} />
         <AssetDetails value={assetData} onChange={handleAssetChange} onImageChange={handleImageChange} />
-        <AssetInfoSection 
-          value={assetData} 
-          onChange={handleAssetChange} 
-          mainAssetId={assetData.main_asset_id}  
-        />
         <ActionButtons2 
           assetData={assetData}  
           onSave={handleSubmit } 
           onCancel={handleCancel} 
         />
+        <div className="mt-14"> {/* เว้นระยะห่างระหว่าง component */}
+            <AssetInfoSection 
+              value={assetData} 
+              onChange={handleAssetChange} 
+              mainAssetId={assetData.main_asset_id}  
+            />
+        </div>
       </div>
     </div>
   );

@@ -429,8 +429,7 @@ app.put("/mainasset/:id", async (req, res) => {
 
 
 // ************************************************************************************************
-
-// API สำหรับเพิ่มข้อมูลในตาราง SubAsset
+//หน้า AddAsset เพิ่มพัสดุย่อย
 app.post('/api/subasset', async (req, res) => {
   const {
     sub_asset_name,
@@ -442,18 +441,25 @@ app.post('/api/subasset', async (req, res) => {
     note,
     type_sub_asset,
     main_asset_id
-
   } = req.body;
 
   try {
-    // คำสั่ง SQL ที่ถูกต้องโดยไม่ต้องส่งค่า sub_asset_id เนื่องจากจะถูกสร้างอัตโนมัติ
+    // แก้ไข SQL Query
     const query = `
-      INSERT INTO public."subasset"(
-        sub_asset_name, details, quantity, unit_price, status, counting_unit, main_asset_idnote, type_sub_asset,
+      INSERT INTO public."subasset" (
+        sub_asset_name, 
+        details, 
+        quantity, 
+        unit_price, 
+        status, 
+        counting_unit, 
+        main_asset_id, 
+        note, 
+        type_sub_asset
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7 ,$8 ,$9)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `;
-    
+
     const values = [
       sub_asset_name,
       details,
@@ -461,9 +467,9 @@ app.post('/api/subasset', async (req, res) => {
       unit_price,
       status,
       counting_unit,
-      note,
-      type_sub_asset,
-      main_asset_id
+      main_asset_id,  // ตำแหน่งที่ถูกต้อง
+      note, 
+      type_sub_asset
     ];
 
     await pool.query(query, values);
@@ -474,7 +480,6 @@ app.post('/api/subasset', async (req, res) => {
     res.status(500).json({ error: 'Error adding sub asset' });
   }
 });
-
 
 
 // API สำหรับดึงข้อมูล SubAsset ทั้งหมด
@@ -789,138 +794,58 @@ app.delete("/api/asset_type/:id", async (req, res) => {
 
 //****************************************************************************************************************** */
 // //เพิ่มข้อมูลผู้ใช้
-// app.post('/api/user', async (req, res) => {
-//   const { user_name, user_email, department_id, role_id, user_role_name } = req.body;
 
-//   if (!user_name || !user_email || !department_id || !role_id || !user_role_name) {
-//     return res.status(400).json({ error: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
-//   }
-
-//   const client = await pool.connect();
-//   try {
-//     await client.query('BEGIN');
-
-//     // ตรวจสอบว่า role_ID มีอยู่หรือไม่
-//     const roleCheck = await client.query(
-//       `SELECT "role_id" FROM public."role" WHERE "role_id" = $1`, [role_id]
-//     );
-//     if (roleCheck.rows.length === 0) {
-//       await client.query('ROLLBACK');
-//       return res.status(400).json({ error: 'role_ID ไม่ถูกต้อง' });
-//     }
-
-//     // ตรวจสอบว่ามี user_email ซ้ำหรือไม่
-//     const emailCheck = await client.query(
-//       `SELECT "user_id" FROM public."user" WHERE user_email = $1`, [user_email]
-//     );
-//     if (emailCheck.rows.length > 0) {
-//       await client.query('ROLLBACK');
-//       return res.status(400).json({ error: 'อีเมลนี้ถูกใช้ไปแล้ว' });
-//     }
-
-//     // เพิ่มข้อมูลผู้ใช้
-//     const userInsert = await client.query(
-//       `INSERT INTO public."user" (user_name, user_email, "department_id") 
-//        VALUES ($1, $2, $3) RETURNING "user_id", user_name, user_email, "department_id"`,
-//       [user_name, user_email, department_ID]
-//     );
-
-//     const user_ID = userInsert.rows[0].user_ID; // ดึง user_ID ที่เพิ่มมา
-
-//     // เพิ่มข้อมูล UserRole
-//     const userRoleInsert = await client.query(
-//       `INSERT INTO public."userrole" (user_role_name, "user_id", "role_id") 
-//        VALUES ($1, $2, $3) RETURNING *`,
-//       [user_role_name, user_ID, role_ID]
-//     );
-
-//     await client.query('COMMIT');
-//     res.status(201).json({
-//       message: 'เพิ่มผู้ใช้และบทบาทเรียบร้อย',
-//       user: userInsert.rows[0],
-//       userRole: userRoleInsert.rows[0],
-//     });
-
-//   } catch (error) {
-//     await client.query('ROLLBACK');
-//     console.error('Database error:', error);
-//     res.status(500).json({ error: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูล' });
-//   } finally {
-//     client.release();
-//   }
-// });
-
-
-
-// ✅ GET: ดึงข้อมูลผู้ใช้ทั้งหมด
-app.get("/user", async (req, res) => {
+// Endpoint สำหรับเพิ่มผู้ใช้ใหม่
+app.post("/api/users", async (req, res) => {
+  const { user_id, user_name, user_email, department_id, role_name } = req.body;
   try {
-    const result = await pool.query('SELECT * FROM public."user"');
+    // เพิ่มข้อมูลผู้ใช้ใหม่
+    const userResult = await pool.query(`
+      INSERT INTO "user" (user_id, user_name, user_email, department_id)
+      VALUES ($1, $2, $3, $4) RETURNING user_id
+    `, [user_id, user_name, user_email, department_id]);
+
+    const userId = userResult.rows[0].user_id;
+
+    // ดึงข้อมูล role_id จาก role_name
+    const roleResult = await pool.query(`
+      SELECT role_id FROM role WHERE role_name = $1
+    `, [role_name]);
+
+    if (roleResult.rows.length === 0) {
+      return res.status(400).json({ error: "Invalid role name" });
+    }
+
+    const roleId = roleResult.rows[0].role_id;
+
+    // เพิ่มบทบาทให้กับผู้ใช้
+    await pool.query(`
+      INSERT INTO userrole (user_id, role_id)
+      VALUES ($1, $2)
+    `, [userId, roleId]);
+
+    res.status(201).json({ message: "User created successfully" });
+  } catch (err) {
+    console.error("Error creating user:", err);
+    res.status(500).json({ error: "Failed to create user" });
+  }
+});
+
+
+// API สำหรับดึงข้อมูลบทบาททั้งหมด
+app.get('/api/role', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM role');
     res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Error fetching roles:', err);
+    res.status(500).send('Server Error');
   }
 });
 
-// ✅ GET: ดึงข้อมูลผู้ใช้ตาม ID
-app.get("/user/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await pool.query('SELECT * FROM public."user" WHERE user_id = $1', [id]);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
-// ✅ POST: เพิ่มผู้ใช้ใหม่
-app.post("/user", async (req, res) => {
-  try {
-    const { user_id, user_name, user_email, department_id } = req.body;
-    const result = await pool.query(
-      'INSERT INTO public."user" (user_id, user_name, user_email, department_id) VALUES ($1, $2, $3, $4) RETURNING *',
-      [user_id, user_name, user_email, department_id]
-    );
-    res.status(201).json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
-// ✅ PUT: แก้ไขข้อมูลผู้ใช้
-app.put("/user/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { user_name, user_email, department_id } = req.body;
-    const result = await pool.query(
-      'UPDATE public."user" SET user_name = $1, user_email = $2, department_id = $3 WHERE user_id = $4 RETURNING *',
-      [user_name, user_email, department_id, id]
-    );
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
-// ✅ DELETE: ลบผู้ใช้
-app.delete("/user/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await pool.query('DELETE FROM public."user" WHERE user_id = $1 RETURNING *', [id]);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.json({ message: "User deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 
 app.listen(PORT, () => {

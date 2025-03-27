@@ -1,0 +1,135 @@
+/* AssetDetails.css */
+.bg-white {
+    background-color: #ffffff;
+  }
+  
+  .mt-4 {
+    margin-top: 1rem;
+  }
+  
+  .p-4 {
+    padding: 1rem;
+  }
+  
+  .rounded-md {
+    border-radius: 0.375rem;
+  }
+  
+  .shadow-md {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .text-lg {
+    font-size: 1.125rem;
+  }
+  
+  .font-bold {
+    font-weight: bold;
+  }
+  
+  .text-gray-700 {
+    color: #4a4a4a;
+  }
+  
+  .mb-4 {
+    margin-bottom: 1rem;
+  }
+  
+  .grid {
+    display: grid;
+  }
+  
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .gap-4 {
+    gap: 1rem;
+  }
+  
+  .block {
+    display: block;
+  }
+  
+  .text-sm {
+    font-size: 0.875rem;
+  }
+  
+  .border-2 {
+    border-width: 2px;
+  }
+  
+  .border-blue-100 {
+    border-color: #cce4ff;
+  }
+  
+  .rounded-xl {
+    border-radius: 0.75rem;
+  }
+  
+  .p-2 {
+    padding: 0.5rem;
+  }
+  
+  .w-full {
+    width: 100%;
+  }
+  
+  .mt-4 img {
+    width: 8rem;
+    height: 8rem;
+    object-fit: cover;
+    border-radius: 0.375rem;
+  }
+  
+  /* AssetDetails.css */
+
+/* สไตล์ของ label */
+.input-label {
+    font-size: 0.875rem; /* ขนาดตัวอักษร */
+    color: #4B5563; /* สีของตัวอักษร */
+    margin-bottom: 0.5rem; /* ช่องว่างใต้ label */
+    display: block;
+  }
+  
+  /* สไตล์ของ input */
+  .input-field {
+    width: 100%;
+    border: 1px solid #bfe2ff; /* Light blue */
+    border-radius: 1rem; /* 16px */
+    padding: 0.5rem; /* 8px */
+  }
+  
+  .input-field:focus {
+    border-color: #3B82F6; /* เปลี่ยนสีขอบเมื่อ focus */
+  }
+  
+  /* สไตล์ของ select input */
+  .select-field {
+    width: 100%;
+    border: 1px solid #bfe2ff; /* Light blue */
+    border-radius: 1rem; /* 16px */
+    padding: 0.5rem; /* 8px */
+  }
+  
+  .select-field:focus {
+    border-color: #3B82F6;
+  }
+  
+  /* สไตล์สำหรับไฟล์อัพโหลด */
+  .input-file {
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px solid #E0F2FE;
+    border-radius: 0.75rem;
+  }
+  
+  /* รูปภาพพรีวิว */
+  .preview-img {
+    width: 8rem;
+    height: 8rem;
+    object-fit: cover;
+    border-radius: 0.375rem;
+    margin-top: 1rem;
+  }
+  

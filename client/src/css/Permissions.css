@@ -1,0 +1,177 @@
+/* Permissions.css */
+
+/* Container */
+.permissions-container {
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .permissions-header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #4a5568;
+    margin-bottom: 1rem;
+  }
+  
+  /* Button styles */
+  .permissions-add-btn {
+    display: flex;
+    align-items: center;
+    background-color: #3182ce;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .permissions-add-btn:hover {
+    background-color: #2b6cb0;
+  }
+  
+  .icon {
+    margin-right: 0.5rem;
+  }
+  
+  /* Table Styles */
+  .permissions-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .permissions-table-header {
+    background-color: #edf2f7;
+    text-align: left;
+    color: #4a5568;
+  }
+  
+  .permissions-table-cell {
+    padding: 0.75rem;
+    border-top: 1px solid #e2e8f0;
+  }
+  
+  .permissions-table-row {
+    transition: background-color 0.3s ease;
+  }
+  
+  .permissions-table-row:hover {
+    background-color: #f7fafc;
+  }
+  
+  .permissions-status-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .permissions-status-btn.active {
+    background-color: #48bb78;
+  }
+  
+  .permissions-status-btn.inactive {
+    background-color: #cbd5e0;
+  }
+  
+  .permissions-edit-btn,
+  .permissions-save-btn,
+  .permissions-delete-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    color: #fff;
+    cursor: pointer;
+    display: flex-1;
+    align-items: center;
+    margin-right: 0.5rem;
+  }
+  
+  .permissions-edit-btn {
+    background-color: #ecc94b;
+  }
+  
+  .permissions-edit-btn:hover {
+    background-color: #d69e2e;
+  }
+  
+  .permissions-save-btn {
+    background-color: #3182ce;
+  }
+  
+  .permissions-save-btn:hover {
+    background-color: #2b6cb0;
+  }
+  
+  .permissions-delete-btn {
+    background-color: #e53e3e;
+  }
+  
+  .permissions-delete-btn:hover {
+    background-color: #c53030;
+  }
+  
+  /* Modal styles */
+  .permissions-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .permissions-modal {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 500px;
+  }
+  
+  .permissions-modal-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #4a5568;
+    margin-bottom: 1rem;
+  }
+  
+  .permissions-modal-input,
+  .permissions-modal-select {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 12px;
+    border: 1px solid #cbd5e0;
+    margin-bottom: 1rem;
+  }
+  
+  .permissions-modal-actions {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .permissions-modal-cancel-btn,
+  .permissions-modal-save-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  
+  .permissions-modal-cancel-btn {
+    background-color: #edf2f7;
+  }
+  
+  .permissions-modal-save-btn {
+    background-color: #3182ce;
+    color: #fff;
+  }
+  
+  .permissions-modal-cancel-btn:hover {
+    background-color: #e2e8f0;
+  }
+  
+  .permissions-modal-save-btn:hover
+  

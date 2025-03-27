@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Breadcrumb5 from "../components/Breadcrumb5";
+import '../css/ShowInfo.css'; // Import the CSS file
 
 const ShowInfo = () => {
   const { id } = useParams();
@@ -10,13 +11,12 @@ const ShowInfo = () => {
   const [error, setError] = useState(null);
   const encodedId = encodeURIComponent(id);
 
-
   useEffect(() => {
     console.log("Fetching asset data for ID:", id); // Debug log
-  
+
     const fetchAssetData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/mainasset/${encodeURIComponent(id)}`);
+        const response = await axios.get(`http://localhost:5000/mainasset/${encodedId}`);
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -25,10 +25,10 @@ const ShowInfo = () => {
         setLoading(false);
       }
     };
-  
+
     if (id) fetchAssetData(); // ตรวจสอบว่า `id` มีค่าก่อนเรียก API
-  }, [id]); 
-  
+  }, [id]);
+
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" }).format(value);
   };
@@ -42,36 +42,36 @@ const ShowInfo = () => {
   }
 
   return (
-    <div style={{ backgroundColor: "#f1f8e9" }} className="min-h-screen font-sans">
+    <div className="show-info-container">
       <Breadcrumb5 />
       <div className="container mx-auto p-4">
         {/* ส่วนกรอกข้อมูล */}
-        <div className="bg-white mt-4 p-4 rounded-md shadow-md">
-          <h3 className="text-lg font-bold text-gray-700 mb-4">ข้อมูลครุภัณฑ์</h3>
+        <div className="asset-info-section">
+          <h3 className="section-title">ข้อมูลครุภัณฑ์</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน</label>
+              <label className="label">รหัสทรัพย์สิน</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 bg-yellow-100"
+                className="input-field-show"
                 value={data.mainAsset?.main_asset_id || ''}
                 readOnly
               />
             </div>
             <div>
-              <label className="block text-gray-700 text-sm mb-2">ภาควิชา</label>
+              <label className="label">ภาควิชา</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="input-field-show"
                 value={data.mainAsset?.department_id || ''}
                 readOnly
               />
             </div>
             <div>
-              <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
+              <label className="label">สภาพการครุภัณฑ์</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="input-field-show"
                 value={data.mainAsset?.status || ''}
                 readOnly
               />
@@ -80,50 +80,50 @@ const ShowInfo = () => {
         </div>
 
         {/* ส่วนวิธีการได้มา */}
-        <div className="bg-white mt-4 p-4 rounded-md shadow-md">
-          <h3 className="text-lg font-bold text-gray-700 mb-4">วิธีการได้มา</h3>
+        <div className="asset-info-section">
+          <h3 className="section-title">วิธีการได้มา</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-gray-700 text-sm mb-2">ปีงบประมาณ</label>
+              <label className="label">ปีงบประมาณ</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="input-field-show"
                 value={data.mainAsset?.fiscal_year || ''}
                 readOnly
               />
             </div>
             <div>
-              <label className="block text-gray-700 text-sm mb-2">วันที่ตรวจรับ</label>
+              <label className="label">วันที่ตรวจรับ</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="input-field-show"
                 value={data.mainAsset?.date_received || ''}
                 readOnly
               />
             </div>
             <div>
-              <label className="block text-gray-700 text-sm mb-2">ประเภทเงิน</label>
+              <label className="label">ประเภทเงิน</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="input-field-show"
                 value={data.mainAsset?.budget_type || ''}
                 readOnly
               />
             </div>
             <div>
-              <label className="block text-gray-700 text-sm mb-2">วงเงินงบประมาณ</label>
+              <label className="label">วงเงินงบประมาณ</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="input-field-show"
                 value={data.mainAsset?.budget_limit || ''}
                 readOnly
               />
             </div>
             <div>
-              <label className="block text-gray-700 text-sm mb-2">ราคากลาง</label>
+              <label className="label">ราคากลาง</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="input-field-show"
                 value={data.mainAsset?.averange_price || ''}
                 readOnly
               />
@@ -132,64 +132,64 @@ const ShowInfo = () => {
         </div>
 
         {/* ส่วนรายละเอียดพัสดุ */}
-        <div className="bg-white mt-4 p-4 rounded-md shadow-md">
-          <h3 className="text-lg font-bold text-gray-700 mb-4">รายละเอียดพัสดุ</h3>
+        <div className="asset-info-section">
+          <h3 className="section-title">รายละเอียดพัสดุ</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-2">ชื่อสินทรัพย์</label>
+              <label className="label">ชื่อสินทรัพย์</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="input-field-show"
                 value={data.mainAsset?.main_asset_name || ''}
                 readOnly
               />
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 mb-2">ประเภทสินทรัพย์</label>
+              <label className="label">ประเภทสินทรัพย์</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="input-field-show"
                 value={data.mainAsset?.asset_type || ''}
                 readOnly
               />
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 mb-2">สถานที่ใช้งาน</label>
+              <label className="label">สถานที่ใช้งาน</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="input-field-show"
                 value={data.mainAsset?.location_use || ''}
                 readOnly
               />
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 mb-2">การใช้งาน</label>
+              <label className="label">การใช้งาน</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="input-field-show"
                 value={data.mainAsset?.usage || ''}
                 readOnly
               />
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 mb-2">สถานที่ส่งมอบ</label>
+              <label className="label">สถานที่ส่งมอบ</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="input-field-show"
                 value={data.mainAsset?.location_deliver || ''}
                 readOnly
               />
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 mb-2">ผู้รับผิดชอบ</label>
+              <label className="label">ผู้รับผิดชอบ</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="input-field-show"
                 value={data.mainAsset?.responsible_person || ''}
                 readOnly
               />
@@ -198,8 +198,8 @@ const ShowInfo = () => {
         </div>
 
         {/* ตารางแสดงข้อมูลพัสดุย่อย */}
-        <div className="bg-white mt-4 p-4 rounded-md shadow-md overflow-x-auto">
-          <h3 className="text-lg font-bold text-gray-700 mb-4">ข้อมูลพัสดุย่อย</h3>
+        <div className="sub-assets-table">
+          <h3 className="section-title">ข้อมูลพัสดุย่อย</h3>
           <table className="table-auto w-full border-collapse text-sm">
             <thead>
               <tr className="bg-gray-200 text-gray-700">
@@ -211,7 +211,6 @@ const ShowInfo = () => {
                 <th className="border px-4 py-2">หน่วยนับ</th>
                 <th className="border px-4 py-2">การใช้งาน</th>
                 <th className="border px-4 py-2">หมายเหตุ</th>
-                <th className="border px-4 py-2">จัดการ</th>
               </tr>
             </thead>
             <tbody>
@@ -224,8 +223,8 @@ const ShowInfo = () => {
                       <td className="border px-4 py-2">{formatCurrency(item.unit_price)}</td>
                       <td className="border px-4 py-2">{item.quantity}</td>
                       <td className="border px-4 py-2">{item.counting_unit}</td>
-                      <td className="border px-4 py-2">{item.note}</td>
                       <td className="border px-4 py-2">{item.status}</td>
+                      <td className="border px-4 py-2">{item.note}</td>
                   </tr>
                 ))
               ) : (
