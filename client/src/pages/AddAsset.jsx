@@ -31,7 +31,7 @@ const AddAsset = () => {
     department_id: '',
     note:'',
     type_sub_asset:'',
-    image: ''  // เพิ่มฟิลด์เก็บรูปภาพ
+    image: null  // เพิ่มฟิลด์เก็บรูปภาพ
   });
 
   // อัปเดตข้อมูลจากอินพุตทั่วไป
@@ -43,12 +43,13 @@ const AddAsset = () => {
   };
 
   // อัปเดตรูปภาพ
-  const handleImageChange = (file) => {
+  const handleImageChange = (files) => {
     setAssetData((prevData) => ({
       ...prevData,
-      image: file, // เก็บไฟล์รูป
+      image: files, // เก็บหลายไฟล์
     }));
   };
+  
 
   // ฟังก์ชันแจ้งเตือน
   const handleAlert = (message, type = "error") => {
@@ -56,44 +57,40 @@ const AddAsset = () => {
   };
 
   const handleSubmit = async () => {
-    if (!assetData.main_asset_id) {
-      handleAlert('กรุณากรอก main_asset_id');
-      return;
+    const formData = new FormData();
+  
+    // เพิ่มข้อมูล assetData ลงใน formData
+    for (const key in assetData) {
+      if (key.startsWith("image") && assetData[key] instanceof File) {
+        formData.append(key, assetData[key]); // ใช้ชื่อฟิลด์ตรงกับที่เซิร์ฟเวอร์คาดหวัง
+      } else {
+        formData.append(key, assetData[key]);
+      }
     }
   
     try {
-      const formData = new FormData();
-  
-      // เพิ่มข้อมูลทั้งหมดลงใน FormData
-      Object.keys(assetData).forEach((key) => {
-        if (assetData[key] !== null && assetData[key] !== undefined) {
-          if (key === 'image' && assetData[key] instanceof File) {
-            formData.append(key, assetData[key]); // แนบไฟล์รูป
-          } else if (key !== 'image') {
-            formData.append(key, assetData[key]);
-          }
-        }
+      const response = await axios.post('http://localhost:5000/mainasset', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
   
-      // ตรวจสอบว่าไฟล์ใน FormData ถูกต้องหรือไม่
-      for (let pair of formData.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-      }
-  
-      // ส่งข้อมูลไป backend
-      const mainAssetResponse = await axios.post(
-        'http://localhost:5000/mainasset',
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-      console.log('บันทึกข้อมูล mainasset สำเร็จ:', mainAssetResponse.data);
-  
-      handleAlert('บันทึกข้อมูลสำเร็จ!', "success");
+      console.log('บันทึกข้อมูลสำเร็จ:', response.data);
+      alert('บันทึกข้อมูลสำเร็จ!');
     } catch (error) {
-      console.error('เกิดข้อผิดพลาด:', error);
-      handleAlert('เกิดข้อผิดพลาดในการบันทึกข้อมูล!');
+      if (error.response) {
+        console.error('ข้อผิดพลาดจากการตอบกลับ:', error.response.data);
+        alert(error.response.data.error || 'เกิดข้อผิดพลาดที่เซิร์ฟเวอร์!');
+      } else if (error.request) {
+        console.error('ข้อผิดพลาดจากการส่งคำขอ:', error.request);
+        alert('ไม่ได้รับการตอบกลับจากเซิร์ฟเวอร์!');
+      } else {
+        console.error('ข้อความข้อผิดพลาด:', error.message);
+        alert('ข้อผิดพลาดที่ไม่คาดคิด!');
+      }
     }
   };
+  
   
   // รีเซ็ตข้อมูล
   const handleCancel = () => {
@@ -119,9 +116,10 @@ const AddAsset = () => {
       department_id: '',
       note:'',
       type_sub_asset:'',
-      image: ''  // เพิ่มฟิลด์เก็บรูปภาพ
+      image: null  // เปลี่ยนเป็น null เพื่อให้ไม่มีค่าเริ่มต้น
     });
   };
+  
 
   return (
     <div style={{ backgroundColor: '#f1f8e9' }} className="min-h-screen font-sans">

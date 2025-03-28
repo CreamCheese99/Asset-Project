@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const multer = require("multer");  // นำเข้า multer
 const pool = require("./db");
 
 const app = express();
@@ -13,118 +14,27 @@ app.use(cors());
 app.use(bodyParser.json({ limit: "50mb" })); // ตั้งขีดจำกัดเป็น 50MB
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true })); // รองรับข้อมูล urlencoded ขนาดใหญ่
 
-
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-
-
-// ตั้งค่า multer - กำหนดขนาดไฟล์ (5MB = 5 * 1024 * 1024 bytes)
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, "uploads/");
-    },
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + "-" + file.originalname);
-    },
-  }),
-  limits: { fileSize: 5 * 1024 * 1024 }, // จำกัดขนาดไฟล์ 5MB
-});
-
-module.exports = upload;
-
-
-// ตั้งค่า storage ให้กับ multer
+// กำหนดการจัดเก็บไฟล์โดยใช้ multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, 'uploads');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir); // ถ้าโฟลเดอร์ uploads ไม่มี จะสร้างใหม่
-    }
-    cb(null, uploadDir); // ระบุโฟลเดอร์สำหรับเก็บไฟล์
+    cb(null, 'uploads/'); // กำหนดโฟลเดอร์เก็บไฟล์
   },
   filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname)); // ตั้งชื่อไฟล์
+    cb(null, Date.now() + '-' + file.originalname); // ตั้งชื่อไฟล์ที่บันทึก
   }
 });
 
+// สร้าง instance ของ multer
+const upload = multer({ storage: storage });
 
-app.post("/upload", upload.single("image"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "กรุณาอัปโหลดไฟล์รูปภาพ" });
-  }
-  res.json({ message: "อัปโหลดสำเร็จ", file: req.file });
-});
-
-// Middleware จัดการข้อผิดพลาด Multer
-app.use((err, req, res, next) => {
-  if (err.code === "LIMIT_FILE_SIZE") {
-    return res.status(400).json({ error: "ไฟล์มีขนาดใหญ่เกินไป! (สูงสุด 5MB)" });
-  }
-  next(err);
-});
-
-
-
-//*********************************************************************************** */
-//AddAsset page
-// app.post("/mainasset", async (req, res) => {
-//   try {
-//     const {
-//       main_asset_id,
-//       main_asset_name,
-//       status,
-//       fiscal_year,
-//       date_received,
-//       budget_limit,
-//       averange_price,
-//       budget_type,
-//       asset_type,
-//       location_use,
-//       location_deliver,
-//       usage,
-//       responsible_person,
-//       department_id,
-//       image
-//     } = req.body;
-
-//     if (!main_asset_id || !main_asset_name) {
-//       return res.status(400).json({ error: "Missing required fields" });
-//     }
-
-//     const newAsset = await pool.query(
-//       `INSERT INTO "mainasset" (
-//         "main_asset_id", 
-//         main_asset_name, 
-//         status, 
-//         fiscal_year, 
-//         date_received,
-//         budget_limit, 
-//         averange_price, 
-//         budget_type, 
-//         asset_type,
-//         location_use, 
-//         location_deliver, 
-//         usage, 
-//         responsible_person,
-//         department_id,
-//         image
-//       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14 ,$15) RETURNING *`,
-//       [
-//         main_asset_id, main_asset_name, status, fiscal_year, date_received,
-//         budget_limit, averange_price, budget_type, asset_type,
-//         location_use, location_deliver, usage, responsible_person, department_id,image
-//       ]
-//     );
-
-//     res.status(201).json({ message: "Asset added successfully", data: newAsset.rows[0] });
-//   } catch (error) {
-//     console.error("Error adding asset:", error);
-//     res.status(500).json({ error: "Server Error" });
-//   }
-// });
-app.post('/mainasset', upload.single('image'), async (req, res) => {
+// อัปโหลดหลายไฟล์พร้อมกัน
+app.post('/mainasset', upload.fields([
+  { name: 'image1', maxCount: 1 },
+  { name: 'image2', maxCount: 1 },
+  { name: 'image3', maxCount: 1 },
+  { name: 'image4', maxCount: 1 },
+  { name: 'image5', maxCount: 1 }
+]), async (req, res) => {
   try {
     const {
       main_asset_id,
@@ -143,8 +53,13 @@ app.post('/mainasset', upload.single('image'), async (req, res) => {
       department_id
     } = req.body;
 
-    // ตรวจสอบการมีไฟล์ภาพ
-    const image = req.file ? req.file.filename : null; // ถ้ามีไฟล์ให้ใช้ชื่อไฟล์
+    // ตรวจสอบว่าไฟล์มีหรือไม่
+    const images = [];
+    for (let i = 1; i <= 5; i++) {
+      if (req.files[`image${i}`]) {
+        images.push(req.files[`image${i}`][0].filename); // ใช้ชื่อไฟล์
+      }
+    }
 
     // ตรวจสอบฟิลด์ที่จำเป็น
     if (!main_asset_id || !main_asset_name) {
@@ -168,8 +83,12 @@ app.post('/mainasset', upload.single('image'), async (req, res) => {
         usage, 
         responsible_person,
         department_id,
-        image
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *`,
+        image1,
+        image2,
+        image3,
+        image4,
+        image5
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19) RETURNING *`,
       [
         main_asset_id,
         main_asset_name,
@@ -185,7 +104,11 @@ app.post('/mainasset', upload.single('image'), async (req, res) => {
         usage,
         responsible_person,
         department_id,
-        image // ถ้ามีไฟล์จะใช้ชื่อไฟล์ที่ถูกบันทึก
+        images[0] || null, // image1
+        images[1] || null, // image2
+        images[2] || null, // image3
+        images[3] || null, // image4
+        images[4] || null  // image5
       ]
     );
 

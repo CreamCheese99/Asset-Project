@@ -65,11 +65,14 @@ const ActionButtons2 = ({ assetData, onCancel }) => {
     }
   
     const formData = new FormData();   
-
+  
     // วนลูปเพิ่มข้อมูล assetData ลงใน formData
     for (const key in assetData) {
-      if (key === "image" && assetData[key] instanceof File) { 
-        formData.append("image", assetData[key]); // เพิ่มไฟล์ลงใน FormData
+      if (key === "image" && assetData[key] instanceof FileList) { 
+        // ถ้ามีหลายไฟล์
+        Array.from(assetData[key]).forEach((file, index) => {
+          formData.append(`image[${index}]`, file); // เพิ่มไฟล์แต่ละไฟล์ไปใน FormData
+        });
       } else {
         formData.append(key, assetData[key]);
       }
@@ -81,7 +84,7 @@ const ActionButtons2 = ({ assetData, onCancel }) => {
           'Content-Type': 'multipart/form-data',
         },
       });
-
+  
       console.log('บันทึกข้อมูลสำเร็จ:', response.data);
       alert('บันทึกข้อมูลสำเร็จ!');
     } catch (error) {
@@ -97,7 +100,7 @@ const ActionButtons2 = ({ assetData, onCancel }) => {
       }
     }
   };
-
+  
   return (
     <div className="mt-4 flex space-x-4 justify-end">
       <button
