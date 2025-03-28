@@ -11,9 +11,11 @@ const ShowInfo = () => {
   const [error, setError] = useState(null);
   const encodedId = encodeURIComponent(id);
 
+
   useEffect(() => {
     console.log("Fetching asset data for ID:", id); // Debug log
 
+   
     const fetchAssetData = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/mainasset/${encodedId}`);

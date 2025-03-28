@@ -247,16 +247,12 @@ app.get('/api/mainasset', async (req, res) => {
   }
 });
 
-
-
-//shoeInfo page เมื่อคลิกดู
-// API ดึงข้อมูล mainasset และ ดึงข้อมูล subasset ตาม main_asset_id
 app.get("/mainasset/:id", async (req, res) => {
-  const { id } = req.params;
-  console.log("Received ID:", id);
-
   try {
-    // ดึงข้อมูล mainasset
+    const encodedId = req.params.id;
+    const id = decodeURIComponent(encodedId); // ถอดรหัสให้กลับมาเป็นภาษาไทยและอักขระพิเศษ
+    console.log("Decoded ID:", id);
+
     const mainAssetQuery = `SELECT * FROM public.mainasset WHERE main_asset_id = $1`;
     const mainAssetResult = await pool.query(mainAssetQuery, [id]);
 
@@ -264,12 +260,8 @@ app.get("/mainasset/:id", async (req, res) => {
       return res.status(404).json({ message: "Main asset not found" });
     }
 
-    // ดึงข้อมูล subasset
-    console.log("Fetching subasset for main_asset_id:", id);
     const subAssetQuery = `SELECT * FROM public.subasset WHERE main_asset_id = $1`;
     const subAssetResult = await pool.query(subAssetQuery, [id]);
-
-    console.log("Sub-assets found:", subAssetResult.rows);
 
     res.json({
       mainAsset: mainAssetResult.rows[0],
@@ -285,24 +277,41 @@ app.get("/mainasset/:id", async (req, res) => {
 
 
 
+
 //DataTable page
 // API สำหรับลบข้อมูลใน mainasset และ subasset ตาม main_asset_id
 app.delete('/api/mainasset/:id', async (req, res) => {
-  const mainAssetId = req.params.id;
+  const encodedId = req.params.id;
+  const mainAssetId = decodeURIComponent(encodedId); // ถอดรหัส ID
 
   try {
     await pool.query('BEGIN');
+
+    // ตรวจสอบก่อนว่ามี main_asset_id อยู่ในฐานข้อมูลหรือไม่
+    const checkQuery = 'SELECT * FROM public.mainasset WHERE main_asset_id = $1';
+    const checkResult = await pool.query(checkQuery, [mainAssetId]);
+
+    if (checkResult.rows.length === 0) {
+      await pool.query('ROLLBACK');
+      return res.status(404).json({ message: 'ไม่พบข้อมูลที่จะลบ' });
+    }
+
+    // ลบข้อมูล subasset ก่อน
     await pool.query('DELETE FROM public.subasset WHERE main_asset_id = $1', [mainAssetId]);
+    // ลบข้อมูล mainasset
     await pool.query('DELETE FROM public.mainasset WHERE main_asset_id = $1', [mainAssetId]);
+
     await pool.query('COMMIT');
-    res.status(200).send({ message: 'ลบข้อมูลสำเร็จ' });
-    
+    res.status(200).json({ message: 'ลบข้อมูลสำเร็จ' });
+
   } catch (err) {
     await pool.query('ROLLBACK');
-    console.error('Error deleting asset:', err);
-    res.status(500).send({ message: 'เกิดข้อผิดพลาดในการลบข้อมูล' });
+    console.error('เกิดข้อผิดพลาดในการลบ:', err);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบข้อมูล' });
   }
 });
+
+
 
 // API สำหรับการอัปเดตข้อมูล mainasset
 app.put("/mainasset/:id", async (req, res) => {

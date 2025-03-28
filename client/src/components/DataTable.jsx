@@ -26,16 +26,23 @@ const DataTable = () => {
   }, []);
   
   const handleDelete = (id) => {
+    const encodedId = encodeURIComponent(id); // เข้ารหัส ID ก่อนส่ง
+  
     if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?")) {
       axios
-        .delete(`http://localhost:5000/api/mainasset/${id}`)
+        .delete(`http://localhost:5000/api/mainasset/${encodedId}`)
         .then(() => {
           setMainAssetData((prevData) => prevData.filter((item) => item.main_asset_id !== id));
           setSubAssetData((prevData) => prevData.filter((item) => item.main_asset_id !== id));
+          alert("ลบข้อมูลสำเร็จ!"); // แจ้งเตือนเมื่อสำเร็จ
         })
-        .catch((error) => console.error("Error deleting asset:", error));
+        .catch((error) => {
+          console.error("เกิดข้อผิดพลาดในการลบ:", error);
+          alert("ไม่สามารถลบข้อมูลได้");
+        });
     }
   };
+  
 
   // 🔹 รวมข้อมูล mainasset + subasset (เชื่อมโยงด้วย main_asset_id)
   const mergedData = mainAssetData.map((main) => {
@@ -73,21 +80,25 @@ const DataTable = () => {
               {/* <td className="border px-4 py-2">{item.unit || "-"}</td> */}
               <td className="border px-4 py-2">{item.status}</td>
               <td className="border px-4 py-2 flex justify-center space-x-2">
-              <Link 
-                  to={`/show-info/${item.main_asset_id}`} 
+                <Link 
+                  to={`/show-info/${encodeURIComponent(item.main_asset_id)}`} 
                   className="text-blue-500 hover:text-blue-700 bg-gray-200 rounded-lg px-3 py-1"
                 >
                   ดู
                 </Link>
+
                 <Link 
-                  to={`/edit-info/${item.main_asset_id}`} 
+                  to={`/edit-info/${encodeURIComponent(item.main_asset_id)}`} 
                   className="text-yellow-500 hover:text-yellow-700 bg-gray-200 rounded-lg px-3 py-1">
                   แก้ไข
                 </Link>
 
                 <button className="text-red-500 hover:text-red-700 bg-gray-200 rounded-lg px-3 py-1" 
                   onClick={() => 
-                  handleDelete(item.main_asset_id)}>ลบ</button>
+                  handleDelete(item.main_asset_id)}
+                  >
+                  ลบ
+                </button>
               </td>
             </tr>
           ))}
