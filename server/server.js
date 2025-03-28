@@ -805,7 +805,7 @@ app.delete("/api/asset_type/:id", async (req, res) => {
 // //เพิ่มข้อมูลผู้ใช้
 // Endpoint สำหรับเพิ่มผู้ใช้ใหม่
 app.post("/api/users", async (req, res) => {
-  const { user_id, user_name, user_email, department_id, role } = req.body; // รับ role_name จาก body
+  const {  user_name, user_email, department_id, role } = req.body; // รับ role_name จาก body
   try {
     // ตรวจสอบว่า role มีค่าเป็น 'choose' หรือไม่
     if (role === "choose") {
@@ -825,9 +825,9 @@ app.post("/api/users", async (req, res) => {
 
     // เพิ่มข้อมูลผู้ใช้ใหม่
     const userResult = await pool.query(`
-      INSERT INTO "user" (user_id, user_name, user_email, department_id, role_id)
-      VALUES ($1, $2, $3, $4, $5) RETURNING user_id
-    `, [user_id, user_name, user_email, department_id, roleId]);
+      INSERT INTO "users" ( user_name, user_email, department_id, role_id)
+      VALUES ($1, $2, $3, $4 ) RETURNING user_id
+    `, [user_name, user_email, department_id, roleId]);
 
     const userId = userResult.rows[0].user_id;
 
@@ -850,12 +850,12 @@ app.get("/api/users", async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT 
-        u.user_id, 
+        u.user_id,
         u.user_name, 
         u.user_email, 
         d.department_name, 
         r.role_name 
-      FROM "user" u
+      FROM "users" u
       LEFT JOIN department d ON u.department_id = d.department_id
       LEFT JOIN userrole ur ON u.user_id = ur.user_id
       LEFT JOIN role r ON ur.role_id = r.role_id
@@ -869,27 +869,69 @@ app.get("/api/users", async (req, res) => {
   }
 });
 
-app.delete("/users/:user_id", async (req, res) => {
-  const { user_id } = req.params;
-  console.log("🔹 ลบผู้ใช้:", user_id); // ตรวจสอบค่าที่รับมา
-  
+
+
+
+// API สำหรับลบข้อมูลผู้ใช้
+app.delete('/api/users/:id', async (req, res) => {
+  const { id } = req.params;  // แปลง id เป็น integer
+
+  const client = await pool.connect();
   try {
-    const result = await pool.query('DELETE FROM "user" WHERE user_id = $1 RETURNING *', [user_id]);
-
-
+    // ลบข้อมูลผู้ใช้จากฐานข้อมูลโดยใช้ user_id
+    const result = await client.query('DELETE FROM users WHERE user_id = $1 RETURNING *', [id]);
+    
     if (result.rowCount === 0) {
-      return res.status(404).json({ error: "ไม่พบผู้ใช้ที่ต้องการลบ" });
+      return res.status(404).json({ message: 'ไม่พบผู้ใช้ที่ต้องการลบ' });
     }
 
-    res.json({ message: "ลบผู้ใช้สำเร็จ", deletedUser: result.rows[0] });
+    res.status(200).json({ message: 'ลบข้อมูลผู้ใช้สำเร็จ' });
   } catch (err) {
-    console.error("Error deleting user:", err);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการลบผู้ใช้" });
+    console.error("เกิดข้อผิดพลาดในการลบข้อมูลผู้ใช้:", err);
+    res.status(500).json({ message: 'ไม่สามารถลบข้อมูลผู้ใช้ได้' });
   }
 });
 
+app.put('/api/users/:id/role', async (req, res) => {
+  const { id } = req.params;  // รับ user_id จาก URL
+  const { role } = req.body;  // รับ role_name จาก request body
 
+  const client = await pool.connect(); // ใช้ client เพื่อจัดการ connection
+  
+  try {
+    // ดึง role_id จากฐานข้อมูลโดยใช้ role_name
+    const queryRoleId = 'SELECT role_id FROM role WHERE role_name = $1';
+    const roleResult = await client.query(queryRoleId, [role]);
 
+    if (roleResult.rowCount === 0) {
+      return res.status(404).json({ error: 'ไม่พบบทบาทในฐานข้อมูล' });
+    }
+
+    const roleId = roleResult.rows[0].role_id; // ✅ แก้ไขจาก .id เป็น .role_id
+
+    // ตรวจสอบว่ามี user_id ที่ต้องการแก้ไขหรือไม่
+    const userResult = await client.query('SELECT * FROM users WHERE user_id = $1', [id]);
+
+    if (userResult.rowCount === 0) {
+      return res.status(404).json({ message: 'ไม่พบผู้ใช้ที่ต้องการแก้ไข' });
+    }
+
+    // อัปเดต role_id ใหม่ และคืนค่าข้อมูลที่อัปเดต
+    const updateQuery = 'UPDATE users SET role_id = $1 WHERE user_id = $2 RETURNING user_id, role_id';
+    const result = await client.query(updateQuery, [roleId, id]);
+
+    res.status(200).json({ 
+      message: 'อัปเดตบทบาทผู้ใช้สำเร็จ',
+      user: result.rows[0] // คืนค่าข้อมูลที่อัปเดตกลับไป
+    });
+
+  } catch (err) {
+    console.error("เกิดข้อผิดพลาดในการอัปเดตบทบาทผู้ใช้:", err);
+    res.status(500).json({ message: 'ไม่สามารถอัปเดตบทบาทผู้ใช้ได้' });
+  } finally {
+    client.release(); // ปิดการเชื่อมต่อฐานข้อมูล
+  }
+});
 
 // API สำหรับดึงข้อมูลบทบาททั้งหมด
 app.get('/api/role', async (req, res) => {
