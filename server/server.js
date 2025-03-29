@@ -868,9 +868,72 @@ app.get('/api/role', async (req, res) => {
 });
 
 
+//***********************Login************************* */
+// Login API
+// app.post('/login', async (req, res) => {
+//   const { user_email, password } = req.body;
+//   const jwt = require('jsonwebtoken');
 
+//   try {
+//     const result = await pool.query('SELECT * FROM users WHERE user_email = $1', [user_email]);
+//     const user = result.rows[0];
 
+//     if (!user) {
+//       return res.status(400).json({ message: 'Invalid credentials' });
+//     }
 
+//     // เปรียบเทียบรหัสผ่านที่กรอกกับรหัสผ่านที่เก็บในฐานข้อมูล
+//     if (password !== user.password) {
+//       return res.status(400).json({ message: 'Invalid credentials' });
+//     }
+
+//     // สร้าง JWT token
+   
+//     const token = jwt.sign({ userId: user.user_id, roleId: user.role_id }, 'your_jwt_secret', { expiresIn: '1h' });
+
+//     // ส่ง token และข้อมูล role
+//     res.json({
+//       token,
+//       roleId: user.role_id,
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// });
+
+app.post('/login', async (req, res) => {
+  const { user_email, password } = req.body;
+    const jwt = require('jsonwebtoken');
+
+    
+  console.log('Received email:', user_email);  // ตรวจสอบ email ที่รับมา
+  console.log('Received password:', password); // ตรวจสอบ password ที่รับมา
+
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE user_email = $1', [user_email]);
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    if (password !== user.password) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // สร้าง JWT token
+    const token = jwt.sign({ userId: user.user_id, roleId: user.role_id }, 'your_jwt_secret', { expiresIn: '1h' });
+
+    res.json({
+      token,
+      roleId: user.role_id,
+    });
+  } catch (err) {
+    console.error('Error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

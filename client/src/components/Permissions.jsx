@@ -440,6 +440,7 @@ const Permissions = () => {
   };
   
   const handleEdit = (id, currentRoleId) => {
+    console.log(id,currentRoleId);
     setEditingId(id);
     setTempRole({ ...tempRole, [id]: currentRoleId }); // ใช้ role_id
   };
@@ -571,21 +572,19 @@ const Permissions = () => {
                 <td className="py-2">{user.user_email}</td>
                 <td className="py-2">{user.department_name}</td>
                 <td className="py-2">
-                  {editingId === user.user_id ? (
-                   <select
-                   value={tempRole[user.user_id] || user.role_id} // ใช้ role_id
-                   onChange={(e) => setTempRole({ ...tempRole, [user.user_id]: e.target.value })}
-                   className="border p-1 rounded-md"
-                 >
-                   {roles.map(role => (
-                     <option key={role.role_id} value={role.role_id}>
-                       {role.role_name}
-                     </option>
-                   ))}
-                 </select>
-                 
-                  ) : (
-                    user.role_name  // แสดงบทบาทปัจจุบันหากไม่ได้อยู่ในโหมดแก้ไข
+                  {editingId === user.user_id ? ( 
+                    <select
+                      onChange={(e) => setTempRole({ ...tempRole, [user.user_id]: e.target.value })} 
+                      className="border p-1 rounded-md"
+                    >
+                      {roles.map(role => ( 
+                        <option key={role.role_id} value={role.role_id} selected={role.role_id === user.role_id}> 
+                          {role.role_name}
+                        </option>
+                      ))}
+                    </select> 
+                  ) : ( 
+                    user.role_name
                   )}
                 </td>
 
@@ -607,19 +606,22 @@ const Permissions = () => {
                         <FaSave />
                       </button>
                       <button
-                        onClick={() => handleCancelEdit(user.role_name)} // ยกเลิกการแก้ไข
-                        className="bg-gray-500 text-white px-3 py-1 rounded-md hover:bg-gray-600"
+                          onClick={() => handleCancelEdit(user.role_name)}
+                          className="bg-gray-500 text-white px-3 py-1 rounded-md hover:bg-gray-600"
+                        >
+                          <FaTimes />
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setEditingId(user.user_id);
+                          setTempRole({ ...tempRole, [user.user_id]: user.role_id });
+                        }}
+                        className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600"
                       >
-                        <FaTimes />
+                        <FaEdit />
                       </button>
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => handleEdit(user.user_id, user.role_name)} // เข้าสู่โหมดการแก้ไข
-                      className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600"
-                    >
-                      <FaEdit />
-                    </button>
                   )}
                   <button
                     onClick={() => handleDelete(user.user_id)} // ลบผู้ใช้
@@ -653,19 +655,7 @@ const Permissions = () => {
               value={newUser.user_email}
               onChange={(e) => setNewUser({ ...newUser, user_email: e.target.value })}
             />
-
-           {/* <select
-              value={tempRole[user.user_id] || user.role_id} // ใช้ role_id แทน role_name
-              onChange={(e) => setTempRole({ ...tempRole, [user.user_id]: e.target.value })}
-              className="border p-1 rounded-md"
-            >
-              {roles.map(role => (
-                <option key={role.role_id} value={role.role_id}>
-                  {role.role_name}
-                </option>
-              ))}
-            </select> */}
-
+ 
             <select
                className="w-full border p-2 rounded-xl mb-4"
                value={newUser.role}
@@ -677,7 +667,7 @@ const Permissions = () => {
                    {role.role_name}
                  </option>
                ))}
-             </select>
+             </select> 
 
 
             <select
