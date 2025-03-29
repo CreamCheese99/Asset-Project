@@ -123,7 +123,7 @@ const Filters = ({
             </label>
           </div>
         ))}
-      </div>
+      {/* </div> แก้ไขให้ checkbox  */}
 
       <div>
         <label>ปี:</label>
