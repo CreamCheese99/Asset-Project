@@ -95,7 +95,7 @@ const Filters = ({
       </div>
 
       <div>
-        <label>แหล่งเงิน:</label>
+      <label>แหล่งเงิน:</label>
         <select
           value={selectedFund}
           onChange={(e) => setSelectedFund(e.target.value)}
@@ -108,6 +108,21 @@ const Filters = ({
             </option>
           ))}
         </select>
+        {fundTypes.map(fund => (
+          <div key={fund} className="flex items-center mb-2">
+            
+            <input
+              type="checkbox"
+              id={`checkbox-${fund}`}
+              checked={fund.checked}
+              onChange={() => setSelectedFund(fund)}
+              className="w-4 h-4 mr-2"
+            />
+            <label htmlFor={`checkbox-${fund}`} className="text-gray-800">
+              {fund}
+            </label>
+          </div>
+        ))}
       </div>
 
       <div>
