@@ -13,7 +13,7 @@ const Filters = ({
 }) => {
   const [departments, setDepartments] = useState([]);
   const [assetStatus, setAssetStatus] = useState([]);
-  const [budgetType, setBudgetType] = useState([]);  // เปลี่ยนชื่อเป็น setBudgetType
+  const [fundTypes, setFundTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState("");
 
@@ -28,9 +28,9 @@ const Filters = ({
         const data = await response.json(); // ดึงข้อมูล JSON
         
         // ตั้งค่าข้อมูลภาควิชาและแหล่งทุน
-        setDepartments(data.departments || []);
-        setBudgetType(data.budget_type || []);  // แก้ไขเป็น setBudgetType
-        setAssetStatus(data.status || []);  // ตรวจสอบให้แน่ใจว่ามีค่ากลับมา
+        setDepartments(data.departments);
+        setFundTypes(data.fundTypes);
+        setAssetStatus(data.assetStatuses);
 
         setLoading(false); // เปลี่ยนสถานะการโหลด
       } catch (error) {
@@ -102,7 +102,7 @@ const Filters = ({
           style={{ width: "100%", padding: "5px" }}
         >
           <option value="">-- ทุกแหล่งทุน --</option>
-          {budgetType.map((fund) => (  // แก้ไขเป็น budgetType
+          {fundTypes.map((fund) => (
             <option key={fund} value={fund}>
               {fund}
             </option>

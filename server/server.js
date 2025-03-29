@@ -360,48 +360,295 @@
 //   console.log(`Server running on http://localhost:${port}`);
 // });
 
+// const express = require('express');
+// const pool = require('./db'); // import pool เพื่อเชื่อมต่อฐานข้อมูล
+// const app = express();
+// const port = 5000;
 
+// app.use(express.json());
 
-app.get("/mainasset/:id", async (req, res) => {
-  const { id } = req.params;
-  console.log("Received ID:", id);
+// // Endpoint ดึงข้อมูล mainasset และ sub-assets
+// app.get("/mainasset/:id", async (req, res) => {
+//   const { id } = req.params;
+//   console.log("Received ID:", id);
 
-  try {
-    // ดึงข้อมูล mainasset
-    const mainAssetQuery = `SELECT * FROM public.mainasset WHERE main_asset_id = $1`;
-    const mainAssetResult = await pool.query(mainAssetQuery, [id]);
+//   try {
+//     // ดึงข้อมูล mainasset
+//     const mainAssetQuery = `SELECT * FROM public.mainasset WHERE main_asset_id = $1`;
+//     const mainAssetResult = await pool.query(mainAssetQuery, [id]);
 
-    if (mainAssetResult.rows.length === 0) {
-      return res.status(404).json({ message: "Main asset not found" });
-    }
+//     if (mainAssetResult.rows.length === 0) {
+//       return res.status(404).json({ message: "Main asset not found" });
+//     }
 
-    console.log("Sub-assets found:", subAssetResult.rows);
+//     // ดึงข้อมูล sub-assets
+//     const subAssetQuery = `SELECT * FROM public.subasset WHERE main_asset_id = $1`; // สมมุติว่ามีตาราง subasset ที่เชื่อมกับ mainasset
+//     const subAssetResult = await pool.query(subAssetQuery, [id]);
 
-    res.json({
-      mainAsset: mainAssetResult.rows[0],
-      subAssets: subAssetResult.rows,
-    });
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-app.get('/api/department', async (req, res) => {
-  try {
-    // ดึงข้อมูลจากฐานข้อมูล โดยจัดเรียงตาม department_id
-    const result = await pool.query('SELECT * FROM department ORDER BY department_id ASC');
+//     console.log("Sub-assets found:", subAssetResult.rows);
+
+//     res.json({
+//       mainAsset: mainAssetResult.rows[0],
+//       subAssets: subAssetResult.rows,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });
+
+// // Endpoint ดึงข้อมูลแผนก
+// app.get('/api/department', async (req, res) => {
+//   try {
+//     // ดึงข้อมูลจากฐานข้อมูล โดยจัดเรียงตาม department_id
+//     const result = await pool.query('SELECT * FROM department ORDER BY department_id ASC');
     
-    // ถ้าไม่มีข้อมูลในตาราง department
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'No departments found' }); // ส่ง 404 ถ้าไม่มีข้อมูล
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ message: 'No departments found' });
+//     }
+
+//     res.status(200).json(result.rows); // ส่งข้อมูลพร้อมสถานะ 200 OK
+
+//   } catch (err) {
+//     console.error('Error fetching department:', err);
+//     res.status(500).json({ error: 'Server error, please try again later' });
+//   }
+// });
+
+// // เริ่มต้นเซิร์ฟเวอร์
+// app.listen(port, () => {
+//   console.log(`Server running on http://localhost:${port}`);
+// });
+const express = require('express');
+const cors = require('cors');
+const app = express();
+const port = 5000;
+
+// ใช้ cors โดยกำหนดให้เฉพาะโดเมนที่ต้องการเข้าถึง API ได้
+const corsOptions = {
+  origin: 'http://localhost:5173', // ระบุ URL ของฝั่ง Client ที่อนุญาตให้เข้าถึง API
+  methods: 'GET,POST', // กำหนดวิธีการ HTTP ที่อนุญาต
+  allowedHeaders: 'Content-Type', // กำหนดหัวข้อที่อนุญาต
+};
+
+app.use(cors(corsOptions)); // ใช้ CORS ตามที่กำหนด
+
+// ข้อมูล JSON ที่เราจำลองจากฐานข้อมูล (ข้อมูลสำหรับกราฟ)
+const data = {
+  departments: [
+    "ครุศาสตร์วิศวกรรม",
+    "ครุศาสตร์เกษตร",
+    "ครุศาสตร์สถาปัตยกรรม",
+    "ครุศาสตร์การออกแบบ",
+    "ครุศาสตร์การออกแบบสภาพแวดล้อมภายใน"
+  ],
+  fundTypes: [
+    "เงินงบประมาณ", 
+    "เงินรายได้", 
+    "เงินสะสม", 
+    "เงินกันเหลื่อมปี"
+  ],
+  years: ["2565", "2566", "2567", "2568"],
+  departmentAssets: {
+    "ครุศาสตร์วิศวกรรม": {
+      "ใช้งาน": {
+        "2565": [50, 30, 20],
+        "2566": [60, 40, 30],
+        "2567": [70, 50, 40],
+        "2568": [80, 60, 50]
+      },
+      "ส่งซ่อม": {
+        "2565": [10, 15, 5],
+        "2566": [12, 18, 8],
+        "2567": [14, 20, 10],
+        "2568": [16, 22, 12]
+      },
+      "ชำรุด": {
+        "2565": [5, 3, 2],
+        "2566": [6, 4, 3],
+        "2567": [7, 5, 4],
+        "2568": [8, 6, 5]
+      },
+      "บริจาค/โอน": {
+        "2565": [3, 2, 1],
+        "2566": [4, 3, 2],
+        "2567": [5, 4, 3],
+        "2568": [6, 5, 4]
+      },
+      "รับโอน": {
+        "2565": [2, 1, 1],
+        "2566": [3, 2, 1],
+        "2567": [4, 3, 2],
+        "2568": [5, 4, 3]
+      },
+      "จำหน่าย": {
+        "2565": [1, 1, 0],
+        "2566": [2, 2, 1],
+        "2567": [3, 2, 1],
+        "2568": [4, 3, 2]
+      }
+    },
+    "ครุศาสตร์เกษตร": {
+      "ใช้งาน": {
+        "2565": [40, 20, 10],
+        "2566": [50, 30, 20],
+        "2567": [60, 40, 30],
+        "2568": [70, 50, 40]
+      },
+      "ส่งซ่อม": {
+        "2565": [8, 10, 3],
+        "2566": [10, 12, 4],
+        "2567": [12, 14, 6],
+        "2568": [14, 16, 8]
+      },
+      "ชำรุด": {
+        "2565": [3, 2, 1],
+        "2566": [4, 3, 2],
+        "2567": [5, 4, 3],
+        "2568": [6, 5, 4]
+      },
+      "บริจาค/โอน": {
+        "2565": [2, 1, 1],
+        "2566": [3, 2, 1],
+        "2567": [4, 3, 2],
+        "2568": [5, 4, 3]
+      },
+      "รับโอน": {
+        "2565": [1, 1, 0],
+        "2566": [2, 2, 1],
+        "2567": [3, 3, 2],
+        "2568": [4, 3, 2]
+      },
+      "จำหน่าย": {
+        "2565": [0, 0, 0],
+        "2566": [1, 1, 0],
+        "2567": [2, 1, 1],
+        "2568": [3, 2, 1]
+      }
+    },
+    "ครุศาสตร์สถาปัตยกรรม": {
+      "ใช้งาน": {
+        "2565": [55, 35, 25],
+        "2566": [65, 45, 35],
+        "2567": [75, 55, 45],
+        "2568": [85, 65, 55]
+      },
+      "ส่งซ่อม": {
+        "2565": [15, 20, 10],
+        "2566": [18, 25, 12],
+        "2567": [20, 30, 15],
+        "2568": [22, 35, 18]
+      },
+      "ชำรุด": {
+        "2565": [8, 5, 3],
+        "2566": [10, 7, 4],
+        "2567": [12, 9, 6],
+        "2568": [14, 10, 7]
+      },
+      "บริจาค/โอน": {
+        "2565": [4, 3, 2],
+        "2566": [5, 4, 3],
+        "2567": [6, 5, 4],
+        "2568": [7, 6, 5]
+      },
+      "รับโอน": {
+        "2565": [3, 2, 1],
+        "2566": [4, 3, 2],
+        "2567": [5, 4, 3],
+        "2568": [6, 5, 4]
+      },
+      "จำหน่าย": {
+        "2565": [2, 1, 1],
+        "2566": [3, 2, 1],
+        "2567": [4, 3, 2],
+        "2568": [5, 4, 3]
+      }
+    },
+    "ครุศาสตร์การออกแบบ": {
+      "ใช้งาน": {
+        "2565": [60, 40, 30],
+        "2566": [70, 50, 40],
+        "2567": [80, 60, 50],
+        "2568": [90, 70, 60]
+      },
+      "ส่งซ่อม": {
+        "2565": [12, 15, 7],
+        "2566": [14, 18, 9],
+        "2567": [16, 20, 12],
+        "2568": [18, 22, 15]
+      },
+      "ชำรุด": {
+        "2565": [6, 4, 3],
+        "2566": [7, 5, 4],
+        "2567": [8, 6, 5],
+        "2568": [9, 7, 6]
+      },
+      "บริจาค/โอน": {
+        "2565": [3, 2, 1],
+        "2566": [4, 3, 2],
+        "2567": [5, 4, 3],
+        "2568": [6, 5, 4]
+      },
+      "รับโอน": {
+        "2565": [2, 1, 1],
+        "2566": [3, 2, 1],
+        "2567": [4, 3, 2],
+        "2568": [5, 4, 3]
+      },
+      "จำหน่าย": {
+        "2565": [1, 1, 0],
+        "2566": [2, 2, 1],
+        "2567": [3, 2, 1],
+        "2568": [4, 3, 2]
+      }
+    },
+    "ครุศาสตร์การออกแบบสภาพแวดล้อมภายใน": {
+      "ใช้งาน": {
+        "2565": [30, 20, 15],
+        "2566": [40, 30, 25],
+        "2567": [50, 40, 35],
+        "2568": [60, 50, 45]
+      },
+      "ส่งซ่อม": {
+        "2565": [6, 8, 4],
+        "2566": [8, 10, 5],
+        "2567": [10, 12, 6],
+        "2568": [12, 14, 8]
+      },
+      "ชำรุด": {
+        "2565": [3, 2, 1],
+        "2566": [4, 3, 2],
+        "2567": [5, 4, 3],
+        "2568": [6, 5, 4]
+      },
+      "บริจาค/โอน": {
+        "2565": [1, 1, 0],
+        "2566": [2, 1, 1],
+        "2567": [3, 2, 1],
+        "2568": [4, 3, 2]
+      },
+      "รับโอน": {
+        "2565": [1, 0, 0],
+        "2566": [2, 1, 1],
+        "2567": [3, 2, 1],
+        "2568": [4, 3, 2]
+      },
+      "จำหน่าย": {
+        "2565": [0, 0, 0],
+        "2566": [1, 1, 0],
+        "2567": [2, 1, 1],
+        "2568": [3, 2, 1]
+      }
     }
-
-    // ส่งข้อมูลกลับในรูปแบบ JSON
-    res.status(200).json(result.rows); // ส่งข้อมูลพร้อมสถานะ 200 OK
-
-  } catch (err) {
-    console.error('Error fetching department:', err); // log ข้อผิดพลาดในเซิร์ฟเวอร์
-    // ส่งข้อความข้อผิดพลาดในรูปแบบ JSON
-    res.status(500).json({ error: 'Server error, please try again later' }); // ส่ง 500 เมื่อเกิดข้อผิดพลาดที่เซิร์ฟเวอร์
   }
+};
+
+// API ที่ส่งข้อมูล mock
+app.get('/api/getData', (req, res) => {
+  res.json(data);
+});
+
+// เริ่มต้นเซิร์ฟเวอร์ที่พอร์ต 5000
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
 });
