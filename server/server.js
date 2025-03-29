@@ -769,6 +769,31 @@ app.post("/api/users", async (req, res) => {
 
 
 
+// app.get("/api/users", async (req, res) => {
+//   try {
+//     const result = await pool.query(`
+//       SELECT 
+//         u.user_id,
+//         u.user_name, 
+//         u.user_email, 
+//         d.department_name, 
+//         r.role_name 
+//       FROM "users" u
+//       LEFT JOIN department d ON u.department_id = d.department_id
+//       LEFT JOIN userrole ur ON u.user_id = ur.user_id
+//       LEFT JOIN role r ON ur.role_id = r.role_id
+//       ORDER BY u.user_id ASC
+//     `);
+
+//     res.json(result.rows);
+//   } catch (err) {
+//     console.error("Error fetching users:", err);
+//     res.status(500).json({ error: "Failed to fetch users" });
+//   }
+// });
+
+
+
 app.get("/api/users", async (req, res) => {
   try {
     const result = await pool.query(`
@@ -791,7 +816,6 @@ app.get("/api/users", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch users" });
   }
 });
-
 
 
 
@@ -870,38 +894,6 @@ app.get('/api/role', async (req, res) => {
 
 //***********************Login************************* */
 // Login API
-// app.post('/login', async (req, res) => {
-//   const { user_email, password } = req.body;
-//   const jwt = require('jsonwebtoken');
-
-//   try {
-//     const result = await pool.query('SELECT * FROM users WHERE user_email = $1', [user_email]);
-//     const user = result.rows[0];
-
-//     if (!user) {
-//       return res.status(400).json({ message: 'Invalid credentials' });
-//     }
-
-//     // เปรียบเทียบรหัสผ่านที่กรอกกับรหัสผ่านที่เก็บในฐานข้อมูล
-//     if (password !== user.password) {
-//       return res.status(400).json({ message: 'Invalid credentials' });
-//     }
-
-//     // สร้าง JWT token
-   
-//     const token = jwt.sign({ userId: user.user_id, roleId: user.role_id }, 'your_jwt_secret', { expiresIn: '1h' });
-
-//     // ส่ง token และข้อมูล role
-//     res.json({
-//       token,
-//       roleId: user.role_id,
-//     });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// });
-
 app.post('/login', async (req, res) => {
   const { user_email, password } = req.body;
     const jwt = require('jsonwebtoken');

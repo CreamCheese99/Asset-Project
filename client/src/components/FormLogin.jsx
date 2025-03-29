@@ -83,7 +83,7 @@ function FormLogin() {
   return (
     <div className="w-full space-y-4 max-w-lg px-[60px] py-[54px] bg-white rounded-3xl shadow-inner flex flex-col items-center">
       <LogoSection />
-      <h1>เข้าสู่ระบบ</h1>
+      <h1>Log in</h1>
       <div className="w-96 space-y-8 text-left">
         <FormInputField 
           label="Email"
