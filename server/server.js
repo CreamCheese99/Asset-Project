@@ -805,8 +805,7 @@ app.get("/api/users", async (req, res) => {
         r.role_name 
       FROM "users" u
       LEFT JOIN department d ON u.department_id = d.department_id
-      LEFT JOIN userrole ur ON u.user_id = ur.user_id
-      LEFT JOIN role r ON ur.role_id = r.role_id
+      LEFT JOIN role r ON u.role_id = r.role_id
       ORDER BY u.user_id ASC
     `);
 
