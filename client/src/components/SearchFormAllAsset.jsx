@@ -6,9 +6,9 @@ const SearchFormAllAsset = ({ onFilter }) => {
   const [filters, setFilters] = useState({
     assetCode: "",
     department: "", // เลือกภาควิชาจากดรอปดาวน์
-    status: "ใช้งาน",
-    assetType: "ครุภัณฑ์สำนักงาน",
-    budgetYear: "2566",
+    usage: "",
+    assetType: "",
+    budgetYear: "",
   });
 
   // State to store asset types and departments
@@ -83,7 +83,7 @@ const SearchFormAllAsset = ({ onFilter }) => {
           <input
             type="text"
             name="assetCode"
-            value={filters.assetCode}
+            value={filters.main_asset_id}
             onChange={handleChange}
             placeholder="สมอ.xxx-xxx-xxxx/61"
             className="w-full px-4 py-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -141,7 +141,6 @@ const SearchFormAllAsset = ({ onFilter }) => {
                 </option>
               ))}
             </select>
-
         </div>
         
         <div className="flex-1">
@@ -149,8 +148,8 @@ const SearchFormAllAsset = ({ onFilter }) => {
             สภาพการครุภัณฑ์
           </label>
           <select
-            name="status"
-            value={filters.status}
+            name="usage"
+            value={filters.usage}
             onChange={handleChange}
             className="w-full px-4 py-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           >
