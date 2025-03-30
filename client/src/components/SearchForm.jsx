@@ -193,7 +193,7 @@ const SearchForm = ({ onFilter }) => {
   const handleSearch = () => {
     const formattedFilters = {
       main_asset_id: filters.main_asset_id.trim(),
-      department_name: filters.department_name, // เปลี่ยนจาก department → department_name
+      department_id: filters.department_id, // เปลี่ยนจาก department → department_name
       usage: filters.usage,
       asset_type: filters.asset_type,
       budget_type: filters.budget_type,
@@ -210,7 +210,7 @@ const SearchForm = ({ onFilter }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <div>
           <label className="block text-gray-700 text-sm mb-2">ภาควิชา</label>
-          <select  name="department_name" value={filters.department_name} onChange={handleChange} className="w-full border-2 border-blue-100 rounded-xl p-2">
+          <select  name="department_id" value={filters.department_id} onChange={handleChange} className="w-full border-2 border-blue-100 rounded-xl p-2">
             <option value="">-- กรุณาเลือก --</option>
             {department.map((dept) => (
               <option key={dept.department_id} value={dept.department_id}>{dept.department_name}</option>
