@@ -242,7 +242,7 @@ export function summaryFilterDepartmentDetails(data, department = "", fundType =
 
   summary[department] = {};
 
-  const selectedFundTypes = fundType ? [fundType] : Object.keys(data.departmentDetails[department]);
+  const selectedFundTypes = selectedFunds.length > 0 ? selectedFunds : Object.keys(data.departmentDetails[department]);
 
   selectedFundTypes.forEach((type) => {
     if (!data.departmentDetails[department][type]) return;
