@@ -1,133 +1,3 @@
-// import { useState, useEffect } from "react";
-
-// const Filters = ({
-//   selectedDepartment,
-//   setSelectedDepartment,
-//   selectedAssetStatus,
-//   setSelectedAssetStatus,
-//   selectedFund,
-//   setSelectedFund,
-//   selectedYear,
-//   handleYearChange,
-//   errorMessage,
-// }) => {
-//   const [departments, setDepartments] = useState([]);
-//   const [assetStatus, setAssetStatus] = useState([]);
-//   const [fundTypes, setFundTypes] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [apiError, setApiError] = useState("");
-
-//   // ดึงข้อมูลภาควิชาและแหล่งทุนจาก API
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         // ดึงข้อมูลจาก API ของเซิร์ฟเวอร์
-//         const response = await fetch("http://localhost:5000/api/getData"); // เปลี่ยน URL เป็น '/api/getData'
-//         if (!response.ok) throw new Error("ไม่สามารถดึงข้อมูลได้");
-
-//         const data = await response.json(); // ดึงข้อมูล JSON
-        
-//         // ตั้งค่าข้อมูลภาควิชาและแหล่งทุน
-//         setDepartments(data.departments);
-//         setFundTypes(data.fundTypes);
-//         setAssetStatus(data.assetStatuses);
-
-//         setLoading(false); // เปลี่ยนสถานะการโหลด
-//       } catch (error) {
-//         setApiError("เกิดข้อผิดพลาดในการดึงข้อมูล");
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchData();
-//   }, []);
-
-//   if (loading) {
-//     return <div>กำลังโหลดข้อมูล...</div>;
-//   }
-
-//   return (
-//     <div
-//       style={{
-//         background: "#f9f9f9",
-//         padding: "15px",
-//         borderRadius: "10px",
-//         marginBottom: "20px",
-//         display: "grid",
-//         gap: "10px",
-//         gridTemplateColumns: "1fr 1fr 1fr",
-//       }}
-//     >
-//       {apiError && (
-//         <div style={{ color: "red", gridColumn: "span 3" }}>{apiError}</div>
-//       )}
-
-//       <div>
-//         <label>ภาควิชา:</label>
-//         <select
-//           value={selectedDepartment}
-//           onChange={(e) => setSelectedDepartment(e.target.value)}
-//           style={{ width: "100%", padding: "5px" }}
-//         >
-//           <option value="">-- ทุกภาควิชา --</option>
-//           {departments.map((dept) => (
-//             <option key={dept} value={dept}>
-//               {dept}
-//             </option>
-//           ))}
-//         </select>
-//       </div>
-
-//       <div>
-//         <label>สถานะสินทรัพย์:</label>
-//         <select
-//           value={selectedAssetStatus}
-//           onChange={(e) => setSelectedAssetStatus(e.target.value)}
-//           style={{ width: "100%", padding: "5px" }}
-//         >
-//           <option value="">-- ทุกสถานะสินทรัพย์ --</option>
-//           {assetStatus.map((status) => (
-//             <option key={status} value={status}>
-//               {status}
-//             </option>
-//           ))}
-//         </select>
-//       </div>
-
-//       <div>
-//         <label>แหล่งเงิน:</label>
-//         <select
-//           value={selectedFund}
-//           onChange={(e) => setSelectedFund(e.target.value)}
-//           style={{ width: "100%", padding: "5px" }}
-//         >
-//           <option value="">-- ทุกแหล่งทุน --</option>
-//           {fundTypes.map((fund) => (
-//             <option key={fund} value={fund}>
-//               {fund}
-//             </option>
-//           ))}
-//         </select>
-//       </div>
-
-//       <div>
-//         <label>ปี:</label>
-//         <input
-//           type="text"
-//           value={selectedYear}
-//           onChange={handleYearChange}
-//           placeholder="2565 หรือ 2565-2568"
-//           style={{ width: "100%", padding: "5px" }}
-//         />
-//         {errorMessage && (
-//           <div style={{ color: "red", marginTop: "5px" }}>{errorMessage}</div>
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Filters;
 import { useState, useEffect } from "react";
 
 const Filters = ({
@@ -135,8 +5,8 @@ const Filters = ({
   setSelectedDepartment,
   selectedAssetStatus,
   setSelectedAssetStatus,
-  selectedFunds,
-  setSelectedFunds,
+  selectedFund,
+  setSelectedFund,
   selectedYear,
   handleYearChange,
   errorMessage,
@@ -146,36 +16,201 @@ const Filters = ({
   const [fundTypes, setFundTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState("");
+  
+  // สำหรับแหล่งเงิน
+  const [selectAllFunds, setSelectAllFunds] = useState(false);
+  const [selectedFundsInternal, setSelectedFundsInternal] = useState([]);
+  
+  // สำหรับภาควิชา
+  const [selectAllDepts, setSelectAllDepts] = useState(false);
+  const [selectedDeptsInternal, setSelectedDeptsInternal] = useState([]);
 
+  // สำหรับสถานะสินทรัพย์
+  const [selectAllAssets, setSelectAllAssets] = useState(false);
+  const [selectedAssetsInternal, setSelectedAssetsInternal] = useState([]);
+
+  // ดึงข้อมูลภาควิชาและแหล่งทุนจาก API
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // ดึงข้อมูลจาก API ของเซิร์ฟเวอร์
         const response = await fetch("http://localhost:5000/api/getData");
         if (!response.ok) throw new Error("ไม่สามารถดึงข้อมูลได้");
 
         const data = await response.json();
+        
+        // ตั้งค่าข้อมูลภาควิชาและแหล่งทุน
         setDepartments(data.departments);
-        setFundTypes(data.fundTypes.map(fund => ({ name: fund, checked: false })));
+        setFundTypes(data.fundTypes);
         setAssetStatus(data.assetStatuses);
+
         setLoading(false);
       } catch (error) {
         setApiError("เกิดข้อผิดพลาดในการดึงข้อมูล");
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
-  // Handle checkbox change
-  const handleCheckboxChange = (fundName) => {
-    setFundTypes(fundTypes.map(fund => 
-      fund.name === fundName ? { ...fund, checked: !fund.checked } : fund
-    ));
+  // เมื่อ selectedFund เปลี่ยน ให้อัปเดต selectedFundsInternal
+  useEffect(() => {
+    if (selectedFund) {
+      const fundsArray = selectedFund.split(",");
+      setSelectedFundsInternal(fundsArray);
+      // อัปเดตสถานะ selectAllFunds
+      setSelectAllFunds(fundsArray.length === fundTypes.length);
+    } else {
+      setSelectedFundsInternal([]);
+      setSelectAllFunds(false);
+    }
+  }, [selectedFund, fundTypes]);
+  
+  // เมื่อ selectedDepartment เปลี่ยน ให้อัปเดต selectedDeptsInternal
+  useEffect(() => {
+    if (selectedDepartment) {
+      const deptsArray = selectedDepartment.split(",");
+      setSelectedDeptsInternal(deptsArray);
+      // อัปเดตสถานะ selectAllDepts
+      setSelectAllDepts(deptsArray.length === departments.length);
+    } else {
+      setSelectedDeptsInternal([]);
+      setSelectAllDepts(false);
+    }
+  }, [selectedDepartment, departments]);
+
+  // เมื่อ selectedAssetStatus เปลี่ยน ให้อัปเดต selectedAssetsInternal
+  useEffect(() => {
+    if (selectedAssetStatus) {
+      const assetsArray = selectedAssetStatus.split(",");
+      setSelectedAssetsInternal(assetsArray);
+      // อัปเดตสถานะ selectAllAssets
+      setSelectAllAssets(assetsArray.length === assetStatus.length);
+    } else {
+      setSelectedAssetsInternal([]);
+      setSelectAllAssets(false);
+    }
+  }, [selectedAssetStatus, assetStatus]);
+
+  // จัดการการเลือกหรือยกเลิกการเลือกประเภทสินทรัพย์ทั้งหมด
+  const handleSelectAllAssets = () => {
+    if (selectAllAssets) {
+      // ถ้าตอนนี้เลือกทั้งหมดอยู่แล้ว ให้ยกเลิกการเลือกทั้งหมด
+      setSelectedAssetsInternal([]);
+      setSelectAllAssets(false);
+      setSelectedAssetStatus("");
+    } else {
+      // ถ้าตอนนี้ยังไม่ได้เลือกทั้งหมด ให้เลือกทั้งหมด
+      setSelectedAssetsInternal([...assetStatus]);
+      setSelectAllAssets(true);
+      setSelectedAssetStatus(assetStatus.join(","));
+    }
   };
 
-  // Get all selected funds
-  const getSelectedFunds = () => {
-    return fundTypes.filter(fund => fund.checked).map(fund => fund.name);
+  // จัดการการเลือกสินทรัพย์แต่ละรายการ
+  const handleAssetStatusChange = (status) => {
+    let newSelectedAssets;
+    
+    if (selectedAssetsInternal.includes(status)) {
+      // ถ้ามีอยู่แล้ว ให้ลบออก
+      newSelectedAssets = selectedAssetsInternal.filter(item => item !== status);
+    } else {
+      // ถ้ายังไม่มี ให้เพิ่มเข้าไป
+      newSelectedAssets = [...selectedAssetsInternal, status];
+    }
+    
+    setSelectedAssetsInternal(newSelectedAssets);
+    
+    // อัปเดตสถานะ selectAllAssets
+    setSelectAllAssets(newSelectedAssets.length === assetStatus.length);
+    
+    // ส่งค่าไปที่ parent component
+    if (newSelectedAssets.length === 0) {
+      setSelectedAssetStatus("");
+    } else {
+      setSelectedAssetStatus(newSelectedAssets.join(","));
+    }
+  };
+
+  // จัดการการเลือกหรือยกเลิกการเลือกภาควิชาทั้งหมด
+  const handleSelectAllDepartments = () => {
+    if (selectAllDepts) {
+      // ถ้าตอนนี้เลือกทั้งหมดอยู่แล้ว ให้ยกเลิกการเลือกทั้งหมด
+      setSelectedDeptsInternal([]);
+      setSelectAllDepts(false);
+      setSelectedDepartment("");
+    } else {
+      // ถ้าตอนนี้ยังไม่ได้เลือกทั้งหมด ให้เลือกทั้งหมด
+      setSelectedDeptsInternal([...departments]);
+      setSelectAllDepts(true);
+      setSelectedDepartment(departments.join(","));
+    }
+  };
+
+  // จัดการการเลือกภาควิชาแต่ละรายการ
+  const handleDepartmentChange = (dept) => {
+    let newSelectedDepts;
+    
+    if (selectedDeptsInternal.includes(dept)) {
+      // ถ้ามีอยู่แล้ว ให้ลบออก
+      newSelectedDepts = selectedDeptsInternal.filter(item => item !== dept);
+    } else {
+      // ถ้ายังไม่มี ให้เพิ่มเข้าไป
+      newSelectedDepts = [...selectedDeptsInternal, dept];
+    }
+    
+    setSelectedDeptsInternal(newSelectedDepts);
+    
+    // อัปเดตสถานะ selectAllDepts
+    setSelectAllDepts(newSelectedDepts.length === departments.length);
+    
+    // ส่งค่าไปที่ parent component
+    if (newSelectedDepts.length === 0) {
+      setSelectedDepartment("");
+    } else {
+      setSelectedDepartment(newSelectedDepts.join(","));
+    }
+  };
+
+  // จัดการการเลือกหรือยกเลิกการเลือกแหล่งเงินทั้งหมด
+  const handleSelectAllFunds = () => {
+    if (selectAllFunds) {
+      // ถ้าตอนนี้เลือกทั้งหมดอยู่แล้ว ให้ยกเลิกการเลือกทั้งหมด
+      setSelectedFundsInternal([]);
+      setSelectAllFunds(false);
+      setSelectedFund("");
+    } else {
+      // ถ้าตอนนี้ยังไม่ได้เลือกทั้งหมด ให้เลือกทั้งหมด
+      setSelectedFundsInternal([...fundTypes]);
+      setSelectAllFunds(true);
+      setSelectedFund(fundTypes.join(","));
+    }
+  };
+
+  // จัดการการเลือกแหล่งเงินแต่ละรายการ
+  const handleFundChange = (fund) => {
+    let newSelectedFunds;
+    
+    if (selectedFundsInternal.includes(fund)) {
+      // ถ้ามีอยู่แล้ว ให้ลบออก
+      newSelectedFunds = selectedFundsInternal.filter(item => item !== fund);
+    } else {
+      // ถ้ายังไม่มี ให้เพิ่มเข้าไป
+      newSelectedFunds = [...selectedFundsInternal, fund];
+    }
+    
+    setSelectedFundsInternal(newSelectedFunds);
+    
+    // อัปเดตสถานะ selectAllFunds
+    setSelectAllFunds(newSelectedFunds.length === fundTypes.length);
+    
+    // ส่งค่าไปที่ parent component
+    if (newSelectedFunds.length === 0) {
+      setSelectedFund("");
+    } else {
+      setSelectedFund(newSelectedFunds.join(","));
+    }
   };
 
   if (loading) {
@@ -200,49 +235,83 @@ const Filters = ({
 
       <div>
         <label>ภาควิชา:</label>
-        <select
-          value={selectedDepartment}
-          onChange={(e) => setSelectedDepartment(e.target.value)}
-          style={{ width: "100%", padding: "5px" }}
-        >
-          <option value="">-- ทุกภาควิชา --</option>
+        <div style={{ marginTop: "5px", maxHeight: "150px", overflowY: "auto", backgroundColor: "white", padding: "5px", borderRadius: "5px" }}>
+          <label style={{ display: "flex", alignItems: "center", marginBottom: "5px", fontWeight: "bold" }}>
+            <input
+              type="checkbox"
+              checked={selectAllDepts}
+              onChange={handleSelectAllDepartments}
+              style={{ marginRight: "5px" }}
+            />
+            เลือกทั้งหมด
+          </label>
+          <hr style={{ margin: "5px 0" }} />
           {departments.map((dept) => (
-            <option key={dept} value={dept}>
+            <label key={dept} style={{ display: "flex", alignItems: "center", marginBottom: "5px" }}>
+              <input
+                type="checkbox"
+                value={dept}
+                checked={selectedDeptsInternal.includes(dept)}
+                onChange={() => handleDepartmentChange(dept)}
+                style={{ marginRight: "5px" }}
+              />
               {dept}
-            </option>
+            </label>
           ))}
-        </select>
+        </div>
       </div>
 
       <div>
         <label>สถานะสินทรัพย์:</label>
-        <select
-          value={selectedAssetStatus}
-          onChange={(e) => setSelectedAssetStatus(e.target.value)}
-          style={{ width: "100%", padding: "5px" }}
-        >
-          <option value="">-- ทุกสถานะสินทรัพย์ --</option>
+        <div style={{ marginTop: "5px", maxHeight: "150px", overflowY: "auto", backgroundColor: "white", padding: "5px", borderRadius: "5px" }}>
+          <label style={{ display: "flex", alignItems: "center", marginBottom: "5px", fontWeight: "bold" }}>
+            <input
+              type="checkbox"
+              checked={selectAllAssets}
+              onChange={handleSelectAllAssets}
+              style={{ marginRight: "5px" }}
+            />
+            เลือกทั้งหมด
+          </label>
+          <hr style={{ margin: "5px 0" }} />
           {assetStatus.map((status) => (
-            <option key={status} value={status}>
+            <label key={status} style={{ display: "flex", alignItems: "center", marginBottom: "5px" }}>
+              <input
+                type="checkbox"
+                value={status}
+                checked={selectedAssetsInternal.includes(status)}
+                onChange={() => handleAssetStatusChange(status)}
+                style={{ marginRight: "5px" }}
+              />
               {status}
-            </option>
+            </label>
           ))}
-        </select>
+        </div>
       </div>
 
       <div>
         <label>แหล่งเงิน:</label>
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ marginTop: "5px", maxHeight: "150px", overflowY: "auto", backgroundColor: "white", padding: "5px", borderRadius: "5px" }}>
+          <label style={{ display: "flex", alignItems: "center", marginBottom: "5px", fontWeight: "bold" }}>
+            <input
+              type="checkbox"
+              checked={selectAllFunds}
+              onChange={handleSelectAllFunds}
+              style={{ marginRight: "5px" }}
+            />
+            เลือกทั้งหมด
+          </label>
+          <hr style={{ margin: "5px 0" }} />
           {fundTypes.map((fund) => (
-            <label key={fund.name} style={{ display: "flex", alignItems: "center" }}>
+            <label key={fund} style={{ display: "flex", alignItems: "center", marginBottom: "5px" }}>
               <input
                 type="checkbox"
-                value={fund.name}
-                checked={fund.checked}
-                onChange={() => handleCheckboxChange(fund.name)}
+                value={fund}
+                checked={selectedFundsInternal.includes(fund)}
+                onChange={() => handleFundChange(fund)}
                 style={{ marginRight: "5px" }}
               />
-              {fund.name}
+              {fund}
             </label>
           ))}
         </div>

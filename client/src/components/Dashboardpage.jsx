@@ -35,7 +35,15 @@ const DashboardPage = () => {
       console.log("Data received from API:", data);
 
       // คำนวณข้อมูลกราฟจากข้อมูลที่ได้รับ
+      // ถ้ามีการเลือกตัวกรองอย่างน้อยหนึ่งตัว ให้ใช้ฟังก์ชันกรอง
       if (selectedDepartment || selectedAssetStatus || selectedFund || selectedYear) {
+        // แสดง log ข้อมูลที่ส่งไปยังฟังก์ชันกรอง
+        console.log("Filter parameters:", {
+          selectedDepartment,
+          selectedFund,
+          selectedYear
+        });
+        
         setBarData(
           summaryFilterDepartmentDetails(data, selectedDepartment, selectedFund, selectedYear)
         );
@@ -48,6 +56,7 @@ const DashboardPage = () => {
           )
         );
       } else {
+        // ถ้าไม่มีการเลือกตัวกรอง ให้แสดงข้อมูลทั้งหมด
         setBarData(summaryDepartmentDetails(data));
         setPieData(summaryDepartmentAssets(data));
       }
@@ -60,15 +69,10 @@ const DashboardPage = () => {
     }
   };
 
+  // เรียกใช้ fetchData เมื่อมีการเปลี่ยนแปลงตัวกรอง
   useEffect(() => {
     fetchData();
   }, [selectedDepartment, selectedAssetStatus, selectedFund, selectedYear]);
-  // // ดึงข้อมูลเมื่อฟิลเตอร์ครบถ้วน
-  // useEffect(() => {
-  //   if (selectedDepartment || selectedFund || selectedYear) {
-  //     fetchData();
-  //   }
-  // }, [selectedDepartment, selectedFund, selectedYear]);
 
   // ฟังก์ชันจัดการการเปลี่ยนปี
   const handleYearChange = (e) => {
@@ -80,10 +84,10 @@ const DashboardPage = () => {
       <Filters
         selectedDepartment={selectedDepartment}
         setSelectedDepartment={setSelectedDepartment}
-        selectedFund={selectedFund}
-        setSelectedFund={setSelectedFund}
         selectedAssetStatus={selectedAssetStatus}
         setSelectedAssetStatus={setSelectedAssetStatus}
+        selectedFund={selectedFund}
+        setSelectedFund={setSelectedFund}
         selectedYear={selectedYear}
         handleYearChange={handleYearChange}
         errorMessage={errorMessage}
@@ -98,15 +102,15 @@ const DashboardPage = () => {
           <p>{errorMessage}</p> // แสดงข้อความ error ถ้ามี
         ) : (
           <>
-            {barData ? (
+            {barData && barData.datasets && barData.datasets.length > 0 ? (
               <BarChart data={barData} />
             ) : (
-              <p>ข้อมูลกราฟไม่ครบถ้วน</p>
+              <p>ไม่มีข้อมูลกราฟแท่งที่ตรงกับตัวกรอง</p>
             )}
-            {pieData ? (
+            {pieData && pieData.datasets && pieData.datasets.length > 0 ? (
               <PieChart data={pieData} />
             ) : (
-              <p>ข้อมูลกราฟไม่ครบถ้วน</p>
+              <p>ไม่มีข้อมูลกราฟวงกลมที่ตรงกับตัวกรอง</p>
             )}
           </>
         )}
