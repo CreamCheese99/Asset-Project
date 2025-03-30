@@ -27,8 +27,104 @@ const storage = multer.diskStorage({
 // สร้าง instance ของ multer
 const upload = multer({ storage: storage });
 
-// อัปโหลดหลายไฟล์พร้อมกัน
-app.post('/mainasset', upload.fields([
+// // อัปโหลดหลายไฟล์พร้อมกัน
+// app.post('/mainasset', upload.fields([
+//   { name: 'image1', maxCount: 1 },
+//   { name: 'image2', maxCount: 1 },
+//   { name: 'image3', maxCount: 1 },
+//   { name: 'image4', maxCount: 1 },
+//   { name: 'image5', maxCount: 1 }
+// ]), async (req, res) => {
+//   try {
+//     const {
+//       main_asset_id,
+//       main_asset_name,
+//       status,
+//       fiscal_year,
+//       date_received,
+//       budget_limit,
+//       averange_price,
+//       budget_type,
+//       asset_type,
+//       location_use,
+//       location_deliver,
+//       usage,
+//       responsible_person,
+//       department_id,
+//       curriculum
+//     } = req.body;
+
+//     // ตรวจสอบว่าไฟล์มีหรือไม่
+//     const images = [];
+//     for (let i = 1; i <= 5; i++) {
+//       if (req.files[`image${i}`]) {
+//         images.push(req.files[`image${i}`][0].filename); // ใช้ชื่อไฟล์
+//       }
+//     }
+
+//     // ตรวจสอบฟิลด์ที่จำเป็น
+//     if (!main_asset_id || !main_asset_name) {
+//       return res.status(400).json({ error: 'Missing required fields' });
+//     }
+
+//     // การบันทึกข้อมูลในฐานข้อมูล
+//     const newAsset = await pool.query(
+//       `INSERT INTO mainasset (
+//         main_asset_id, 
+//         main_asset_name, 
+//         status, 
+//         fiscal_year, 
+//         date_received,
+//         budget_limit, 
+//         averange_price, 
+//         budget_type, 
+//         asset_type,
+//         location_use, 
+//         location_deliver, 
+//         usage, 
+//         responsible_person,
+//         department_id,
+//         curriculum,
+//         image1,
+//         image2,
+//         image3,
+//         image4,
+//         image5
+//       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19,$20) RETURNING *`,
+//       [
+//         main_asset_id,
+//         main_asset_name,
+//         status,
+//         fiscal_year,
+//         date_received,
+//         budget_limit,
+//         averange_price,
+//         budget_type,
+//         asset_type,
+//         location_use,
+//         location_deliver,
+//         usage,
+//         responsible_person,
+//         department_id,
+//         curriculum,
+//         images[0] || null, // image1
+//         images[1] || null, // image2
+//         images[2] || null, // image3
+//         images[3] || null, // image4
+//         images[4] || null  // image5
+//       ]
+//     );
+
+//     res.status(201).json({ message: 'Asset added successfully', data: newAsset.rows[0] });
+//   } catch (error) {
+//     console.error('Error adding asset:', error);
+//     if (error instanceof multer.MulterError) {
+//       return res.status(400).json({ error: error.message });
+//     }
+//     res.status(500).json({ error: 'Server Error' });
+//   }
+// });
+app.post('/mainasset', upload.fields([ 
   { name: 'image1', maxCount: 1 },
   { name: 'image2', maxCount: 1 },
   { name: 'image3', maxCount: 1 },
@@ -50,8 +146,14 @@ app.post('/mainasset', upload.fields([
       location_deliver,
       usage,
       responsible_person,
-      department_id
+      department_id,
+      curriculum
     } = req.body;
+
+    // ตรวจสอบว่า curriculum ถูกส่งมาหรือไม่
+    if (!curriculum || curriculum.length === 0) {
+      return res.status(400).json({ error: 'Missing or empty curriculum data' });
+    }
 
     // ตรวจสอบว่าไฟล์มีหรือไม่
     const images = [];
@@ -66,7 +168,7 @@ app.post('/mainasset', upload.fields([
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // การบันทึกข้อมูลในฐานข้อมูล
+    // การบันทึกข้อมูลในฐานข้อมูล mainasset
     const newAsset = await pool.query(
       `INSERT INTO mainasset (
         main_asset_id, 
@@ -112,6 +214,25 @@ app.post('/mainasset', upload.fields([
       ]
     );
 
+    // บันทึกข้อมูลในตาราง assetcurriculum
+    const curriculumData = Array.isArray(curriculum) ? curriculum : []; // ตรวจสอบให้แน่ใจว่า curriculum เป็น array
+    for (const curriculumId of curriculumData) {
+      const result = await pool.query(
+        `INSERT INTO assetcurriculum (
+          asset_curriculum_name, 
+          curriculum_id, 
+          main_asset_id
+        ) VALUES ($1, $2, $3) RETURNING *`,
+        [
+          main_asset_name, // เก็บ main_asset_name ใน asset_curriculum_name
+          curriculumId,
+          main_asset_id
+        ]
+      );
+
+      console.log('Inserted into assetcurriculum:', result.rows[0]); // เพิ่มการตรวจสอบ
+    }
+
     res.status(201).json({ message: 'Asset added successfully', data: newAsset.rows[0] });
   } catch (error) {
     console.error('Error adding asset:', error);
@@ -121,6 +242,7 @@ app.post('/mainasset', upload.fields([
     res.status(500).json({ error: 'Server Error' });
   }
 });
+
 
 
 // API สำหรับดึงข้อมูลทั้งหมดจากตาราง MainAsset
@@ -551,6 +673,28 @@ app.get('/api/department', async (req, res) => {
   }
 });
 
+// ดึงข้อมูลหลักสูตรตามภาควิชา
+app.get('/api/curriculum/:departmentId', async (req, res) => {
+  const { departmentId } = req.params;
+  
+  try {
+    // Query เพื่อดึงข้อมูลหลักสูตรที่เชื่อมโยงกับ departmentId
+    const result = await pool.query(
+      'SELECT * FROM curriculum WHERE department_id = $1',
+      [departmentId]
+    );
+
+    if (result.rows.length > 0) {
+      res.json(result.rows); // ส่งข้อมูลหลักสูตรที่เกี่ยวข้อง
+    } else {
+      res.status(404).json({ error: 'No curricula found for this department' });
+    }
+  } catch (err) {
+    console.error('Error fetching curriculum:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.post("/department", async (req, res) => {
   const { department_name, curriculum } = req.body;
 
@@ -961,6 +1105,206 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+
+
+
+
+
+
+
+
+//****************************
+
+app.get("/api/department-assets", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT 
+          d.department_id, 
+          ma.fiscal_year, 
+          ma.budget_type, 
+          SUM(ma.budget_limit) as budget_limit
+        FROM mainasset ma
+        JOIN department d ON ma.department_id = d.department_id  -- สมมติว่าใช้ department_id
+        GROUP BY d.department_id, ma.fiscal_year, ma.budget_type
+        ORDER BY ma.fiscal_year;`
+            );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+  }
+});
+
+
+// // กำหนด API ที่จะดึงข้อมูล
+// app.get("/api/status-summary", async (req, res) => {
+//   try {
+//     // Query เพื่อดึงข้อมูลจากฐานข้อมูล
+//     const query = `
+//       SELECT m.status, m.fiscal_year, d.department_name AS department
+//       FROM mainasset m
+//       LEFT JOIN department d ON m.department_id = d.department_id;
+//     `;
+    
+//     // ดึงข้อมูลจากฐานข้อมูล
+//     const result = await pool.query(query);
+    
+//     // ส่งข้อมูลกลับไปยัง client
+//     res.json(result.rows);
+//   } catch (err) {
+//     console.error("Error fetching status summary:", err);
+//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+//   }
+// });
+
+
+
+
+// app.get("/api/status-summary", async (req, res) => {
+//   try {
+//     const result = await pool.query(
+//       `SELECT status, fiscal_year, COUNT(*) as count 
+//       FROM mainasset 
+//       GROUP BY status, fiscal_year;`
+//     );
+
+//     const labels = result.rows.map((row) => row.status);
+//     const data = result.rows.map((row) => parseInt(row.count));
+    
+
+//   } catch (error) {
+//     console.error("Database error:", error);
+//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+//   }
+// });
+
+app.get("/api/status-summary", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT status, fiscal_year, COUNT(*) as count 
+      FROM mainasset 
+      GROUP BY status, fiscal_year 
+      ORDER BY fiscal_year;`
+    );
+
+    // จัดกลุ่มข้อมูลโดยแบ่งตามปีงบประมาณ (fiscal_year)
+    const groupedData = {};
+    result.rows.forEach(row => {
+      const { fiscal_year, status, count } = row;
+      if (!groupedData[fiscal_year]) {
+        groupedData[fiscal_year] = {
+          labels: [],
+          data: [],
+        };
+      }
+      groupedData[fiscal_year].labels.push(status);
+      groupedData[fiscal_year].data.push(parseInt(count));
+    });
+
+    // สร้างโครงสร้างข้อมูลสำหรับส่งไปยัง Frontend
+    const responseData = Object.keys(groupedData).map(year => ({
+      fiscal_year: year,
+      labels: groupedData[year].labels,
+      datasets: [{
+        data: groupedData[year].data,
+        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
+      }]
+    }));
+
+    res.json(responseData);
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+  }
+});
+
+
+
+// app.get("/api/getData", async (req, res) => {
+//   try {
+//     const departmentsQuery = await pool.query("SELECT department_name FROM department");
+//     const fundTypesQuery = await pool.query("SELECT DISTINCT fund_type FROM mainasset");
+//     const assetStatusesQuery = await pool.query("SELECT DISTINCT asset_status FROM mainasset");
+
+//     res.json({
+//       departments: departmentsQuery.rows.map((row) => row.department_name),
+//       fundTypes: fundTypesQuery.rows.map((row) => row.fund_type),
+//       assetStatuses: assetStatusesQuery.rows.map((row) => row.asset_status),
+//     });
+//   } catch (err) {
+//     res.status(500).json({ error: "Error fetching data: " + err.message });
+//   }
+// });
+
+
+// API สำหรับดึงข้อมูล
+app.get('/api/getData', async (req, res) => {
+  try {
+    // ดึงข้อมูลภาควิชา
+    const departmentResult = await pool.query('SELECT department_name FROM public.department');
+    const departments = departmentResult.rows.map(row => row.department_name);
+
+    // ดึงข้อมูลสถานะสินทรัพย์ (status)
+    const assetStatusResult = await pool.query('SELECT DISTINCT status FROM public.mainasset');
+    const assetStatuses = assetStatusResult.rows.map(row => row.status);
+
+    // ดึงข้อมูลแหล่งทุน (budget_type)
+    const fundTypesResult = await pool.query('SELECT DISTINCT budget_type FROM public.mainasset');
+    const fundTypes = fundTypesResult.rows.map(row => row.budget_type);
+
+    res.json({
+      departments,
+      assetStatuses,
+      fundTypes,
+    });
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Error fetching data' });
+  }
+});
+
+
+app.get("/api/mainasset-dash", async (req, res) => {
+  try {
+    const { department, budgetType, year } = req.query;
+
+    let query = `
+      SELECT d.department_name AS department, m.budget_type, m.fiscal_year, SUM(m.budget_limit) AS total_budget
+      FROM mainasset m
+      JOIN department d ON m.department_id = d.department_id
+      WHERE 1=1
+    `;
+
+    let params = [];
+
+    if (department) {
+      query += ` AND d.department_name = $${params.length + 1}`;
+      params.push(department);
+    }
+    if (budgetType) {
+      query += ` AND m.budget_type = $${params.length + 1}`;
+      params.push(budgetType);
+    }
+    if (year) {
+      query += ` AND m.fiscal_year = $${params.length + 1}`;
+      params.push(year);
+    }
+
+    query += " GROUP BY d.department_name, m.budget_type, m.fiscal_year ORDER BY m.fiscal_year";
+
+    const result = await pool.query(query, params);
+
+    // 🔹 ห่อข้อมูลที่ส่งกลับด้วย `departmentDetails`
+    res.json({ departmentDetails: result.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

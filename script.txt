@@ -182,3 +182,4 @@ ALTER TABLE IF EXISTS public.userrole
     NOT VALID;
  
 END;
+
