@@ -327,7 +327,31 @@ app.get('/api/mainasset', async (req, res) => {
     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลจากฐานข้อมูล", message: err.message });
   }
 });
+app.get('/api/mainasset-assetlist', async (req, res) => {
+  try {
+    // คำสั่ง SQL สำหรับดึงข้อมูลพร้อม URL ของรูปภาพ
+    const query = `
+      SELECT ma.main_asset_id, ma.main_asset_name, ma.status, 
+             ma.image1, ma.image2, ma.image3, ma.image4, ma.image5
+      FROM mainasset ma
+    `;
+    
+    const result = await pool.query(query);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "ไม่พบข้อมูล" });
+    }
 
+    // ส่งข้อมูลไปที่ Frontend
+    res.json(result.rows);
+  } catch (err) {
+    console.error("ข้อผิดพลาดในการดึงข้อมูล:", err);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลจากฐานข้อมูล", message: err.message });
+  }
+});
+
+const path = require('path');  // เพิ่มบรรทัดนี้
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get("/mainasset/:id", async (req, res) => {
   try {
     const encodedId = req.params.id;

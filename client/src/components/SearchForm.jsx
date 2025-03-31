@@ -117,12 +117,12 @@ const SearchForm = ({ onFilter }) => {
 
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-600 mb-2">รหัสทรัพย์สิน</label>
-          <input type="text" name="main_asset_id" value={filters.main_asset_id} onChange={handleChange} placeholder="สมอ.xxx-xxx-xxxx/61" className="w-full px-4 py-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
+          <input type="text" name="main_asset_id" value={filters.main_asset_id} onChange={handleChange} placeholder="สมอ.xxx-xxx-xxxx/61" className="w-full border-2 border-blue-100 rounded-xl p-2" />
         </div>
 
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-600 mb-2">ปีงบประมาณ</label>
-          <select name="fiscal_year" value={filters.fiscal_year} onChange={handleChange} className="w-full px-4 py-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+          <label className="block text-sm font-medium text-gray-600 mb-2">ประจำปีงบประมาณ</label>
+          <select name="fiscal_year" value={filters.fiscal_year} onChange={handleChange} className="w-full border-2 border-blue-100 rounded-xl p-2">
             <option value="">-- กรุณาเลือก --</option>
             {getYearOptions().map((year) => (
               <option key={year} value={year}>{year}</option>
