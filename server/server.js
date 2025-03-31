@@ -301,14 +301,14 @@ app.post('/api/login', async (req, res) => {
         const checkUserQuery = 'SELECT * FROM "user" WHERE "user_email" = $1';
         const checkUserResult = await client.query(checkUserQuery, [userFromJson.mail]);
 
-        if (checkUserResult.rows.length === 0) {
+        if (checkUserResult.rows.length === 0) {  
           // เพิ่มผู้ใช้ลงฐานข้อมูล
           const insertQuery = `
-            INSERT INTO "user" ("user_id", "user_name", "user_email")
-            VALUES ($1, $2, $3)
+            INSERT INTO "user" ("user_id", "user_name", "user_email", "role_id")
+            VALUES ($1, $2, $3, $4)
             `;
-
-          await client.query(insertQuery, [userFromJson.uid, userFromJson.cn, userFromJson.mail]);
+            
+          await client.query(insertQuery, [userFromJson.uid, userFromJson.cn, userFromJson.mail, userFromJson.role]);
           console.log('New user added to database:', userFromJson.mail);
         } else {
           console.log('User already exists in database:', userFromJson.mail);
