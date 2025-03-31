@@ -1,32 +1,38 @@
 [
   {
     "uid": "65030027",
-    "cn": "Khemmasedth",
+    "cn": "Khemmasedth Limwattanochai",
     "mail": "65030027@kmitl.ac.th",
-    "o": "1"
+    "password" : "Omelaweng01",
+    "o": "1",
+    "role" : "2"
   },
   {
     "uid": "65030000",
     "cn": "No",
     "mail": "65030000@kmitl.ac.th",
-    "o": "2"
+    "o": "2",
+    "role" : "4"
   },
   {
     "uid": "65030099",
     "cn": "Thanchira",
     "mail": "65030099@kmitl.ac.th",
-    "o": "3"
+    "o": "3",
+    "role" : "3"
   },
   {
     "uid": "650300130",
     "cn": "Nitiphom",
     "mail": "65030130@kmitl.ac.th",
-    "o": "4"
+    "o": "4",
+    "role" :""
   },
   {
     "uid": "65030121",
     "cn": "Natthamon",
     "mail": "65030121@kmitl.ac.th",
-    "o": "1"
+    "o": "1",
+    "role" : "1"
   }
 ]
