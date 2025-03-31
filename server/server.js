@@ -598,11 +598,10 @@ app.delete('/api/subasset/:id', async (req, res) => {
   }
 });
 
-// API สำหรับอัปเดตข้อมูล SubAsset โดยใช้ sub_asset_id
 app.put('/api/subasset/:id', async (req, res) => {
   const { id } = req.params;
-  const { sub_asset_name, details, quantity, unit_price, status, counting_unit, main_asset_id } = req.body;
-  
+  const { sub_asset_name, details, quantity, unit_price, status, counting_unit, note, type_sub_asset, main_asset_id } = req.body;
+
   try {
     const query = `
       UPDATE public."subasset"
@@ -618,19 +617,66 @@ app.put('/api/subasset/:id', async (req, res) => {
       WHERE sub_asset_id = $10
       RETURNING *;
     `;
-    const values = [sub_asset_name, details, quantity, unit_price, status, counting_unit, main_asset_id, id];
-    const result = await pool.query(query, values);
+    const values = [sub_asset_name, details, quantity, unit_price, status, counting_unit, note, type_sub_asset, main_asset_id, id];
     
+    const result = await pool.query(query, values);
+
     if(result.rows.length === 0){
       return res.status(404).json({ error: 'Sub asset not found' });
     }
-    
+
     res.status(200).json(result.rows[0]);
   } catch (error) {
     console.error("Error updating sub asset:", error);
     res.status(500).json({ error: 'Error updating sub asset' });
   }
 });
+
+app.put('/api/subasset-edit/:id', async (req, res) => {
+  const { id } = req.params; // รับค่า id จาก URL params
+  const { sub_asset_name, details, quantity, unit_price, status, counting_unit, note, type_sub_asset, main_asset_id } = req.body;
+
+  // ตรวจสอบว่า id เป็นตัวเลขหรือไม่
+  if (isNaN(id) || parseInt(id) <= 0) {
+    return res.status(400).json({ error: 'Invalid sub_asset_id' }); // ส่งกลับ error หาก id ไม่เป็นตัวเลข
+  }
+
+  // ตรวจสอบข้อมูลที่ได้รับจาก request body
+  if (!sub_asset_name || !details || !quantity || !unit_price || !status || !counting_unit || !note || !type_sub_asset || !main_asset_id) {
+    return res.status(400).json({ error: 'All fields must be provided' }); // ส่งกลับ error หากข้อมูลไม่ครบ
+  }
+
+  try {
+    const query = `
+      UPDATE public."subasset"
+      SET sub_asset_name = $1,
+          details = $2,
+          quantity = $3,
+          unit_price = $4,
+          status = $5,
+          counting_unit = $6,
+          note = $7,
+          type_sub_asset = $8,
+          main_asset_id = $9
+      WHERE sub_asset_id = $10
+      RETURNING *;
+    `;
+    const values = [sub_asset_name, details, quantity, unit_price, status, counting_unit, note, type_sub_asset, main_asset_id, id];
+    
+    const result = await pool.query(query, values);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Sub asset not found' }); // หากไม่พบ subasset ให้ส่ง error
+    }
+
+    // ส่งกลับข้อมูล subasset ที่ถูกอัปเดต
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error updating sub asset:", error);
+    res.status(500).json({ error: 'Error updating sub asset' }); // หากมีข้อผิดพลาดเกิดขึ้นใน server
+  }
+});
+
 
 
 // //************************************************************************************************** */
@@ -1098,7 +1144,8 @@ app.post('/login', async (req, res) => {
 
     res.json({
       token,
-      roleId: user.role_id,
+      roleId: user.role_id ,
+      dept: user.department_id
     });
   } catch (err) {
     console.error('Error:', err);
@@ -1322,7 +1369,7 @@ const data = {
   ],
   years: ["2565", "2566", "2567", "2568"],
 
-  
+
   departmentDetails: {
     "ครุศาสตร์วิศวกรรม": {
       "เงินงบประมาณ": {

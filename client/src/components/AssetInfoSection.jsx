@@ -15,6 +15,9 @@ const AssetInfoSection = ({ value, onChange }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([ ]);
 
+  const [statusMessage, setStatusMessage] = useState("");
+
+  {statusMessage && <div className="status-message">{statusMessage}</div>}
 
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -42,54 +45,57 @@ const AssetInfoSection = ({ value, onChange }) => {
     setIsPopupOpen(false);
     setEditMode(false);
   };
+const handleSave = async () => {
+  if (!newSubasset || !newDetail || !newPrice || !newQuantity || !newUnit || !newStatus || !newNote || !newTypeSubAsset) {
+    alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+    return;
+  }
 
-  // ฟังก์ชันบันทึกข้อมูล
-  const handleSave = async () => {
-    if (!newSubasset || !newDetail || !newPrice || !newQuantity || !newUnit || !newStatus || !newNote || !newTypeSubAsset) {
-      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
-      return;
-    }
-    console.log("Data received:", data);
-    setLoading(true);
+  setLoading(true);
 
-    // สร้าง object สำหรับส่งไปยัง backend
-    const subAssetData = {
-      sub_asset_name: newSubasset,
-      details: newDetail,
-      quantity: parseInt(newQuantity),
-      unit_price: parseFloat(newPrice),
-      counting_unit: newUnit,
-      status: newStatus,
-      note:newNote,
-      type_sub_asset:newTypeSubAsset,
-      main_asset_id: value.main_asset_id, // ใช้ main_asset_id จาก props
-    };
-
-    try {
-      // ส่งข้อมูลไปที่ backend โดยไม่ส่ง sub_asset_id ให้กับระบบ
-      const response = await axios.post('http://localhost:5000/api/subasset', subAssetData);
-      console.log('บันทึกข้อมูลสำเร็จ:', response.data);
-
-      if (editMode) {
-        setData(data.map(item => (item.id === editId ? { ...item, ...subAssetData } : item)));
-      } else {
-        setData([...data, { ...subAssetData, id: data.length + 1 }]);
-      }
-
-      setIsPopupOpen(false);
-      resetForm();
-      setLoading(false);
-    } catch (error) {
-      console.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล:', error);
-      alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล!');
-      setLoading(false);
-    }
+  // สร้าง object สำหรับส่งไปยัง backend
+  const subAssetData = {
+    sub_asset_name: newSubasset,
+    details: newDetail,
+    quantity: parseInt(newQuantity),
+    unit_price: parseFloat(newPrice),
+    counting_unit: newUnit,
+    status: newStatus,
+    note: newNote,
+    type_sub_asset: newTypeSubAsset,
+    main_asset_id: value.main_asset_id,
   };
 
-  // ฟังก์ชันลบข้อมูล
+  try {
+    let response;
+
+    if (editMode) {
+      response = await axios.put(`http://localhost:5000/api/subasset/${editId}`, subAssetData);
+      setData(data.map(item => (item.id === editId ? { ...item, ...subAssetData } : item)));
+      setStatusMessage("แก้ไขข้อมูลพัสดุย่อยสำเร็จ!");  // เพิ่มการแสดงข้อความ
+    } else {
+      response = await axios.post('http://localhost:5000/api/subasset', subAssetData);
+      setData([...data, { ...subAssetData, id: data.length + 1 }]);
+      setStatusMessage("บันทึกข้อมูลพัสดุย่อยสำเร็จ!");  // เพิ่มการแสดงข้อความ
+    }
+
+    setIsPopupOpen(false);
+    resetForm();
+    setLoading(false);
+  } catch (error) {
+    console.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล:', error);
+    alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล!');
+    setLoading(false);
+    setStatusMessage("เกิดข้อผิดพลาดในการบันทึกข้อมูล!");  // เพิ่มการแสดงข้อความกรณีเกิดข้อผิดพลาด
+  }
+};
+
+  
   const handleDelete = (id) => {
     setData(data.filter((item) => item.id !== id));
+    setStatusMessage("ลบข้อมูลพัสดุย่อยสำเร็จ!");
   };
+  
 
   // ฟังก์ชันรีเซ็ตฟอร์ม
   const resetForm = () => {

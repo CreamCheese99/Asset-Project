@@ -147,41 +147,108 @@ const EditInfo = () => {
       setNewTypeSubAsset("")
       };
     
+  // const handleSaveSubasset = async () => {
+  //   if (!newSubasset || !newDetail || !newPrice || !newQuantity || !newUnit || !newStatus || !newNote || !newTypeSubAsset) {
+  //     alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+  //     return;
+  //   }
+  //   console.log("Data received:", data);
+
+    
+  //   // ตรวจสอบว่า data.mainAsset มีค่าหรือไม่
+  //   if (!data?.mainAsset?.main_asset_id) {
+  //     console.error(" main_asset_id ไม่พบข้อมูล!");
+  //     alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Main Asset ID");
+  //     return;
+  //   }
+
+  // const subassets = Array.isArray(data?.subasset) ? data.subasset : [];
+  
+  //   // สร้าง object สำหรับส่งไปยัง backend
+  // const subAssetData = {
+  //   sub_asset_name: newSubasset,
+  //   details: newDetail,
+  //   quantity: parseInt(newQuantity),
+  //   unit_price: parseFloat(newPrice),
+  //   counting_unit: newUnit,
+  //   status: newStatus,
+  //   note: newNote,
+  //   type_sub_asset: newTypeSubAsset,
+  //   main_asset_id: data.mainAsset.main_asset_id, //ใช้ data.mainAsset.main_asset_id แทน value
+  //   };
+  
+  //   try {
+  //     const response = await axios.post("http://localhost:5000/api/subasset", subAssetData);
+  //     console.log("บันทึกข้อมูลสำเร็จ:", response.data);
+  
+  //     if (editMode) {
+  //       setData({
+  //         ...data,
+  //         subasset: subassets.map((item) =>
+  //           item.sub_asset_id === editId ? { ...item, ...subAssetData } : item
+  //         ),
+  //       });
+  //     } else {
+  //       setData({
+  //         ...data,
+  //         subasset: [...subassets, { ...subAssetData, sub_asset_id: response.data.sub_asset_id }],
+  //       });
+  //     }
+  
+  //     setIsPopupOpen(false);
+  //     resetForm();
+  //   } catch (error) {
+  //     console.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล:", error);
+  //     alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล!");
+  //   }
+  // };
+  
   const handleSaveSubasset = async () => {
     if (!newSubasset || !newDetail || !newPrice || !newQuantity || !newUnit || !newStatus || !newNote || !newTypeSubAsset) {
       alert("กรุณากรอกข้อมูลให้ครบถ้วน");
       return;
     }
     console.log("Data received:", data);
-
-    
+  
     // ตรวจสอบว่า data.mainAsset มีค่าหรือไม่
     if (!data?.mainAsset?.main_asset_id) {
-      console.error(" main_asset_id ไม่พบข้อมูล!");
+      console.error("main_asset_id ไม่พบข้อมูล!");
       alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Main Asset ID");
       return;
     }
-
-  const subassets = Array.isArray(data?.subasset) ? data.subasset : [];
+  
+    const subassets = Array.isArray(data?.subasset) ? data.subasset : [];
   
     // สร้าง object สำหรับส่งไปยัง backend
-  const subAssetData = {
-    sub_asset_name: newSubasset,
-    details: newDetail,
-    quantity: parseInt(newQuantity),
-    unit_price: parseFloat(newPrice),
-    counting_unit: newUnit,
-    status: newStatus,
-    note: newNote,
-    type_sub_asset: newTypeSubAsset,
-    main_asset_id: data.mainAsset.main_asset_id, //ใช้ data.mainAsset.main_asset_id แทน value
+    const subAssetData = {
+      sub_asset_name: newSubasset,
+      details: newDetail,
+      quantity: parseInt(newQuantity),
+      unit_price: parseFloat(newPrice),
+      counting_unit: newUnit,
+      status: newStatus,
+      note: newNote,
+      type_sub_asset: newTypeSubAsset,
+      main_asset_id: data.mainAsset.main_asset_id, // ใช้ data.mainAsset.main_asset_id แทน value
     };
   
     try {
-      const response = await axios.post("http://localhost:5000/api/subasset", subAssetData);
-      console.log("บันทึกข้อมูลสำเร็จ:", response.data);
+      let response;
   
       if (editMode) {
+        // ถ้าอยู่ในโหมดการแก้ไข (editMode) ส่งคำขอ PUT
+        if (!editId) {
+          alert("เกิดข้อผิดพลาด: ไม่พบ ID ของ Subasset ที่จะอัปเดต");
+          return;
+        }
+        // ส่งคำขอ PUT ไปยัง backend
+        response = await axios.put(`http://localhost:5000/api/subasset-edit/${editId}`, subAssetData);
+        console.log("อัปเดตข้อมูลสำเร็จ:", response.data);
+
+        // อัปเดตข้อมูลใน state
+        const subassets = Array.isArray(data?.subasset) ? data.subasset : [];
+       
+     // อัปเดตข้อมูลใน state
         setData({
           ...data,
           subasset: subassets.map((item) =>
@@ -189,6 +256,11 @@ const EditInfo = () => {
           ),
         });
       } else {
+        // ถ้าไม่ใช่โหมดการแก้ไข ส่งคำขอ POST สำหรับเพิ่มข้อมูลใหม่
+        response = await axios.post("http://localhost:5000/api/subasset", subAssetData);
+        console.log("บันทึกข้อมูลสำเร็จ:", response.data);
+  
+        // อัปเดตข้อมูลใน state
         setData({
           ...data,
           subasset: [...subassets, { ...subAssetData, sub_asset_id: response.data.sub_asset_id }],
@@ -203,7 +275,6 @@ const EditInfo = () => {
     }
   };
   
-
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" }).format(value);
   };
