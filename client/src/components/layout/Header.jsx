@@ -47,16 +47,16 @@ import { UserCircle, LogOut } from "lucide-react";
 import logo from "../../image/logo.svg";
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // ✅ สร้าง state ควบคุมเมนู
-  const user = JSON.parse(localStorage.getItem("user")); // ✅ ดึงข้อมูลผู้ใช้จาก localStorage
+  const [isMenuOpen, setIsMenuOpen] = useState(false); //  สร้าง state ควบคุมเมนู
+  const user = JSON.parse(localStorage.getItem("user")); //  ดึงข้อมูลผู้ใช้จาก localStorage
 
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen); // ✅ สลับสถานะเมนู เปิด-ปิด
+    setIsMenuOpen(!isMenuOpen); //  สลับสถานะเมนู เปิด-ปิด
   };
 
   const logout = () => {
-    localStorage.removeItem("user"); // ✅ ลบข้อมูลผู้ใช้
-    window.location.href = "/login"; // ✅ รีเฟรชไปหน้า login
+    localStorage.removeItem("user"); //  ลบข้อมูลผู้ใช้
+    window.location.href = "/login"; //  รีเฟรชไปหน้า login
   };
 
   return (
