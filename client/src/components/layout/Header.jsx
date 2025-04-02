@@ -56,26 +56,26 @@ const Header = () => {
       <nav style={{ backgroundColor: '#aed581' }} className="rounded-b-md shadow-lg py-4">
         <div className="container mx-auto flex justify-center space-x-8">
           {(roleId === '1'  || roleId === '3' || roleId === '4') && (
-            <Link to="/home" className="hover:text-blue-800 transition duration-300">หน้าหลัก</Link>
+            <Link to="/home" className="hover:text-gray-200 transition duration-300">หน้าหลัก</Link>
           )}
 
           {/* เมนูที่เข้าถึงได้ตามบทบาท */}
           {(roleId  === '3' || roleId === '4') && (
             <>
-              <Link to="/manage-assets" className="hover:text-blue-800 transition duration-300">จัดการพัสดุ</Link>
-              <Link to="/asset-list" className="hover:text-blue-800 transition duration-300">รายการพัสดุ</Link>
+              <Link to="/manage-assets" className="hover:text-gray-200 transition duration-300">จัดการพัสดุ</Link>
+              <Link to="/asset-list" className="hover:text-gray-200 transition duration-300">รายการพัสดุ</Link>
             </>
           )}
 
           {(roleId === '2' || roleId === '3') && ( // สำหรับ Admin
             <>
-              <Link to="/manage-permissions" className="hover:text-blue-800 transition duration-300">จัดการสิทธิ์</Link>
-              <Link to="/manage-personal-info" className="hover:text-blue-800 transition duration-300">ข้อมูลทั่วไป</Link>
+              <Link to="/manage-permissions" className="hover:text-gray-200 transition duration-300">จัดการสิทธิ์</Link>
+              <Link to="/manage-personal-info" className="hover:text-gray-200 transition duration-300">ข้อมูลทั่วไป</Link>
             </>
           )}
 
           {(roleId === '1' || roleId === '2' || roleId === '3' || roleId === '4') && (
-            <Link to="/guidebook" className="hover:text-blue-800 transition duration-300">คู่มือการใช้งานระบบ</Link>
+            <Link to="/guidebook" className="hover:text-gray-200 transition duration-300">คู่มือการใช้งานระบบ</Link>
           )}
         </div>
       </nav>
