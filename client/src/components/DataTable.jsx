@@ -38,6 +38,7 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
 
   return (
     <div className="bg-white mt-4 p-4 rounded-md shadow-md overflow-x-auto">
+      <h1 className="text-lg font-bold mb-4">รายการพัสดุ</h1>
       <table className="table-auto w-full border-collapse text-sm">
         <thead>
           <tr className="bg-gray-200 text-gray-700">
