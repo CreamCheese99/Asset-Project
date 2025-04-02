@@ -31,6 +31,9 @@ const ManageAssets = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
+
+  const [roleId, setRoleId] = useState(localStorage.getItem("roleId"));
+
   const handleFilterChange = (newFilters) => {
     console.log("Updated Filters:", newFilters);
     setFilters(newFilters);
@@ -124,7 +127,7 @@ const ManageAssets = () => {
       <Breadcrumb2 />
       <div className="container mx-auto p-4">
         <SearchForm onFilter={handleFilterChange} />
-        <ActionButtons />
+        <ActionButtons data={data} roleId={roleId} />
         <DataTable data={data} filteredData={filteredData} handleDelete={handleDelete} />
         <ActionButtons4 />
       </div>

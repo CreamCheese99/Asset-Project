@@ -49,7 +49,7 @@ const ActionButtons2 = ({ assetData, onCancel }) => {
   return (
     <div className="mt-4 flex space-x-4 justify-end">
       <button
-        className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-700"
+        className="bg-gray-500 text-white px-4 py-2 rounded-xl hover:bg-red-500"
         onClick={onCancel}
       >
         ยกเลิก

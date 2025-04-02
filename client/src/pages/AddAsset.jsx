@@ -6,7 +6,7 @@ import AcquisitionInfo from "../components/AcquisitionInfo";
 import ActionButtons2 from "../components/ActionButtons2";
 import AssetDetails from "../components/AssetDetails";
 import AssetInfoSection from "../components/AssetInfoSection";
-import ActionButtons3 from "../components/ActionButtons3";
+import ActionButtons5 from "../components/ActionButtons5";
 
 const AddAsset = () => {
   // State to hold asset data
@@ -142,7 +142,7 @@ const AddAsset = () => {
               mainAssetId={assetData.main_asset_id}  
             />
         </div>
-        <ActionButtons3 />
+        <ActionButtons5 />
       </div>
     </div>
   );
