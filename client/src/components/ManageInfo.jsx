@@ -72,8 +72,8 @@ const ManageInfo = () => {
         <table className="w-full mt-4 bg-white shadow-md rounded-lg overflow-hidden">
           <thead className="bg-gray-200 text-gray-700">
             <tr className="text-gray-600 bg-gray-100">
-              <th className="py-2 px-4 text-left">ภาควิชา</th>
-              <th className="py-2 px-4 text-left">หลักสูตร</th>
+              <th className="py-2 px-4 text-left">ภาควิชา/หน่วนงาน</th>
+              <th className="py-2 px-4 text-left">หลักสูตร/งาน</th>
               <th className="py-2 px-4 text-center">จัดการ</th>
             </tr>
           </thead>

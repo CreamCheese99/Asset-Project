@@ -3,7 +3,6 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const multer = require("multer");  // นำเข้า multer
 const pool = require("./db");
-
 const app = express();
 const PORT = 5000;
 
@@ -151,12 +150,66 @@ app.post('/mainasset', upload.fields([
 
 // API สำหรับดึงข้อมูลทั้งหมดจากตาราง MainAsset
 //DataTable page
+
+// app.get("/mainasset", async (req, res) => {
+//   try {
+//     const { main_asset_id, department_name, usage, asset_type, budget_type, fiscal_year } = req.query;
+
+//     let query = `SELECT mainasset.main_asset_id, main_asset_name, mainasset.usage, department_name, mainasset.asset_type, 
+//                  mainasset.budget_type, mainasset.fiscal_year, COUNT(*) AS subamount 
+//                  FROM mainasset  
+//                  LEFT JOIN subasset ON mainasset.main_asset_id = subasset.main_asset_id 
+//                  INNER JOIN department ON department.department_id = mainasset.department_id `;
+
+//     let conditions = [];
+//     let values = [];
+
+//     if (main_asset_id) {
+//       conditions.push(`mainasset.main_asset_id ILIKE $${values.length + 1}`);
+//       values.push(`%${main_asset_id}%`);
+//     }
+//     if (department_name) {
+//       conditions.push(`department_name ILIKE $${values.length + 1}`);
+//       values.push(`%${department_name}%`);
+//     }
+//     if (usage) {
+//       conditions.push(`mainasset.usage ILIKE $${values.length + 1}`);
+//       values.push(`%${usage}%`);
+//     }
+//     if (asset_type) {
+//       conditions.push(`mainasset.asset_type ILIKE $${values.length + 1}`);
+//       values.push(`%${asset_type}%`);
+//     }
+//     if (budget_type) {
+//       conditions.push(`mainasset.budget_type ILIKE $${values.length + 1}`);
+//       values.push(`%${budget_type}%`);
+//     }
+//     if (fiscal_year) {
+//       conditions.push(`mainasset.fiscal_year::TEXT ILIKE $${values.length + 1}`);
+//       values.push(`%${fiscal_year}%`);
+//     }
+
+//     if (conditions.length > 0) {
+//       query += " WHERE " + conditions.join(" AND ");
+//     }
+
+//     query += " GROUP BY mainasset.main_asset_id, main_asset_name, mainasset.status, department_name;";
+
+//     const result = await pool.query(query, values);
+//     res.status(200).json(result.rows);
+//   } catch (error) {
+//     console.error("Error fetching assets:", error);
+//     res.status(500).json({ error: "Server Error" });
+//   }
+// });
+
+
 app.get("/mainasset", async (req, res) => {
   try {
     const { main_asset_id, department_name, usage, asset_type, budget_type, fiscal_year } = req.query;
 
     let query = `SELECT mainasset.main_asset_id, main_asset_name, mainasset.usage, department_name, mainasset.asset_type, 
-                 mainasset.budget_type, mainasset.fiscal_year, COUNT(*) AS subamount 
+                 mainasset.budget_type, mainasset.fiscal_year, COUNT(subasset.sub_asset_id) AS subamount 
                  FROM mainasset  
                  LEFT JOIN subasset ON mainasset.main_asset_id = subasset.main_asset_id 
                  INNER JOIN department ON department.department_id = mainasset.department_id `;
@@ -193,7 +246,9 @@ app.get("/mainasset", async (req, res) => {
       query += " WHERE " + conditions.join(" AND ");
     }
 
-    query += " GROUP BY mainasset.main_asset_id, main_asset_name, mainasset.status, department_name;";
+    query += ` GROUP BY mainasset.main_asset_id, main_asset_name, mainasset.usage, department_name, 
+               mainasset.asset_type, mainasset.budget_type, mainasset.fiscal_year
+               ORDER BY mainasset.fiscal_year ASC;`;
 
     const result = await pool.query(query, values);
     res.status(200).json(result.rows);
@@ -202,6 +257,7 @@ app.get("/mainasset", async (req, res) => {
     res.status(500).json({ error: "Server Error" });
   }
 });
+
 
 //API หน้า AllAsset
 app.get('/api/mainasset', async (req, res) => {
@@ -1197,49 +1253,6 @@ app.get("/api/status-summary", async (req, res) => {
 
 
 
-// app.get("/api/getData", async (req, res) => {
-//   try {
-//     const departmentsQuery = await pool.query("SELECT department_name FROM department");
-//     const fundTypesQuery = await pool.query("SELECT DISTINCT fund_type FROM mainasset");
-//     const assetStatusesQuery = await pool.query("SELECT DISTINCT asset_status FROM mainasset");
-
-//     res.json({
-//       departments: departmentsQuery.rows.map((row) => row.department_name),
-//       fundTypes: fundTypesQuery.rows.map((row) => row.fund_type),
-//       assetStatuses: assetStatusesQuery.rows.map((row) => row.asset_status),
-//     });
-//   } catch (err) {
-//     res.status(500).json({ error: "Error fetching data: " + err.message });
-//   }
-// });
-
-
-// // API สำหรับดึงข้อมูล
-// app.get('/api/getData', async (req, res) => {
-//   try {
-//     // ดึงข้อมูลภาควิชา
-//     const departmentResult = await pool.query('SELECT department_name FROM public.department');
-//     const departments = departmentResult.rows.map(row => row.department_name);
-
-//     // ดึงข้อมูลสถานะสินทรัพย์ (status)
-//     const assetStatusResult = await pool.query('SELECT DISTINCT status FROM public.mainasset');
-//     const assetStatuses = assetStatusResult.rows.map(row => row.status);
-
-//     // ดึงข้อมูลแหล่งทุน (budget_type)
-//     const fundTypesResult = await pool.query('SELECT DISTINCT budget_type FROM public.mainasset');
-//     const fundTypes = fundTypesResult.rows.map(row => row.budget_type);
-
-//     res.json({
-//       departments,
-//       assetStatuses,
-//       fundTypes,
-//     });
-//   } catch (error) {
-//     console.error('Error fetching data:', error);
-//     res.status(500).json({ error: 'Error fetching data' });
-//   }
-// });
-
 
 app.get("/api/mainasset-dash", async (req, res) => {
   try {
@@ -1338,18 +1351,18 @@ const data = {
         "2567": [130, 160, 190],
         "2568": [140, 170, 200]
       },
-      "เงินสะสม": {
-        "2565": [40, 35, 25],
-        "2566": [50, 45, 35],
-        "2567": [60, 55, 45],
-        "2568": [70, 60, 50]
-      },
-      "เงินกันเหลื่อมปี": {
-        "2565": [15, 10, 5],
-        "2566": [25, 15, 10],
-        "2567": [35, 20, 15],
-        "2568": [45, 30, 20]
-      }
+      // "เงินสะสม": {
+      //   "2565": [40, 35, 25],
+      //   "2566": [50, 45, 35],
+      //   "2567": [60, 55, 45],
+      //   "2568": [70, 60, 50]
+      // },
+      // "เงินกันเหลื่อมปี": {
+      //   "2565": [15, 10, 5],
+      //   "2566": [25, 15, 10],
+      //   "2567": [35, 20, 15],
+      //   "2568": [45, 30, 20]
+      // }
     },
     "ครุศาสตร์สถาปัตยกรรม": {
       "เงินงบประมาณ": {
@@ -1364,18 +1377,18 @@ const data = {
         "2567": [170, 200, 220],
         "2568": [180, 210, 240]
       },
-      "เงินสะสม": {
-        "2565": [60, 50, 40],
-        "2566": [70, 60, 50],
-        "2567": [80, 70, 60],
-        "2568": [90, 80, 70]
-      },
-      "เงินกันเหลื่อมปี": {
-        "2565": [25, 20, 15],
-        "2566": [35, 30, 20],
-        "2567": [45, 35, 30],
-        "2568": [55, 45, 35]
-      }
+      // "เงินสะสม": {
+      //   "2565": [60, 50, 40],
+      //   "2566": [70, 60, 50],
+      //   "2567": [80, 70, 60],
+      //   "2568": [90, 80, 70]
+      // },
+      // "เงินกันเหลื่อมปี": {
+      //   "2565": [25, 20, 15],
+      //   "2566": [35, 30, 20],
+      //   "2567": [45, 35, 30],
+      //   "2568": [55, 45, 35]
+      // }
     },
     "ครุศาสตร์การออกแบบ": {
       "เงินงบประมาณ": {
@@ -1390,18 +1403,18 @@ const data = {
         "2567": [120, 150, 180],
         "2568": [130, 160, 190]
       },
-      "เงินสะสม": {
-        "2565": [30, 25, 20],
-        "2566": [40, 35, 30],
-        "2567": [50, 45, 40],
-        "2568": [60, 55, 50]
-      },
-      "เงินกันเหลื่อมปี": {
-        "2565": [10, 8, 5],
-        "2566": [15, 12, 8],
-        "2567": [20, 18, 10],
-        "2568": [25, 22, 15]
-      }
+      // "เงินสะสม": {
+      //   "2565": [30, 25, 20],
+      //   "2566": [40, 35, 30],
+      //   "2567": [50, 45, 40],
+      //   "2568": [60, 55, 50]
+      // },
+      // "เงินกันเหลื่อมปี": {
+      //   "2565": [10, 8, 5],
+      //   "2566": [15, 12, 8],
+      //   "2567": [20, 18, 10],
+      //   "2568": [25, 22, 15]
+      // }
     },
     "ครุศาสตร์การออกแบบสภาพแวดล้อมภายใน": {
       "เงินงบประมาณ": {
@@ -1416,18 +1429,18 @@ const data = {
         "2567": [150, 180, 210],
         "2568": [160, 190, 220]
       },
-      "เงินสะสม": {
-        "2565": [45, 35, 30],
-        "2566": [55, 45, 35],
-        "2567": [65, 55, 45],
-        "2568": [75, 65, 55]
-      },
-      "เงินกันเหลื่อมปี": {
-        "2565": [12, 10, 6],
-        "2566": [18, 15, 10],
-        "2567": [24, 20, 15],
-        "2568": [30, 25, 20]
-      }
+      // "เงินสะสม": {
+      //   "2565": [45, 35, 30],
+      //   "2566": [55, 45, 35],
+      //   "2567": [65, 55, 45],
+      //   "2568": [75, 65, 55]
+      // },
+      // "เงินกันเหลื่อมปี": {
+      //   "2565": [12, 10, 6],
+      //   "2566": [18, 15, 10],
+      //   "2567": [24, 20, 15],
+      //   "2568": [30, 25, 20]
+      // }
     }
   },
   assetStatuses: [
@@ -1458,24 +1471,24 @@ const data = {
         "2567": [7, 10, 5],
         "2568": [8, 12, 6]
       },
-      "บริจาค/โอน": {
-        "2565": [3, 4, 2],
-        "2566": [4, 5, 3],
-        "2567": [5, 6, 4],
-        "2568": [6, 7, 5]
-      },
-      "รับโอน": {
-        "2565": [1, 2, 1],
-        "2566": [2, 3, 1],
-        "2567": [3, 4, 2],
-        "2568": [4, 5, 3]
-      },
-      "จำหน่าย": {
-        "2565": [2, 3, 1],
-        "2566": [3, 4, 2],
-        "2567": [4, 5, 3],
-        "2568": [5, 6, 4]
-      }
+      // "บริจาค/โอน": {
+      //   "2565": [3, 4, 2],
+      //   "2566": [4, 5, 3],
+      //   "2567": [5, 6, 4],
+      //   "2568": [6, 7, 5]
+      // },
+      // "รับโอน": {
+      //   "2565": [1, 2, 1],
+      //   "2566": [2, 3, 1],
+      //   "2567": [3, 4, 2],
+      //   "2568": [4, 5, 3]
+      // },
+      // "จำหน่าย": {
+      //   "2565": [2, 3, 1],
+      //   "2566": [3, 4, 2],
+      //   "2567": [4, 5, 3],
+      //   "2568": [5, 6, 4]
+      // }
     },
     "ครุศาสตร์เกษตร": {
       "ใช้งาน": {
@@ -1490,30 +1503,30 @@ const data = {
         "2567": [14, 17, 10],
         "2568": [16, 20, 12]
       },
-      "ชำรุด": {
-        "2565": [6, 8, 3],
-        "2566": [7, 10, 5],
-        "2567": [8, 12, 6],
-        "2568": [9, 14, 7]
-      },
-      "บริจาค/โอน": {
-        "2565": [4, 5, 2],
-        "2566": [5, 6, 3],
-        "2567": [6, 7, 4],
-        "2568": [7, 8, 5]
-      },
-      "รับโอน": {
-        "2565": [2, 3, 1],
-        "2566": [3, 4, 2],
-        "2567": [4, 5, 3],
-        "2568": [5, 6, 4]
-      },
-      "จำหน่าย": {
-        "2565": [3, 4, 2],
-        "2566": [4, 5, 3],
-        "2567": [5, 6, 4],
-        "2568": [6, 7, 5]
-      }
+      // "ชำรุด": {
+      //   "2565": [6, 8, 3],
+      //   "2566": [7, 10, 5],
+      //   "2567": [8, 12, 6],
+      //   "2568": [9, 14, 7]
+      // },
+      // "บริจาค/โอน": {
+      //   "2565": [4, 5, 2],
+      //   "2566": [5, 6, 3],
+      //   "2567": [6, 7, 4],
+      //   "2568": [7, 8, 5]
+      // },
+      // "รับโอน": {
+      //   "2565": [2, 3, 1],
+      //   "2566": [3, 4, 2],
+      //   "2567": [4, 5, 3],
+      //   "2568": [5, 6, 4]
+      // },
+      // "จำหน่าย": {
+      //   "2565": [3, 4, 2],
+      //   "2566": [4, 5, 3],
+      //   "2567": [5, 6, 4],
+      //   "2568": [6, 7, 5]
+      // }
     },
     "ครุศาสตร์สถาปัตยกรรม": {
       "ใช้งาน": {
@@ -1534,24 +1547,24 @@ const data = {
         "2567": [9, 14, 7],
         "2568": [10, 15, 8]
       },
-      "บริจาค/โอน": {
-        "2565": [5, 7, 3],
-        "2566": [6, 8, 4],
-        "2567": [7, 9, 5],
-        "2568": [8, 10, 6]
-      },
-      "รับโอน": {
-        "2565": [3, 4, 2],
-        "2566": [4, 5, 3],
-        "2567": [5, 6, 4],
-        "2568": [6, 7, 5]
-      },
-      "จำหน่าย": {
-        "2565": [2, 3, 2],
-        "2566": [3, 4, 3],
-        "2567": [4, 5, 4],
-        "2568": [5, 6, 5]
-      }
+      // "บริจาค/โอน": {
+      //   "2565": [5, 7, 3],
+      //   "2566": [6, 8, 4],
+      //   "2567": [7, 9, 5],
+      //   "2568": [8, 10, 6]
+      // },
+      // "รับโอน": {
+      //   "2565": [3, 4, 2],
+      //   "2566": [4, 5, 3],
+      //   "2567": [5, 6, 4],
+      //   "2568": [6, 7, 5]
+      // },
+      // "จำหน่าย": {
+      //   "2565": [2, 3, 2],
+      //   "2566": [3, 4, 3],
+      //   "2567": [4, 5, 4],
+      //   "2568": [5, 6, 5]
+      // }
     },
     "ครุศาสตร์การออกแบบ": {
       "ใช้งาน": {
@@ -1572,24 +1585,24 @@ const data = {
         "2567": [7, 10, 5],
         "2568": [8, 12, 6]
       },
-      "บริจาค/โอน": {
-        "2565": [3, 4, 1],
-        "2566": [4, 5, 2],
-        "2567": [5, 6, 3],
-        "2568": [6, 7, 4]
-      },
-      "รับโอน": {
-        "2565": [2, 3, 1],
-        "2566": [3, 4, 2],
-        "2567": [4, 5, 3],
-        "2568": [5, 6, 4]
-      },
-      "จำหน่าย": {
-        "2565": [2, 3, 1],
-        "2566": [3, 4, 2],
-        "2567": [4, 5, 3],
-        "2568": [5, 6, 4]
-      }
+      // "บริจาค/โอน": {
+      //   "2565": [3, 4, 1],
+      //   "2566": [4, 5, 2],
+      //   "2567": [5, 6, 3],
+      //   "2568": [6, 7, 4]
+      // },
+      // "รับโอน": {
+      //   "2565": [2, 3, 1],
+      //   "2566": [3, 4, 2],
+      //   "2567": [4, 5, 3],
+      //   "2568": [5, 6, 4]
+      // },
+      // "จำหน่าย": {
+      //   "2565": [2, 3, 1],
+      //   "2566": [3, 4, 2],
+      //   "2567": [4, 5, 3],
+      //   "2568": [5, 6, 4]
+      // }
     },
     "ครุศาสตร์การออกแบบสภาพแวดล้อมภายใน": {
       "ใช้งาน": {
@@ -1610,24 +1623,24 @@ const data = {
         "2567": [8, 12, 6],
         "2568": [9, 13, 7]
       },
-      "บริจาค/โอน": {
-        "2565": [4, 5, 3],
-        "2566": [5, 6, 4],
-        "2567": [6, 7, 5],
-        "2568": [7, 8, 6]
-      },
-      "รับโอน": {
-        "2565": [2, 3, 2],
-        "2566": [3, 4, 3],
-        "2567": [4, 5, 4],
-        "2568": [5, 6, 5]
-      },
-      "จำหน่าย": {
-        "2565": [3, 4, 2],
-        "2566": [4, 5, 3],
-        "2567": [5, 6, 4],
-        "2568": [6, 7, 5]
-      }
+      // "บริจาค/โอน": {
+      //   "2565": [4, 5, 3],
+      //   "2566": [5, 6, 4],
+      //   "2567": [6, 7, 5],
+      //   "2568": [7, 8, 6]
+      // },
+      // "รับโอน": {
+      //   "2565": [2, 3, 2],
+      //   "2566": [3, 4, 3],
+      //   "2567": [4, 5, 4],
+      //   "2568": [5, 6, 5]
+      // },
+      // "จำหน่าย": {
+      //   "2565": [3, 4, 2],
+      //   "2566": [4, 5, 3],
+      //   "2567": [5, 6, 4],
+      //   "2568": [6, 7, 5]
+      // }
     }
   }
 };

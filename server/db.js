@@ -1,7 +1,5 @@
-const { response } = require("express"); //response ถูกนำเข้าจาก express 
-const {Pool} = require("pg"); //Pool คือคลาสที่ใช้ในการจัดการการเชื่อมต่อกับฐานข้อมูล PostgreSQL
-
-
+const { response } = require("express"); 
+const {Pool} = require("pg"); 
 // ตั้งค่าการเชื่อมต่อ PostgreSQL
 const pool = new Pool({
     user: 'postgres',      

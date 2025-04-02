@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import Breadcrumb5 from "../components/Breadcrumb5";
 import '../css/ShowInfo.css'; // Import the CSS file
+import ActionButtons3 from '../components/ActionButtons3';
 
 const ShowInfo = () => {
   const { id } = useParams();
@@ -238,6 +239,7 @@ const ShowInfo = () => {
           </table>
         </div>
       </div>
+      <ActionButtons3 />
     </div>
   );
 };

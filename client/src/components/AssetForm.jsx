@@ -194,7 +194,7 @@ const AssetForm = ({ value = { curriculum: [] }, onChange }) => {
         </div>
 
         <div>
-          <label className="asset-form-label">ภาควิชา</label>
+          <label className="asset-form-label">ภาควิชา/หน่วยงาน</label>
           <select
             className="asset-form-select"
             value={value.department_id}
@@ -214,7 +214,7 @@ const AssetForm = ({ value = { curriculum: [] }, onChange }) => {
           ) : (
             curriculum.length > 0 && (
               <div>
-                <label className="asset-form-label">เลือกหลักสูตร</label>
+                <label className="asset-form-label">เลือกหลักสูตร/งาน</label>
                 {curriculum.map((curriculum) => (
                   <div key={curriculum.curriculum_id}>
                     <input
