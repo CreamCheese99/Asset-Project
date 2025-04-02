@@ -25,7 +25,7 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           <img src={logo} alt="logo" className="h-10 w-auto" />
           <div>
-            <span className="text-xl font-bold block">ระบบพัสดุ</span>
+            <span className="text-xl font-bold block">ระบบจัดการครุภัณฑ์</span>
             <p className="text-sm">คณะครุศาสตร์อุตสาหกรรมและเทคโนโลยี</p>
           </div>
         </div>

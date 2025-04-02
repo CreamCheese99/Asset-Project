@@ -3,6 +3,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
+import { FaEye, FaEdit, FaTrash, FaFilePdf } from "react-icons/fa";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
@@ -65,32 +66,33 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
               <td className="border px-4 py-2">{item.fiscal_year || "-"}</td>
               <td className="border px-4 py-2">{item.usage}</td>
               <td className="border px-4 py-2 flex justify-center space-x-2">
+                              
                 <Link
                   to={`/show-info/${encodeURIComponent(item.main_asset_id)}`}
-                  className="text-blue-500 hover:text-blue-700 bg-gray-200 rounded-lg px-3 py-1"
+                  className="text-blue-500 hover:text-blue-700 bg-gray-100 rounded-lg p-2"
                 >
-                  ดู
+                  <FaEye />
                 </Link>
 
                 <Link
                   to={`/edit-info/${encodeURIComponent(item.main_asset_id)}`}
-                  className="text-yellow-500 hover:text-yellow-700 bg-gray-200 rounded-lg px-3 py-1"
+                  className="text-yellow-500 hover:text-yellow-700 bg-gray-100 rounded-lg p-2"
                 >
-                  แก้ไข
+                  <FaEdit />
                 </Link>
 
                 <button
-                  className="text-red-500 hover:text-red-700 bg-gray-200 rounded-lg px-3 py-1"
+                  className="text-red-500 hover:text-red-700 bg-gray-100 rounded-lg p-2"
                   onClick={() => handleDelete(item.main_asset_id)}
                 >
-                  ลบ
+                  <FaTrash />
                 </button>
 
                 <button
-                  className="text-green-500 hover:text-green-700 bg-gray-200 rounded-lg px-3 py-1"
+                  className="text-green-500 hover:text-green-700 bg-gray-100 rounded-lg p-2"
                   onClick={() => exportPDF(item.main_asset_id)}
                 >
-                  PDF
+                  <FaFilePdf />
                 </button>
               </td>
             </tr>
