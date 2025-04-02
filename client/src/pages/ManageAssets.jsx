@@ -24,6 +24,7 @@ import SearchForm from "../components/SearchForm";
 import ActionButtons from "../components/ActionButtons";
 import DataTable from "../components/DataTable";
 import axios from "axios";
+import ActionButtons4 from "../components/ActionButtons4";
 
 const ManageAssets = () => {
   const [filters, setFilters] = useState({});
@@ -125,6 +126,7 @@ const ManageAssets = () => {
         <SearchForm onFilter={handleFilterChange} />
         <ActionButtons />
         <DataTable data={data} filteredData={filteredData} handleDelete={handleDelete} />
+        <ActionButtons4 />
       </div>
     </div>
   );

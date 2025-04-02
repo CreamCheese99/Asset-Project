@@ -64,7 +64,7 @@ const ActionButtons = ({ data }) => {
     // </div>
 
           
-      <div className="mt-4 flex justify-end space-x-4">
+      <div className="mt-10 flex justify-end space-x-4">
         <button
           className="bg-green-500 text-white p-2 rounded-xl hover:bg-green-400"
           onClick={handleAddClick}

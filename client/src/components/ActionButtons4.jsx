@@ -1,14 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
-const ActionButtons3 = () => {
+const ActionButtons4 = () => {
   return (
     <div className="mt-4 flex justify-end space-x-4">
       <button className="bg-gray-400 text-white px-4 py-2 rounded-xl hover:bg-blue-600">   
         <Link
-        to={`/manage-assets`}
-        className=" hover:text-white-700  rounded-xl px-3 py-1"
+        to={`/home`}
+        className=" hover:text-white-700 px-3 py-1"
         >
-        ย้อนกลับ
+        กลับสู่หน้าหลัก
         </Link>
       </button>
 
@@ -17,5 +17,5 @@ const ActionButtons3 = () => {
   );
 };
 
-export default ActionButtons3;
+export default ActionButtons4;
 

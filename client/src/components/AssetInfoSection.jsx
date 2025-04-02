@@ -3,6 +3,7 @@ import axios from "axios";
 import '../css/AssetInfoSection.css'
 import {  FaEdit, FaTrash } from "react-icons/fa";
 
+
 const AssetInfoSection = ({ value, onChange }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [newSubasset, setNewSubasset] = useState("");
@@ -22,6 +23,20 @@ const AssetInfoSection = ({ value, onChange }) => {
 
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
+
+
+
+  const formatCurrency = (num) => {
+    if (!num) return "";
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // ใส่เครื่องหมายจุลภาคทุก 3 หลัก
+  };
+  
+  const handlePriceChange = (input) => {
+    const rawValue = input.replace(/,/g, ""); // ลบเครื่องหมายจุลภาคออก
+    setNewPrice(rawValue); // เก็บค่าเป็นตัวเลขปกติ
+  };
+  
+  
 
   // ฟังก์ชันเปิด Popup สำหรับเพิ่มหรือแก้ไข
   const handleButtonClick = (item = null) => {
@@ -110,13 +125,13 @@ const handleSave = async () => {
     setNewTypeSubAsset("")
   };
 
-  // ฟังก์ชันสำหรับแปลงราคากลับเป็นรูปแบบสกุลเงิน
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("th-TH", {
-      style: "currency",
-      currency: "THB",
-    }).format(amount);
-  };
+  // // ฟังก์ชันสำหรับแปลงราคากลับเป็นรูปแบบสกุลเงิน
+  // const formatCurrency = (amount) => {
+  //   return new Intl.NumberFormat("th-TH", {
+  //     style: "currency",
+  //     currency: "THB",
+  //   }).format(amount);
+  // };
 
   return (
     <div className="subasset-container">
@@ -177,10 +192,10 @@ const handleSave = async () => {
             <div>
               <label className="subasset-label">ราคาต่อหน่วย</label>
               <input
-                type="number"
-                className="subasset-input"
-                value={newPrice}
-                onChange={(e) => setNewPrice(e.target.value)}
+                type="text" // เปลี่ยนจาก number เป็น text เพื่อให้จัดรูปแบบได้
+                className="subasset-input " // ชิดขวาให้อ่านง่ายขึ้น
+                value={formatCurrency(newPrice)}
+                onChange={(e) => handlePriceChange(e.target.value)}
               />
             </div>
             <div>
