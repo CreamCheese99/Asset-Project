@@ -4,6 +4,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { FaFilePdf, FaPlus } from "react-icons/fa";
 
 const ActionButtons = ({ data }) => {
   const navigate = useNavigate();
@@ -46,21 +47,40 @@ const ActionButtons = ({ data }) => {
   };
 
   return (
-    <div className="mt-4 flex space-x-4">
-      <button
-        className="bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600"
-        onClick={handleAddClick}
-      >
-        เพิ่ม
-      </button>
+    // <div className="mt-4 flex justify-end space-x-4">
+    //   <button
+    //     className="bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600"
+    //     onClick={handleAddClick}
+    //   >
+    //     เพิ่มครุภัณฑ์หลัก
+    //   </button>
 
-      <button
-        className="bg-orange-400 text-white px-4 py-2 rounded-md hover:bg-orange-600"
-        onClick={exportPDF}
-      >
-        Export PDF
-      </button>
-    </div>
+    //   <button
+    //     className="bg-orange-400 text-white px-4 py-2 rounded-xl hover:bg-orange-600"
+    //     onClick={exportPDF}
+    //   >
+    //     Export PDF
+    //   </button>
+    // </div>
+
+          
+      <div className="mt-4 flex justify-end space-x-4">
+        <button
+          className="bg-green-500 text-white p-2 rounded-xl hover:bg-green-400"
+          onClick={handleAddClick}
+        >
+          เพิ่มครุภัณฑ์หลัก
+        </button>
+
+        <button
+          // className="text-orange-500 hover:text-orange-700  rounded-lg p-2 "
+          className="bg-red-500 text-white p-2 rounded-xl hover:bg-red-400"
+          onClick={exportPDF}
+        >
+          <FaFilePdf size={20} />
+        </button>
+      </div>
+
   );
 };
 

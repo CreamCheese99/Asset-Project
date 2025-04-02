@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import Breadcrumb7 from '../components/Breadcrumb7';
 import ActionButtons3 from '../components/ActionButtons3';
+import {  FaEdit, FaTrash } from "react-icons/fa";
 const EditInfo = () => {
   const { id } = useParams();
   const [data, setData] = useState(null);
@@ -577,16 +578,16 @@ const EditInfo = () => {
                     <td className="border px-4 py-2">{item.note}</td>
                     <td className="border px-4 py-2">
                       <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-700 mr-2"
+                        className="text-yellow-500 hover:text-yellow-700 bg-gray-100 rounded-lg p-2 mr-2"
                         onClick={() => handleButtonClick(item)}
                       >
-                        แก้ไข
+                        <FaEdit />
                       </button>
                      <button
-                        className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-700"
+                        className="text-red-500 hover:text-red-700 bg-gray-100 rounded-lg p-2"
                         onClick={() => handleDelete(item.sub_asset_id)} 
                       >
-                        ลบ
+                        <FaTrash />
                       </button>
 
                     </td>

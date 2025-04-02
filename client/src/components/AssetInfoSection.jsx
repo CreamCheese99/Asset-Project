@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import '../css/AssetInfoSection.css'
+import {  FaEdit, FaTrash } from "react-icons/fa";
 
 const AssetInfoSection = ({ value, onChange }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -291,13 +292,13 @@ const handleSave = async () => {
                 className="edit-button"
                 onClick={() => handleButtonClick(item)}
               >
-                แก้ไข
+               <FaEdit />
               </button>
               <button
                 className="delete-button"
                 onClick={() => handleDelete(item.id)}
               >
-                ลบ
+                <FaTrash />
               </button>
             </td>
           </tr>
