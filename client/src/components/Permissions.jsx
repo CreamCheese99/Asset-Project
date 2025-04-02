@@ -193,7 +193,7 @@ const Permissions = () => {
         onClick={() => setIsModalOpen(true)}
       >
         <FaUserPlus className="mr-2" />
-        เพิ่มผู้ใช้งานเว็บไซต์
+        เพิ่มผู้ใช้
       </button>
 
       {isLoading ? (
@@ -206,7 +206,7 @@ const Permissions = () => {
               <th className="py-2 text-left">อีเมล</th>
               <th className="py-2 text-left">ภาควิชา</th>
               <th className="py-2 text-left">บทบาท</th>
-              <th className="py-2 text-left">สถานะ</th>
+              {/* <th className="py-2 text-left">สถานะ</th> */}
               <th className="py-2 text-left">จัดการ</th>
             </tr>
           </thead>
@@ -233,14 +233,15 @@ const Permissions = () => {
                   )}
                 </td>
 
-                <td className="py-2">
+                {/* <td className="py-2">
                   <button
                     onClick={() => toggleStatus(user.user_id)}
                     className={`px-3 py-1 rounded-xl text-white ${user.status === "active" ? "bg-green-500" : "bg-gray-400"}`}
                   >
                     {user.status === "active" ? "เปิดใช้งาน" : "ปิดใช้งาน"}
                   </button>
-                </td>
+                </td> */}
+                
                 <td className="py-2 flex space-x-2">
                   {editingId === user.user_id ? (
                     <>

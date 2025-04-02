@@ -132,6 +132,25 @@ const SearchForm = ({ onFilter }) => {
                 ))}
               </select>
             </div>
+
+             {/* สภาพการครุภัณฑ์ */}
+             <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">สภาพการครุภัณฑ์</label>
+              <select
+                name="usage"
+                value={filters.usage}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">-- กรุณาเลือก --</option>
+                <option value="ใช้งาน">ใช้งาน</option>
+                <option value="ซ่อม">ซ่อม</option>
+                <option value="ชำรุด">ชำรุด</option>
+                <option value="บริจาค/โอน">บริจาค/โอน</option>
+                <option value="รับโอน">รับโอน</option>
+                <option value="จำหน่าย">จำหน่าย</option>
+              </select>
+            </div>
     
             {/* ประเภทเงิน */}
             <div>
@@ -147,25 +166,6 @@ const SearchForm = ({ onFilter }) => {
                 <option value="เงินงบประมาณ">เงินงบประมาณ</option>
                 <option value="เงินสะสมคลัง">เงินสะสมคลัง</option>
                 <option value="เงินกันเหลือบปี">เงินกันเหลือบปี</option>
-              </select>
-            </div>
-    
-            {/* สภาพการครุภัณฑ์ */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">สภาพการครุภัณฑ์</label>
-              <select
-                name="usage"
-                value={filters.usage}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">-- กรุณาเลือก --</option>
-                <option value="ใช้งาน">ใช้งาน</option>
-                <option value="ซ่อม">ซ่อม</option>
-                <option value="ชำรุด">ชำรุด</option>
-                <option value="บริจาค/โอน">บริจาค/โอน</option>
-                <option value="รับโอน">รับโอน</option>
-                <option value="จำหน่าย">จำหน่าย</option>
               </select>
             </div>
           </div>

@@ -63,7 +63,7 @@ const Header = () => {
           {(roleId  === '3' || roleId === '4') && (
             <>
               <Link to="/manage-assets" className="hover:text-gray-200 transition duration-300">จัดการพัสดุ</Link>
-              <Link to="/asset-list" className="hover:text-gray-200 transition duration-300">รายการพัสดุ</Link>
+              {/* <Link to="/asset-list" className="hover:text-gray-200 transition duration-300">รายการพัสดุ</Link> */}
             </>
           )}
 
