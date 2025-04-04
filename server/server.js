@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const multer = require("multer");  // นำเข้า multer
 const pool = require("./db");
 const app = express();
-const PORT = 5000;
+const PORT = 5001;
 
 // ใช้ cors สำหรับการอนุญาตให้เข้าถึง API
 app.use(cors());

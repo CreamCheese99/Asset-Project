@@ -37,7 +37,7 @@ const EditInfo = () => {
 
     const fetchAssetData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/mainasset/${encodeURIComponent(id)}`);
+        const response = await axios.get(`http://localhost:5001/mainasset/${encodeURIComponent(id)}`);
         setData(response.data);
 
         if (response.data?.mainAsset) {
@@ -69,7 +69,7 @@ const EditInfo = () => {
 
   const handleSave = async () => {
     try {
-      const response = await axios.put(`http://localhost:5000/mainasset/${id}`, updatedData);
+      const response = await axios.put(`http://localhost:5001/mainasset/${id}`, updatedData);
       setIsEditing(false); // ปิดโหมดการแก้ไข
       setData(response.data); // อัปเดตข้อมูลที่ดึงมาใหม่
       setSuccessMessage("บันทึกการเปลี่ยนแปลงสำเร็จ");
@@ -118,7 +118,7 @@ const EditInfo = () => {
     
     try {
       // ลบข้อมูลจาก backend
-      await axios.delete(`http://localhost:5000/api/subasset/${subId}`);
+      await axios.delete(`http://localhost:5001/api/subasset/${subId}`);
       
       // ตรวจสอบว่า subasset เป็น array ก่อนทำการอัปเดต state
       setData(prevData => ({
@@ -179,7 +179,7 @@ const EditInfo = () => {
     };
   
     try {
-      const response = await axios.post("http://localhost:5000/api/subasset", subAssetData);
+      const response = await axios.post("http://localhost:5001/api/subasset", subAssetData);
       console.log("บันทึกข้อมูลสำเร็จ:", response.data);
   
       if (editMode) {

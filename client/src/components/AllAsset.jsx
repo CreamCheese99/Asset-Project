@@ -14,7 +14,7 @@ const AllAsset = ({ filters }) => {
   useEffect(() => {
     const fetchAssets = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/mainasset-assetlist');
+        const response = await fetch('http://localhost:5001/api/mainasset-assetlist');
         
         if (!response.ok) {
           throw new Error('เกิดข้อผิดพลาดในการดึงข้อมูลจากเซิร์ฟเวอร์');
@@ -99,7 +99,7 @@ const AllAsset = ({ filters }) => {
                   {/* รูปภาพ */}
                   {item.image1 && (
                     <img
-                      src={`http://localhost:5000/uploads/${item.image1}`}  // URL รูปภาพจากฐานข้อมูล
+                      src={`http://localhost:5001/uploads/${item.image1}`}  // URL รูปภาพจากฐานข้อมูล
                       alt={item.main_asset_name}
                       className="w-full h-48 object-cover rounded-md cursor-pointer transform hover:scale-105 transition-transform duration-300"
                       onClick={() => openModal(item.image1)} // เปิดโมดัลเมื่อคลิก
@@ -107,7 +107,7 @@ const AllAsset = ({ filters }) => {
                   )}
                   {item.image2 && (
                     <img
-                      src={`http://localhost:5000/uploads/${item.image2}`}  // URL รูปภาพจากฐานข้อมูล
+                      src={`http://localhost:5001/uploads/${item.image2}`}  // URL รูปภาพจากฐานข้อมูล
                       alt={item.main_asset_name}
                       className="w-full h-48 object-cover rounded-md cursor-pointer transform hover:scale-105 transition-transform duration-300"
                       onClick={() => openModal(item.image2)} // เปิดโมดัลเมื่อคลิก
@@ -115,7 +115,7 @@ const AllAsset = ({ filters }) => {
                   )}
                   {item.image3 && (
                     <img
-                      src={`http://localhost:5000/uploads/${item.image3}`}  // URL รูปภาพจากฐานข้อมูล
+                      src={`http://localhost:5001/uploads/${item.image3}`}  // URL รูปภาพจากฐานข้อมูล
                       alt={item.main_asset_name}
                       className="w-full h-48 object-cover rounded-md cursor-pointer transform hover:scale-105 transition-transform duration-300"
                       onClick={() => openModal(item.image3)} // เปิดโมดัลเมื่อคลิก
@@ -123,7 +123,7 @@ const AllAsset = ({ filters }) => {
                   )}
                   {item.image4 && (
                     <img
-                      src={`http://localhost:5000/uploads/${item.image4}`}  // URL รูปภาพจากฐานข้อมูล
+                      src={`http://localhost:5001/uploads/${item.image4}`}  // URL รูปภาพจากฐานข้อมูล
                       alt={item.main_asset_name}
                       className="w-full h-48 object-cover rounded-md cursor-pointer transform hover:scale-105 transition-transform duration-300"
                       onClick={() => openModal(item.image4)} // เปิดโมดัลเมื่อคลิก
@@ -131,7 +131,7 @@ const AllAsset = ({ filters }) => {
                   )}
                   {item.image5 && (
                     <img
-                      src={`http://localhost:5000/uploads/${item.image5}`}  // URL รูปภาพจากฐานข้อมูล
+                      src={`http://localhost:5001/uploads/${item.image5}`}  // URL รูปภาพจากฐานข้อมูล
                       alt={item.main_asset_name}
                       className="w-full h-48 object-cover rounded-md cursor-pointer transform hover:scale-105 transition-transform duration-300"
                       onClick={() => openModal(item.image5)} // เปิดโมดัลเมื่อคลิก
@@ -176,7 +176,7 @@ const AllAsset = ({ filters }) => {
               X
             </button>
             <img
-              src={`http://localhost:5000/uploads/${selectedImage}`} // รูปที่ถูกเลือกจากฐานข้อมูล
+              src={`http://localhost:5001/uploads/${selectedImage}`} // รูปที่ถูกเลือกจากฐานข้อมูล
               alt="Selected asset"
               className="w-full h-full object-contain"
             />

@@ -38,7 +38,7 @@ const AssetDetails = ({ value, onChange }) => {
   useEffect(() => {
     const fetchAssetType = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/asset_type");
+        const response = await axios.get("http://localhost:5001/api/asset_type");
         if (Array.isArray(response.data)) {
           setAssetType(response.data);
         } else {

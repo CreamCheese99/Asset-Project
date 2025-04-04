@@ -14,7 +14,7 @@ const ManageAssetTypes = () => {
 
   const fetchAssetTypes = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/asset_type");
+      const response = await axios.get("http://localhost:5001/api/asset_type");
       setData(response.data);
     } catch (error) {
       console.error("Error fetching asset types:", error);
@@ -35,11 +35,11 @@ const ManageAssetTypes = () => {
 
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/api/asset_type/${editingId}`, {
+        await axios.put(`http://localhost:5001/api/asset_type/${editingId}`, {
           asset_type_name: tempData.assetType,
         });
       } else {
-        await axios.post("http://localhost:5000/api/asset_type", {
+        await axios.post("http://localhost:5001/api/asset_type", {
           asset_type_name: tempData.assetType,
         });
       }
@@ -56,7 +56,7 @@ const ManageAssetTypes = () => {
   const handleDelete = async (id) => {
     if (window.confirm("คุณต้องการลบประเภทสินทรัพย์นี้หรือไม่?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/asset_type/${id}`);
+        await axios.delete(`http://localhost:5001/api/asset_type/${id}`);
         fetchAssetTypes();
       } catch (error) {
         console.error("Error deleting asset type:", error);

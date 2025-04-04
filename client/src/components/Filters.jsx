@@ -34,7 +34,7 @@ const Filters = ({
     const fetchData = async () => {
       try {
         // ดึงข้อมูลจาก API ของเซิร์ฟเวอร์
-        const response = await fetch("http://localhost:5000/api/getData");
+        const response = await fetch("http://localhost:5001/api/getData");
         if (!response.ok) throw new Error("ไม่สามารถดึงข้อมูลได้");
 
         const data = await response.json();

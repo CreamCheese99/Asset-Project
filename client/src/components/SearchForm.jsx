@@ -17,7 +17,7 @@
 //   useEffect(() => {
 //     const fetchAssetType = async () => {
 //       try {
-//         const response = await axios.get("http://localhost:5000/api/asset_type");
+//         const response = await axios.get("http://localhost:5001/api/asset_type");
 //         if (Array.isArray(response.data)) {
 //           setAssetType(response.data);
 //         }
@@ -31,7 +31,7 @@
 //   useEffect(() => {
 //     const fetchDepartment = async () => {
 //       try {
-//         const response = await axios.get("http://localhost:5000/api/department");
+//         const response = await axios.get("http://localhost:5001/api/department");
 //         if (Array.isArray(response.data)) {
 //           setDepartment(response.data);
 //         }
@@ -221,7 +221,7 @@ const SearchForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchAssetType = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/asset_type");
+        const response = await axios.get("http://localhost:5001/api/asset_type");
         if (Array.isArray(response.data)) {
           setAssetType(response.data);
         }
@@ -235,7 +235,7 @@ const SearchForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchDepartment = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/department");
+        const response = await axios.get("http://localhost:5001/api/department");
         if (Array.isArray(response.data)) {
           setDepartment(response.data);
         }

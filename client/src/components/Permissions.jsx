@@ -24,7 +24,7 @@ const Permissions = () => {
     const fetchUsers = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get('http://localhost:5000/api/users');
+        const response = await axios.get('http://localhost:5001/api/users');
         setUsers(response.data);
       } catch (err) {
         console.error('เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้:', err);
@@ -39,7 +39,7 @@ const Permissions = () => {
     const fetchDepartment = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get('http://localhost:5000/api/department');
+        const response = await axios.get('http://localhost:5001/api/department');
         if (Array.isArray(response.data)) {
           setDepartment(response.data);
         } else {
@@ -57,7 +57,7 @@ const Permissions = () => {
   useEffect(() => {
     const fetchRole = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/role");
+        const response = await axios.get("http://localhost:5001/api/role");
         if (response.data && Array.isArray(response.data)) {
           setRoles(response.data);
         } else {
@@ -77,7 +77,7 @@ const Permissions = () => {
     );
     setUsers(updatedUsers);
     try {
-      await axios.put(`http://localhost:5000/api/users/${id}/status`, { status: updatedUsers.find(user => user.id === id).status });
+      await axios.put(`http://localhost:5001/api/users/${id}/status`, { status: updatedUsers.find(user => user.id === id).status });
     } catch (err) {
       console.error("Error updating user status:", err);
       alert('ไม่สามารถอัพเดตสถานะผู้ใช้ได้');
@@ -96,7 +96,7 @@ const Permissions = () => {
         alert("กรุณาเลือกบทบาทก่อนบันทึก");
         return;
       }
-      const response = await axios.put(`http://localhost:5000/api/users/${id}/role`, { role_id: selectedRoleId });
+      const response = await axios.put(`http://localhost:5001/api/users/${id}/role`, { role_id: selectedRoleId });
       setUsers(users.map(user =>
         user.user_id === id
           ? { 
@@ -135,7 +135,7 @@ const Permissions = () => {
   
     if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?")) {
       axios
-        .delete(`http://localhost:5000/api/users/${id}`)  // ส่ง id เป็น parameter
+        .delete(`http://localhost:5001/api/users/${id}`)  // ส่ง id เป็น parameter
         .then((response) => {
           // เช็คว่า response มีข้อความตอบกลับที่ถูกต้องหรือไม่
           if (response.status === 200) {
@@ -165,7 +165,7 @@ const Permissions = () => {
       };
   
       try {
-        const response = await axios.post("http://localhost:5000/api/users", newUserData);
+        const response = await axios.post("http://localhost:5001/api/users", newUserData);
         setUsers(prevUsers => [...prevUsers, { 
           user_id: response.data.userId,
           ...newUserData 
