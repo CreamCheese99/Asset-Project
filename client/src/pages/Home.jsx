@@ -26,7 +26,7 @@ const Home = () => {
     setErrorMessage("");
 
     try {
-      const response = await axios.get("http://localhost:5001/api/getData");
+      const response = await axios.get("http://localhost:5000/api/getData");
       const data = response.data;
       console.log("Data received from API:", data);
 

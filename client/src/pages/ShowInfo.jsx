@@ -19,7 +19,7 @@ const ShowInfo = () => {
    
     const fetchAssetData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5001/mainasset/${encodedId}`);
+        const response = await axios.get(`http://localhost:5000/mainasset/${encodedId}`);
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);

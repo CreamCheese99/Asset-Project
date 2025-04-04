@@ -14,7 +14,7 @@ const ManageInfo = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:5001/department");
+      const response = await axios.get("http://localhost:5000/department");
       setData(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -30,7 +30,7 @@ const ManageInfo = () => {
   const handleDelete = async (id) => {
     if (window.confirm("คุณต้องการลบภาควิชาและหลักสูตรนี้หรือไม่?")) {
       try {
-        await axios.delete(`http://localhost:5001/department/${id}`);
+        await axios.delete(`http://localhost:5000/department/${id}`);
         setData(data.filter((item) => item.department_id !== id));
       } catch (error) {
         console.error("Error deleting department:", error);
@@ -41,9 +41,9 @@ const ManageInfo = () => {
   const handleSave = async () => {
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5001/department/${editingId}`, tempData);
+        await axios.put(`http://localhost:5000/department/${editingId}`, tempData);
       } else {
-        await axios.post("http://localhost:5001/department", tempData);
+        await axios.post("http://localhost:5000/department", tempData);
       }
       fetchData(); // โหลดข้อมูลใหม่หลังการเพิ่ม/แก้ไข
       setIsModalOpen(false);

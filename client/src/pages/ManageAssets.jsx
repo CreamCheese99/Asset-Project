@@ -61,7 +61,7 @@
 //   useEffect(() => {
 //     const fetchData = async () => {
 //       try {
-//         const response = await axios.get("http://localhost:5001/mainasset");
+//         const response = await axios.get("http://localhost:5000/mainasset");
 //         setData(response.data);
 //         setFilteredData(response.data); // ใช้ข้อมูลทั้งหมดเป็นค่าเริ่มต้น
 //       } catch (error) {
@@ -106,7 +106,7 @@
 //     const encodedId = encodeURIComponent(id); // เข้ารหัส ID ก่อนส่ง
 //     if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?")) {
 //       axios
-//         .delete(`http://localhost:5001/api/mainasset/${encodedId}`)
+//         .delete(`http://localhost:5000/api/mainasset/${encodedId}`)
 //         .then(() => {
 //           // ลบข้อมูลจาก data และ filteredData
 //           setData((prevData) => prevData.filter((item) => item.main_asset_id !== id));
@@ -183,7 +183,7 @@ const ManageAssets = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:5001/mainasset");
+        const response = await axios.get("http://localhost:5000/mainasset");
         setData(response.data); // เก็บข้อมูลทั้งหมด
         setFilteredData(response.data); // ตั้งค่าเริ่มต้นให้ข้อมูลที่กรองแล้วเป็นข้อมูลทั้งหมด
       } catch (error) {
@@ -199,7 +199,7 @@ const ManageAssets = () => {
     const encodedId = encodeURIComponent(id); // เข้ารหัส ID ก่อนส่ง
     if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?")) {
       axios
-        .delete(`http://localhost:5001/api/mainasset/${encodedId}`)
+        .delete(`http://localhost:5000/api/mainasset/${encodedId}`)
         .then(() => {
           // ลบข้อมูลจาก data และ filteredData
           setData((prevData) => prevData.filter((item) => item.main_asset_id !== id));
