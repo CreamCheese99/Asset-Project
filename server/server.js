@@ -150,60 +150,6 @@ app.post('/mainasset', upload.fields([
 
 // API สำหรับดึงข้อมูลทั้งหมดจากตาราง MainAsset
 //DataTable page
-
-// app.get("/mainasset", async (req, res) => {
-//   try {
-//     const { main_asset_id, department_name, usage, asset_type, budget_type, fiscal_year } = req.query;
-
-//     let query = `SELECT mainasset.main_asset_id, main_asset_name, mainasset.usage, department_name, mainasset.asset_type, 
-//                  mainasset.budget_type, mainasset.fiscal_year, COUNT(*) AS subamount 
-//                  FROM mainasset  
-//                  LEFT JOIN subasset ON mainasset.main_asset_id = subasset.main_asset_id 
-//                  INNER JOIN department ON department.department_id = mainasset.department_id `;
-
-//     let conditions = [];
-//     let values = [];
-
-//     if (main_asset_id) {
-//       conditions.push(`mainasset.main_asset_id ILIKE $${values.length + 1}`);
-//       values.push(`%${main_asset_id}%`);
-//     }
-//     if (department_name) {
-//       conditions.push(`department_name ILIKE $${values.length + 1}`);
-//       values.push(`%${department_name}%`);
-//     }
-//     if (usage) {
-//       conditions.push(`mainasset.usage ILIKE $${values.length + 1}`);
-//       values.push(`%${usage}%`);
-//     }
-//     if (asset_type) {
-//       conditions.push(`mainasset.asset_type ILIKE $${values.length + 1}`);
-//       values.push(`%${asset_type}%`);
-//     }
-//     if (budget_type) {
-//       conditions.push(`mainasset.budget_type ILIKE $${values.length + 1}`);
-//       values.push(`%${budget_type}%`);
-//     }
-//     if (fiscal_year) {
-//       conditions.push(`mainasset.fiscal_year::TEXT ILIKE $${values.length + 1}`);
-//       values.push(`%${fiscal_year}%`);
-//     }
-
-//     if (conditions.length > 0) {
-//       query += " WHERE " + conditions.join(" AND ");
-//     }
-
-//     query += " GROUP BY mainasset.main_asset_id, main_asset_name, mainasset.status, department_name;";
-
-//     const result = await pool.query(query, values);
-//     res.status(200).json(result.rows);
-//   } catch (error) {
-//     console.error("Error fetching assets:", error);
-//     res.status(500).json({ error: "Server Error" });
-//   }
-// });
-
-
 app.get("/mainasset", async (req, res) => {
   try {
     const { main_asset_id, department_name, usage, asset_type, budget_type, fiscal_year } = req.query;
@@ -500,6 +446,97 @@ app.put("/mainasset/:id", async (req, res) => {
   }
 });
 
+
+
+
+//*************** edit mainasset********************* */
+
+
+// สร้าง API endpoint สำหรับอัปเดตข้อมูลครุภัณฑ์
+app.put('/mainasset/:id', async (req, res) => {
+  const {
+    main_asset_id,
+    main_asset_name,
+    status,
+    fiscal_year,
+    date_received,
+    budget_limit,
+    averange_price,
+    budget_type,
+    asset_type,
+    location_use,
+    location_deliver,
+    usage,
+    responsible_person,
+    department_id,
+    image1,
+    image2,
+    image3,
+    image4,
+    image5,
+  } = req.body;
+
+  try {
+    // สร้างคำสั่ง SQL สำหรับการอัปเดตข้อมูล
+    const query = `
+      UPDATE mainasset SET
+        main_asset_name = $1,
+        status = $2,
+        fiscal_year = $3,
+        date_received = $4,
+        budget_limit = $5,
+        averange_price = $6,
+        budget_type = $7,
+        asset_type = $8,
+        location_use = $9,
+        location_deliver = $10,
+        usage = $11,
+        responsible_person = $12,
+        department_id = $13,
+        image1 = $14,
+        image2 = $15,
+        image3 = $16,
+        image4 = $17,
+        image5 = $18
+      WHERE main_asset_id = $19
+    `;
+    const values = [
+      main_asset_name,
+      status,
+      fiscal_year,
+      date_received,
+      budget_limit,
+      averange_price,
+      budget_type,
+      asset_type,
+      location_use,
+      location_deliver,
+      usage,
+      responsible_person,
+      department_id,
+      image1,
+      image2,
+      image3,
+      image4,
+      image5,
+      main_asset_id,
+    ];
+
+    // เรียกใช้คำสั่ง SQL
+    const result = await pool.query(query, values);
+
+    if (result.rowCount > 0) {
+      // ส่งคำตอบกลับเมื่ออัปเดตสำเร็จ
+      res.status(200).json({ message: 'อัปเดตข้อมูลครุภัณฑ์สำเร็จ' });
+    } else {
+      // ถ้าไม่พบข้อมูลที่ต้องการอัปเดต
+      res.status(404).json({ message: 'ไม่พบข้อมูลครุภัณฑ์ที่ต้องการอัปเดต' });
+    }
+  } catch (error) {
+    console.error('เกิดข้อผิดพลาดในการอัปเดตข้อมูล:', error);
+    res.status(500).json({ error: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล' });
+  }
+});
 
 
 // ************************************************************************************************

@@ -27,6 +27,8 @@ const EditInfo = () => {
   const [newStatus, setNewStatus] = useState("");
   const [newNote, setNewNote] = useState("");
   const [newTypeSubAsset, setNewTypeSubAsset] = useState("");
+  const [isClicked, setIsClicked] = useState(false);
+
 
   useEffect(() => {
     if (!id) {
@@ -54,10 +56,38 @@ const EditInfo = () => {
     fetchAssetData();
   }, [id]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (!updatedData || !updatedData.mainAsset) return;
+  
 
+  const handleSaveMainasset = async () => {
+   
+  // const handleSaveMainasset = async () => {
+  try {
+    // ส่งข้อมูลที่แก้ไขไปยัง API ด้วย axios
+    const response = await axios.put('http://localhost:5000/mainasset/:id', updatedData.mainAsset);
+
+    if (response.status === 200) {
+      // ข้อมูลบันทึกสำเร็จ
+      alert("บันทึกข้อมูลสำเร็จ");
+      // ปิดโหมดการแก้ไข
+      setIsEditing(false);
+    } else {
+      // ถ้ามีข้อผิดพลาดจาก API
+      alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+    }
+  } catch (error) {
+    console.error("Error saving data: ", error);
+    alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+  }
+};
+  
+  
+
+  const handleButtonClickMainasset = () => {
+    setIsEditing(true);  // เปลี่ยนสถานะการแก้ไข
+  };
+  
+  const handleChangeMainasset = (e) => {
+    const { name, value } = e.target;
     setUpdatedData((prevData) => ({
       ...prevData,
       mainAsset: {
@@ -67,105 +97,81 @@ const EditInfo = () => {
     }));
   };
 
-  const handleSave = async () => {
-    try {
-      const response = await axios.put(`http://localhost:5000/mainasset/${id}`, updatedData);
-      setIsEditing(false); // ปิดโหมดการแก้ไข
-      setData(response.data); // อัปเดตข้อมูลที่ดึงมาใหม่
-      setSuccessMessage("บันทึกการเปลี่ยนแปลงสำเร็จ");
-      setErrorMessage('');
-    } catch (error) {
-      setErrorMessage("ไม่สามารถบันทึกข้อมูลได้");
-      setSuccessMessage('');
-    }
-  };
-
+  
   /*****************subasset************* */
-  // ฟังก์ชันเปิด Popup สำหรับเพิ่มหรือแก้ไข
-  const handleButtonClick = (item = null) => {
-    resetForm();
-    setEditMode(!!item);
-    if (item) {
-      setEditId(item.id);
-      setNewSubasset(item.sub_asset_name);
-      setNewDetail(item.details);
-      setNewPrice(item.unit_price.toString());
-      setNewQuantity(item.quantity.toString());
-      setNewUnit(item.counting_unit);
-      setNewStatus(item.status);
-      setNewNote(item.note);
-      setNewTypeSubAsset(item.type_sub_asset)
-    }
-    setIsPopupOpen(true);
-  };
-  // ปรับปรุงการตรวจสอบ subasset
-  const subassets = Array.isArray(data?.subasset) ? data.subasset : [];
+// Function to handle opening the popup for adding or editing
+const handleButtonClick = (item = null) => {
+  resetForm();
+  setEditMode(!!item); // Set edit mode if item exists
+  if (item) {
+    setEditId(item.sub_asset_id); // Use sub_asset_id as editId
+    setNewSubasset(item.sub_asset_name);
+    setNewDetail(item.details);
+    setNewPrice(item.unit_price.toString());
+    setNewQuantity(item.quantity.toString());
+    setNewUnit(item.counting_unit);
+    setNewStatus(item.status);
+    setNewNote(item.note);
+    setNewTypeSubAsset(item.type_sub_asset);
+  }
+  setIsPopupOpen(true);
+};
 
-  subassets.forEach(sub => {
-    console.log(sub); // ทำงานกับค่าได้อย่างปลอดภัย
-  });
+// Function to close the popup
+const handleClosePopup = () => {
+  setIsPopupOpen(false);
+  setEditMode(false);
+};
 
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
-    setEditMode(false);
-  };
+// Reset the form fields
+const resetForm = () => {
+  setNewSubasset("");
+  setNewDetail("");
+  setNewPrice("");
+  setNewQuantity("");
+  setNewUnit("");
+  setNewStatus("");
+  setNewNote("");
+  setNewTypeSubAsset("");
+};
 
-  const handleDelete = async (subId) => {
-    const confirmDelete = window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?");
-    if (!confirmDelete) return;
-  
-    console.log("🗑️ ลบ subasset id:", subId);
+// Function to handle deleting a sub-asset
+const handleDelete = async (subId) => {
+  const confirmDelete = window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?");
+  if (!confirmDelete) return;
+
+  console.log(" ลบ subasset id:", subId);
+
+  try {
+    await axios.delete(`http://localhost:5000/api/subasset/${subId}`);
     
-    try {
-      // ลบข้อมูลจาก backend
-      await axios.delete(`http://localhost:5000/api/subasset/${subId}`);
-      
-      // ตรวจสอบว่า subasset เป็น array ก่อนทำการอัปเดต state
-      setData(prevData => ({
-        ...prevData,
-        subasset: Array.isArray(prevData.subasset)
-          ? prevData.subasset.filter(item => item.sub_asset_id !== subId)
-          : [],  // ถ้าไม่ใช่ array ให้ตั้งค่าเป็น array ว่าง
-      }));
-  
-      console.log("✅ ลบข้อมูลสำเร็จ");
-    } catch (error) {
-      console.error("❌ เกิดข้อผิดพลาดในการลบข้อมูล:", error);
-      alert("เกิดข้อผิดพลาดในการลบข้อมูล!");
-    }
-  };
-  
-  
-  // ฟังก์ชันรีเซ็ตฟอร์ม
-  const resetForm = () => {
-      setNewSubasset("");
-      setNewDetail("");
-      setNewPrice("");
-      setNewQuantity("");
-      setNewUnit("");
-      setNewStatus("");
-      setNewNote("");
-      setNewTypeSubAsset("")
-      };
-    
-  const handleSaveSubasset = async () => {
-    if (!newSubasset || !newDetail || !newPrice || !newQuantity || !newUnit || !newStatus || !newNote || !newTypeSubAsset) {
-      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
-      return;
-    }
-    console.log("Data received:", data);
+    // Update state after deletion
+    setData(prevData => ({
+      ...prevData,
+      subasset: prevData.subasset.filter(item => item.sub_asset_id !== subId),
+    }));
 
-    
-    // ตรวจสอบว่า data.mainAsset มีค่าหรือไม่
-    if (!data?.mainAsset?.main_asset_id) {
-      console.error(" main_asset_id ไม่พบข้อมูล!");
-      alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Main Asset ID");
-      return;
-    }
+    console.log("✅ ลบข้อมูลสำเร็จ");
+  } catch (error) {
+    console.error("❌ เกิดข้อผิดพลาดในการลบข้อมูล:", error);
+    alert("เกิดข้อผิดพลาดในการลบข้อมูล!");
+  }
+};
 
-  const subassets = Array.isArray(data?.subasset) ? data.subasset : [];
-  
-    // สร้าง object สำหรับส่งไปยัง backend
+// Function to save sub-asset data (POST or PUT based on edit mode)
+const handleSaveSubasset = async () => {
+  if (!newSubasset || !newDetail || !newPrice || !newQuantity || !newUnit || !newStatus || !newNote || !newTypeSubAsset) {
+    alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+    return;
+  }
+
+  // Check if main_asset_id exists
+  if (!data?.mainAsset?.main_asset_id) {
+    console.error(" main_asset_id ไม่พบข้อมูล!");
+    alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Main Asset ID");
+    return;
+  }
+
   const subAssetData = {
     sub_asset_name: newSubasset,
     details: newDetail,
@@ -175,42 +181,57 @@ const EditInfo = () => {
     status: newStatus,
     note: newNote,
     type_sub_asset: newTypeSubAsset,
-    main_asset_id: data.mainAsset.main_asset_id, //ใช้ data.mainAsset.main_asset_id แทน value
-    };
-  
-    try {
-      const response = await axios.post("http://localhost:5000/api/subasset", subAssetData);
-      console.log("บันทึกข้อมูลสำเร็จ:", response.data);
-  
-      if (editMode) {
-        setData({
-          ...data,
-          subasset: subassets.map((item) =>
-            item.sub_asset_id === editId ? { ...item, ...subAssetData } : item
-          ),
-        });
-      } else {
-        setData({
-          ...data,
-          subasset: [...subassets, { ...subAssetData, sub_asset_id: response.data.sub_asset_id }],
-        });
-      }
-  
-      setIsPopupOpen(false);
-      resetForm();
-    } catch (error) {
-      console.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล:", error);
-      alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล!");
-    }
-  };
-  
-  
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" }).format(value);
+    main_asset_id: data.mainAsset.main_asset_id,
   };
 
-  if (loading) return <div className="text-center py-10">Loading...</div>;
-  if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
+  try {
+    const url = editMode
+      ? `http://localhost:5000/api/subasset/${editId}` // PUT request
+      : "http://localhost:5000/api/subasset"; // POST request
+    
+    const method = editMode ? "put" : "post"; // Determine the request method
+    
+    const response = await axios[method](url, subAssetData);
+    console.log("บันทึกข้อมูลสำเร็จ:", response.data);
+
+    // Update state with the new or edited sub-asset
+    if (editMode) {
+      setData(prevData => ({
+        ...prevData,
+        subasset: prevData.subasset.map(item =>
+          item.sub_asset_id === editId ? { ...item, ...subAssetData } : item
+        ),
+      }));
+    } else {
+      setData(prevData => ({
+        ...prevData,
+        subasset: [...prevData.subasset, { ...subAssetData, sub_asset_id: response.data.sub_asset_id }],
+      }));
+    }
+
+    // Close the popup and reset the form
+    setIsPopupOpen(false);
+    resetForm();
+  } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล:", error);
+    alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล!");
+  }
+};
+
+// Format currency
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" }).format(value);
+};
+
+// Loading and error state
+if (loading) return <div className="text-center py-10">Loading...</div>;
+if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
+
+
+
+
+
+
 
   return (
     <div style={{ backgroundColor: "#f1f8e9" }} className="min-h-screen font-sans">
@@ -229,10 +250,10 @@ const EditInfo = () => {
               <label className="block text-gray-700 text-sm mb-2">รหัสทรัพย์สิน</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 bg-yellow-100"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
                 value={updatedData?.mainAsset?.main_asset_id || ''}
                 readOnly={!isEditing}
-                onChange={handleChange}
+                onChange={handleChangeMainasset}
                 name="main_asset_id"
               />
             </div>
@@ -240,10 +261,10 @@ const EditInfo = () => {
               <label className="block text-gray-700 text-sm mb-2">ภาควิชา</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
                 value={updatedData?.mainAsset?.department_id || ''}
                 readOnly={!isEditing}
-                onChange={handleChange}
+                onChange={handleChangeMainasset}
                 name="department_id"
               />
             </div>
@@ -251,10 +272,10 @@ const EditInfo = () => {
               <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
                 value={updatedData?.mainAsset?.status || ''}
                 readOnly={!isEditing}
-                onChange={handleChange}
+                onChange={handleChangeMainasset}
                 name="status"
               />
             </div>
@@ -271,10 +292,10 @@ const EditInfo = () => {
               <label className="block text-gray-700 text-sm mb-2">ปีงบประมาณ</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
                 value={updatedData?.mainAsset?.fiscal_year || ''}
                 readOnly={!isEditing}
-                onChange={handleChange}
+                onChange={handleChangeMainasset}
                 name="fiscal_year"
               />
             </div>
@@ -282,10 +303,10 @@ const EditInfo = () => {
               <label className="block text-gray-700 text-sm mb-2">วันที่ตรวจรับ</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
                 value={updatedData?.mainAsset?.date_received || ''}
                 readOnly={!isEditing}
-                onChange={handleChange}
+                onChange={handleChangeMainasset}
                 name="date_received"
               />
             </div>
@@ -293,10 +314,10 @@ const EditInfo = () => {
               <label className="block text-gray-700 text-sm mb-2">ประเภทเงิน</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
                 value={updatedData?.mainAsset?.budget_type || ''}
                 readOnly={!isEditing}
-                onChange={handleChange}
+                onChange={handleChangeMainasset}
                 name="budget_type"
               />
             </div>
@@ -304,10 +325,10 @@ const EditInfo = () => {
               <label className="block text-gray-700 text-sm mb-2">วงเงินงบประมาณ</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
                 value={updatedData?.mainAsset?.budget_limit || ''}
                 readOnly={!isEditing}
-                onChange={handleChange}
+                onChange={handleChangeMainasset}
                 name="budget_limit"
               />
             </div>
@@ -315,10 +336,10 @@ const EditInfo = () => {
               <label className="block text-gray-700 text-sm mb-2">ราคากลาง</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
                 value={updatedData?.mainAsset?.averange_price || ''}
                 readOnly={!isEditing}
-                onChange={handleChange}
+                onChange={handleChangeMainasset}
                 name="averange_price"
               />
             </div>
@@ -335,10 +356,10 @@ const EditInfo = () => {
               <label className="block text-sm text-gray-700 mb-2">ชื่อสินทรัพย์</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
                 value={updatedData?.mainAsset?.main_asset_name || ''}
                 readOnly={!isEditing}
-                onChange={handleChange}
+                onChange={handleChangeMainasset}
                 name="main_asset_name"
               />
             </div>
@@ -346,10 +367,10 @@ const EditInfo = () => {
               <label className="block text-sm text-gray-700 mb-2">ประเภทสินทรัพย์</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
                 value={updatedData?.mainAsset?.asset_type || ''}
                 readOnly={!isEditing}
-                onChange={handleChange}
+                onChange={handleChangeMainasset}
                 name="asset_type"
               />
             </div>
@@ -357,10 +378,10 @@ const EditInfo = () => {
               <label className="block text-sm text-gray-700 mb-2">สถานที่ใช้งาน</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
                 value={updatedData?.mainAsset?.location_use || ''}
                 readOnly={!isEditing}
-                onChange={handleChange}
+                onChange={handleChangeMainasset}
                 name="location_use"
               />
             </div>
@@ -368,10 +389,10 @@ const EditInfo = () => {
               <label className="block text-sm text-gray-700 mb-2">การใช้งาน</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
                 value={updatedData?.mainAsset?.usage || ''}
                 readOnly={!isEditing}
-                onChange={handleChange}
+                onChange={handleChangeMainasset}
                 name="usage"
               />
             </div>
@@ -379,10 +400,10 @@ const EditInfo = () => {
               <label className="block text-sm text-gray-700 mb-2">สถานที่ส่งมอบ</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
                 value={updatedData?.mainAsset?.location_deliver || ''}
                 readOnly={!isEditing}
-                onChange={handleChange}
+                onChange={handleChangeMainasset}
                 name="location_deliver"
               />
             </div>
@@ -390,19 +411,34 @@ const EditInfo = () => {
               <label className="block text-sm text-gray-700 mb-2">ผู้รับผิดชอบ</label>
               <input
                 type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100"
+                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
                 value={updatedData?.mainAsset?.responsible_person || ''}
                 readOnly={!isEditing}
-                onChange={handleChange}
+                onChange={handleChangeMainasset}
                 name="responsible_person"
               />
             </div>
           </div>
         </div>
 
+        <div className="flex justify-end space-x-4">
+          <button
+           className={`px-4 py-2 mt-4 rounded-xl text-white ${isClicked ? 'bg-orange-500' : 'bg-gray-300 hover:bg-orange-500 active:bg-orange-700'}`}
+            onClick={() => handleButtonClickMainasset()}
+          >
+            แก้ไข
+          </button>
 
-        
-        {/* ตารางแสดงข้อมูลพัสดุย่อย */}
+          <button
+            className="bg-blue-400 text-white px-4 py-2 mt-4 rounded-xl hover:bg-blue-700 text-right"
+            onClick={handleSaveMainasset}  // เรียกฟังก์ชัน save เมื่อกดบันทึก
+          >
+            บันทึก
+          </button>
+        </div>
+
+    
+        {/* ตารางแสดงข้อมูลพัสดุย่อย */} 
         <div className="bg-white mt-4 p-4 rounded-md shadow-md overflow-x-auto">
           <h3 className="text-lg font-bold text-gray-700 mb-4">ข้อมูลพัสดุย่อย</h3>
           <div className="flex justify-between items-center mb-6">
