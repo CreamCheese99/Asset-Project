@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Breadcrumb7 from '../components/Breadcrumb7';
 import ActionButtons3 from '../components/ActionButtons3';
 import {  FaEdit, FaTrash } from "react-icons/fa";
+
 const EditInfo = () => {
   const { id } = useParams();
   const [data, setData] = useState(null);
@@ -28,6 +29,12 @@ const EditInfo = () => {
   const [newNote, setNewNote] = useState("");
   const [newTypeSubAsset, setNewTypeSubAsset] = useState("");
   const [isClicked, setIsClicked] = useState(false);
+
+
+
+
+  // ดึง roleId จาก localStorage
+  const roleId = localStorage.getItem("roleId");
 
 
   useEffect(() => {
@@ -421,7 +428,7 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
           </div>
         </div>
 
-        <div className="flex justify-end space-x-4">
+        {/* <div className="flex justify-end space-x-4">
           <button
            className={`px-4 py-2 mt-4 rounded-xl text-white ${isClicked ? 'bg-orange-500' : 'bg-gray-300 hover:bg-orange-500 active:bg-orange-700'}`}
             onClick={() => handleButtonClickMainasset()}
@@ -435,8 +442,26 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
           >
             บันทึก
           </button>
-        </div>
-
+        </div> */}
+          {roleId === "3" && (
+            <div className="flex justify-end space-x-4">
+              {!isEditing ? (
+                <button
+                  className="px-4 py-2 mt-4 bg-gray-300 hover:bg-orange-500 text-white rounded-xl"
+                  onClick={handleButtonClickMainasset}
+                >
+                  แก้ไข
+                </button>
+              ) : (
+                <button
+                  className="px-4 py-2 mt-4 bg-blue-400 hover:bg-blue-700 text-white rounded-xl"
+                  onClick={handleSaveMainasset}
+                >
+                  บันทึก
+                </button>
+              )}
+            </div>
+          )}
     
         {/* ตารางแสดงข้อมูลพัสดุย่อย */} 
         <div className="bg-white mt-4 p-4 rounded-md shadow-md overflow-x-auto">
