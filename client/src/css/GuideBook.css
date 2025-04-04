@@ -1,71 +1,62 @@
 .guidebook-container {
-    padding: 24px;
-    max-width: 800px;
-    margin: auto;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .guidebook-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 16px;
-  }
-  
-  .guidebook-section {
-    margin-bottom: 24px;
-  }
-  
-  .guidebook-subtitle {
-    font-size: 20px;
-    font-weight: 600;
-  }
-  
-  .guidebook-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: 'Roboto', sans-serif;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .guidebook-title {
-    font-size: 32px;
-    font-weight: bold;
-    color: #114e4f;
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  
-  .guidebook-section {
-    margin-bottom: 20px;
-  }
-  
-  .guidebook-subtitle {
-    font-size: 24px;
-    color: #13777e;
-    border-bottom: 2px solid #7fc7d1;
-    padding-bottom: 5px;
-    margin-bottom: 10px;
-  }
-  
-  .guidebook-text {
-    font-size: 16px;
-    line-height: 1.6;
-    color: #555555;
-  }
-  
-  .guidebook-text strong {
-    font-weight: bold;
-  }
-  
-  .guidebook-note {
-    display: block;
-    margin-top: 10px;
-    font-size: 14px;
-    color: #6b0a0a;
-  }
-  
+  max-width: 960px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: 'Prompt', sans-serif;
+  background-color: rgb(249, 253, 252);
+}
+
+.guidebook-title {
+  text-align: center;
+  font-size: 36px;
+  font-weight: 700;
+  color: #1b4d6f;
+  margin-bottom: 40px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #58b3c5;
+}
+
+.guidebook-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.guidebook-card:hover {
+  transform: translateY(-2px);
+}
+
+.guidebook-subtitle {
+  font-size: 24px;
+  color: #2b7a78;
+  margin-bottom: 20px;
+  border-left: 6px solid #76c7c5;
+  padding-left: 12px;
+}
+
+.guidebook-image-wrapper {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.guidebook-image-wrapper img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.guidebook-list {
+  padding-left: 24px;
+  color: #444;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.guidebook-list li {
+  margin-bottom: 10px;
+}
