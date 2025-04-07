@@ -60,6 +60,7 @@ function FormLogin() {
         localStorage.setItem('token', data.token);
         localStorage.setItem('roleId', data.roleId);
         localStorage.setItem('userName', data.user_name);
+        localStorage.setItem('departmentId', data.department_id);
   
         // Redirect based on roleId
         if (data.roleId === 1) {
@@ -102,15 +103,14 @@ function FormLogin() {
           onChange={(e) => setPassword(e.target.value)} // ส่งค่าและฟังก์ชันการอัปเดต state
         />
         {error && <p className="text-red-500">{error}</p>}
-        <form onSubmit={handleLogin}>
-          <button
-            type="submit" 
-            style={{ background: '#8bc34a' }}
-            className="w-full py-2 text-white text-base font-medium rounded-lg hover:bg-gray-300 transition duration-200"
-          >
-            Login
-          </button>
-        </form>
+        <button
+          type="submit" 
+          onClick={handleLogin} // ใช้ onClick แทนการส่งฟอร์ม
+          style={{ background: '#8bc34a' }}
+          className="w-full py-2 text-white text-base font-medium rounded-lg hover:bg-gray-300 transition duration-200"
+        >
+          Login
+        </button>
       </div>
     </div>
   );
