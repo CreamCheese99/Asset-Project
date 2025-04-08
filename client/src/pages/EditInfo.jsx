@@ -428,6 +428,7 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
           </div>
         </div>
 
+
         {/* <div className="flex justify-end space-x-4">
           <button
            className={`px-4 py-2 mt-4 rounded-xl text-white ${isClicked ? 'bg-orange-500' : 'bg-gray-300 hover:bg-orange-500 active:bg-orange-700'}`}
@@ -443,6 +444,8 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
             บันทึก
           </button>
         </div> */}
+
+        
           {roleId === "3" && (
             <div className="flex justify-end space-x-4">
               {!isEditing ? (
@@ -462,6 +465,7 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
               )}
             </div>
           )}
+
 
 
           {roleId === "4" && (
