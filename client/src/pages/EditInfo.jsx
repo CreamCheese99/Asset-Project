@@ -462,6 +462,29 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
               )}
             </div>
           )}
+
+
+          {roleId === "4" && (
+            <div className="flex justify-end space-x-4">
+              {!isEditing ? (
+                <button
+                  className="px-4 py-2 mt-4 bg-gray-300 hover:bg-orange-500 text-white rounded-xl"
+                  onClick={handleButtonClickMainasset}
+                >
+                  แก้ไข
+                </button>
+              ) : (
+                <button
+                  className="px-4 py-2 mt-4 bg-blue-400 hover:bg-blue-700 text-white rounded-xl"
+                  onClick={handleSaveMainasset}
+                >
+                  บันทึก
+                </button>
+              )}
+            </div>
+          )}
+          
+
     
         {/* ตารางแสดงข้อมูลพัสดุย่อย */} 
         <div className="bg-white mt-4 p-4 rounded-md shadow-md overflow-x-auto">

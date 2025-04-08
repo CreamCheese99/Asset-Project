@@ -275,15 +275,27 @@ app.get("/mainasset/:id", async (req, res) => {
     const subAssetQuery = `SELECT * FROM public.subasset WHERE main_asset_id = $1`;
     const subAssetResult = await pool.query(subAssetQuery, [id]);
 
+    // res.json({
+    //   mainAsset: mainAssetResult.rows[0],
+    //   subAssets: subAssetResult.rows,
+    // });
+
     res.json({
-      mainAsset: mainAssetResult.rows[0],
+      mainAsset: {
+        ...mainAssetResult.rows[0],
+        image_url: mainAssetResult.rows[0].image1,  // ใช้ image1 จากฐานข้อมูล
+      },
       subAssets: subAssetResult.rows,
     });
+
+    
   } catch (error) {
     console.error("Error fetching data:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+
 
 
 
