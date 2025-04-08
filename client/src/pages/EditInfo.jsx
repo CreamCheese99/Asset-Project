@@ -31,6 +31,10 @@ const EditInfo = () => {
   const [isClicked, setIsClicked] = useState(false);
 
 
+  const [currentUser, setCurrentUser] = useState(null);
+  const [usersInDepartment, setUsersInDepartment] = useState([]);
+
+
 
 
   // ดึง roleId จาก localStorage
@@ -65,6 +69,35 @@ const EditInfo = () => {
 
   
 
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        try {
+          const response = await axios.get(`http://localhost:5000/api/users/${userId}`);
+          setCurrentUser(response.data);
+        } catch (error) {
+          console.error("Error fetching current user:", error);
+        }
+      }
+    };
+  
+    fetchCurrentUser();
+  }, []);
+
+  
+  const departmentId = currentUser?.department_id;
+  axios
+    .get(`http://localhost:5000/api/users/by-department/${departmentId}`)
+    .then(response => {
+      console.log('Users in department:', response.data);
+      setUsersInDepartment(response.data);
+    })
+    .catch(error => {
+      console.error('Error loading users:', error);
+    });
+  
+
   const handleSaveMainasset = async () => {
    
   // const handleSaveMainasset = async () => {
@@ -87,23 +120,22 @@ const EditInfo = () => {
   }
 };
   
-  
 
-  const handleButtonClickMainasset = () => {
-    setIsEditing(true);  // เปลี่ยนสถานะการแก้ไข
-  };
-  
+
   const handleChangeMainasset = (e) => {
     const { name, value } = e.target;
     setUpdatedData((prevData) => ({
       ...prevData,
       mainAsset: {
         ...prevData.mainAsset,
-        [name]: value,
+        [name]: value,  // อัปเดตค่า responsible_person ที่เลือก
       },
     }));
   };
+  
 
+
+  
   
   /*****************subasset************* */
 // Function to handle opening the popup for adding or editing
@@ -414,36 +446,9 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
                 name="location_deliver"
               />
             </div>
-            <div>
-              <label className="block text-sm text-gray-700 mb-2">ผู้รับผิดชอบ</label>
-              <input
-                type="text"
-                className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
-                value={updatedData?.mainAsset?.responsible_person || ''}
-                readOnly={!isEditing}
-                onChange={handleChangeMainasset}
-                name="responsible_person"
-              />
-            </div>
+           
           </div>
         </div>
-
-
-        {/* <div className="flex justify-end space-x-4">
-          <button
-           className={`px-4 py-2 mt-4 rounded-xl text-white ${isClicked ? 'bg-orange-500' : 'bg-gray-300 hover:bg-orange-500 active:bg-orange-700'}`}
-            onClick={() => handleButtonClickMainasset()}
-          >
-            แก้ไข
-          </button>
-
-          <button
-            className="bg-blue-400 text-white px-4 py-2 mt-4 rounded-xl hover:bg-blue-700 text-right"
-            onClick={handleSaveMainasset}  // เรียกฟังก์ชัน save เมื่อกดบันทึก
-          >
-            บันทึก
-          </button>
-        </div> */}
 
         
           {roleId === "3" && (
@@ -466,27 +471,55 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
             </div>
           )}
 
+{roleId === "4" && (
+  <div className="bg-white mt-4 p-4 rounded-md shadow-md">
+    <h3 className="text-lg font-bold text-gray-700 mb-4">ผู้รับผิดชอบ</h3>
+
+    {isEditing ? (
+      <div>
+        <label className="input-label">ผู้รับผิดชอบ</label>
+        <select
+          className="input-field"
+          name="responsible_person"
+          value={updatedData?.mainAsset?.responsible_person || ''}
+          onChange={handleChangeMainasset}
+        >
+          <option value="">-- เลือกผู้รับผิดชอบ --</option>
+          {usersInDepartment.map((users) => (
+            <option key={users.user_id} value={users.user_name}>
+              {users.user_name}
+            </option>
+          ))}
+        </select>
+
+      </div>
+    ) : (
+      <p className="text-gray-600">{updatedData?.mainAsset?.responsible_person || 'ไม่ระบุ'}</p>
+    )}
+
+    <div className="flex justify-end space-x-4">
+      {!isEditing ? (
+        <button
+          className="px-4 py-2 mt-4 bg-gray-300 hover:bg-orange-500 text-white rounded-xl"
+          onClick={handleButtonClickMainasset}
+        >
+          แก้ไข
+        </button>
+      ) : (
+        <button
+          className="px-4 py-2 mt-4 bg-blue-400 hover:bg-blue-700 text-white rounded-xl"
+          onClick={handleSaveMainasset}
+        >
+          บันทึก
+        </button>
+      )}
+    </div>
+  </div>
+)}
 
 
-          {roleId === "4" && (
-            <div className="flex justify-end space-x-4">
-              {!isEditing ? (
-                <button
-                  className="px-4 py-2 mt-4 bg-gray-300 hover:bg-orange-500 text-white rounded-xl"
-                  onClick={handleButtonClickMainasset}
-                >
-                  แก้ไข
-                </button>
-              ) : (
-                <button
-                  className="px-4 py-2 mt-4 bg-blue-400 hover:bg-blue-700 text-white rounded-xl"
-                  onClick={handleSaveMainasset}
-                >
-                  บันทึก
-                </button>
-              )}
-            </div>
-          )}
+
+
           
 
     

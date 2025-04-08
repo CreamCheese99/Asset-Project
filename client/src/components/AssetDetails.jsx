@@ -122,7 +122,7 @@ const AssetDetails = ({ value, onChange }) => {
             onChange={(e) => onChange("location_deliver", e.target.value)}
           />
         </div>
-
+{/* 
         <div>
           <label className="input-label">ผู้รับผิดชอบ</label>
           <input
@@ -132,7 +132,7 @@ const AssetDetails = ({ value, onChange }) => {
             value={value.responsible_person}
             onChange={(e) => onChange("responsible_person", e.target.value)}
           />
-        </div>
+        </div> */}
 
         {/* อัปโหลดรูปภาพ 5 รูป */}
         {Array.from({ length: 5 }, (_, index) => (
