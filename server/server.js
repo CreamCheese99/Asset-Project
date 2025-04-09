@@ -149,10 +149,9 @@ app.post('/mainasset', upload.fields([
 
 
 // API สำหรับดึงข้อมูลทั้งหมดจากตาราง MainAsset
-//DataTable page
 app.get("/mainasset", async (req, res) => {
   try {
-    const { main_asset_id, department_name, usage, asset_type, budget_type, fiscal_year } = req.query;
+    const { main_asset_id, department_name, usage, asset_type, budget_type, fiscal_year, responsible_person } = req.query;
 
     let query = `SELECT mainasset.main_asset_id, main_asset_name, mainasset.usage, department_name, mainasset.asset_type, 
                  mainasset.budget_type, mainasset.fiscal_year, COUNT(subasset.sub_asset_id) AS subamount 
@@ -186,6 +185,12 @@ app.get("/mainasset", async (req, res) => {
     if (fiscal_year) {
       conditions.push(`mainasset.fiscal_year::TEXT ILIKE $${values.length + 1}`);
       values.push(`%${fiscal_year}%`);
+    }
+
+    // กรองข้อมูลตาม responsible_person
+    if (responsible_person) {
+      conditions.push(`mainasset.responsible_person ILIKE $${values.length + 1}`);
+      values.push(`%${responsible_person}%`);
     }
 
     if (conditions.length > 0) {
