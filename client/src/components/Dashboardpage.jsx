@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Importing useNavigate for navigation
 import Filters from "./Filters";
 import BarChart from "./BarChart";
 import PieChart from "./PieChart";
@@ -10,6 +11,7 @@ import {
 } from "./dataUtils";
 
 const DashboardPage = () => {
+  const navigate = useNavigate(); // Hook to navigate to other pages
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedAssetStatus, setSelectedAssetStatus] = useState("");
   const [selectedFund, setSelectedFund] = useState("");
@@ -35,15 +37,13 @@ const DashboardPage = () => {
       console.log("Data received from API:", data);
 
       // คำนวณข้อมูลกราฟจากข้อมูลที่ได้รับ
-      // ถ้ามีการเลือกตัวกรองอย่างน้อยหนึ่งตัว ให้ใช้ฟังก์ชันกรอง
       if (selectedDepartment || selectedAssetStatus || selectedFund || selectedYear) {
-        // แสดง log ข้อมูลที่ส่งไปยังฟังก์ชันกรอง
         console.log("Filter parameters:", {
           selectedDepartment,
           selectedFund,
           selectedYear
         });
-        
+
         setBarData(
           summaryFilterDepartmentDetails(data, selectedDepartment, selectedFund, selectedYear)
         );
@@ -56,12 +56,10 @@ const DashboardPage = () => {
           )
         );
       } else {
-        // ถ้าไม่มีการเลือกตัวกรอง ให้แสดงข้อมูลทั้งหมด
         setBarData(summaryDepartmentDetails(data));
         setPieData(summaryDepartmentAssets(data));
       }
     } catch (error) {
-      // แสดงข้อความ error หากเกิดข้อผิดพลาด
       setErrorMessage("ไม่สามารถดึงข้อมูลได้จากเซิร์ฟเวอร์");
       console.error("Error fetching data:", error);
     } finally {
@@ -79,6 +77,18 @@ const DashboardPage = () => {
     setSelectedYear(e.target.value);
   };
 
+  // ฟังก์ชันสำหรับการไปหน้าถัดไป
+  const handleStatuspage = () => {
+    navigate("/status", {
+      state: { 
+        selectedDepartment, 
+        selectedAssetStatus, 
+        selectedFund, 
+        selectedYear 
+      }
+    });
+  };
+
   return (
     <div style={{ padding: "20px", maxWidth: "1100px", margin: "0 auto" }}>
       <Filters
@@ -93,13 +103,11 @@ const DashboardPage = () => {
         errorMessage={errorMessage}
       />
 
-      <div
-        style={{ display: "grid", gridTemplateColumns: "1fr 0.5fr", gap: "20px" }}
-      >
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 0.5fr", gap: "20px" }}>
         {loading ? (
-          <p>กำลังโหลดข้อมูล...</p> // แสดงข้อความขณะโหลด
+          <p>กำลังโหลดข้อมูล...</p>
         ) : errorMessage ? (
-          <p>{errorMessage}</p> // แสดงข้อความ error ถ้ามี
+          <p>{errorMessage}</p>
         ) : (
           <>
             {barData && barData.datasets && barData.datasets.length > 0 ? (
@@ -115,6 +123,7 @@ const DashboardPage = () => {
           </>
         )}
       </div>
+      <button onClick={handleStatuspage}>ไปหน้าถัดไป</button>
     </div>
   );
 };
