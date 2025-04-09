@@ -321,3 +321,30 @@ export function summaryFilterDepartmentAssets(data, department = "", assetStatus
     datasets: datasets.length ? datasets : []
   };
 }
+// dataUtils.jsx
+
+export const summaryFilterDepartmentAssetsByStatus = (data, selectedDepartment, selectedAssetStatus, selectedYear) => {
+  // Logic for filtering the data based on department, status, and year
+  const filteredData = data.departmentAssets.filter(department => {
+    if (selectedDepartment && department.name !== selectedDepartment) return false;
+    if (selectedAssetStatus && department.status !== selectedAssetStatus) return false;
+    if (selectedYear && department.year !== selectedYear) return false;
+    return true;
+  });
+
+  const result = filteredData.map(department => {
+    return {
+      label: department.name,
+      data: department.statuses.map(status => {
+        return {
+          label: status.name,
+          data: status.values // Or however the data is structured for statuses
+        };
+      })
+    };
+  });
+
+  return {
+    datasets: result
+  };
+};
