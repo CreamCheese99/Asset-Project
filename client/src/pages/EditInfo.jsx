@@ -11,7 +11,7 @@ const EditInfo = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [updatedData, setUpdatedData] = useState(null);
+  // const [updatedData, setUpdatedData] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
@@ -35,6 +35,8 @@ const EditInfo = () => {
   const [usersInDepartment, setUsersInDepartment] = useState([]);
 
 
+  const [updatedData, setUpdatedData] = useState({ mainAsset: { responsible_person: '' } });
+  const [departmentId, setDepartmentId] = useState(null);
 
 
   // ดึง roleId จาก localStorage
@@ -85,20 +87,65 @@ const EditInfo = () => {
     fetchCurrentUser();
   }, []);
 
-  
-  const departmentId = currentUser?.department_id;
-  axios
-    .get(`http://localhost:5000/api/users/by-department/${departmentId}`)
-    .then(response => {
-      console.log('Users in department:', response.data);
-      setUsersInDepartment(response.data);
-    })
-    .catch(error => {
-      console.error('Error loading users:', error);
-    });
-  
 
-  const handleSaveMainasset = async () => {
+
+
+    // // ดึงข้อมูลผู้รับผิดชอบจาก API
+    // useEffect(() => {
+    //   if (!departmentId) {
+    //     console.log("departmentId is null or undefined");
+    //     return;  // ป้องกันการเรียก API ถ้า departmentId เป็น null
+    //   }
+
+    //   // หาก departmentId มีค่าให้เรียก API
+    //   axios
+    //     .get(`http://localhost:5000/api/users/by-department/${departmentId}`)
+    //     .then(response => {
+    //       console.log('Users in department:', response.data);
+    //       setUsersInDepartment(response.data);
+    //     })
+    //     .catch(error => {
+    //       console.error('Error loading users:', error);
+    //     });
+    // }, [departmentId]);
+
+
+//****************************************************************************** */
+ // ดึง departmentId จาก localStorage
+ useEffect(() => {
+  const storedDepartmentId = localStorage.getItem('departmentId');
+  if (storedDepartmentId) {
+    setDepartmentId(storedDepartmentId);
+  }
+}, []);
+
+// ดึงข้อมูลผู้ใช้จาก API เมื่อ departmentId มีค่า
+useEffect(() => {
+  if (departmentId) {
+    axios
+      .get(`http://localhost:5000/api/users/by-department/${departmentId}`)
+      .then(response => {
+        setUsersInDepartment(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching users:', error);
+      });
+  }
+}, [departmentId]); // รันฟังก์ชันนี้เมื่อ departmentId เปลี่ยนแปลง
+
+const handleChangeMainasset1 = (e) => {
+  setUpdatedData({
+    ...updatedData,
+    mainAsset: {
+      ...updatedData?.mainAsset,
+      responsible_person: e.target.value,
+    },
+  });
+};
+
+const handleSaveMainasset = async () => {
+//************************************************************ */
+
    
   // const handleSaveMainasset = async () => {
   try {
@@ -135,6 +182,13 @@ const EditInfo = () => {
   
 
 
+   const handleButtonClickMainasset = () => {
+     setIsEditing(true);  // เปลี่ยนสถานะการแก้ไข
+   };
+   
+
+
+  
   
   
   /*****************subasset************* */
@@ -470,7 +524,6 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
               )}
             </div>
           )}
-
 {roleId === "4" && (
   <div className="bg-white mt-4 p-4 rounded-md shadow-md">
     <h3 className="text-lg font-bold text-gray-700 mb-4">ผู้รับผิดชอบ</h3>
@@ -481,34 +534,35 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
         <select
           className="input-field"
           name="responsible_person"
-          value={updatedData?.mainAsset?.responsible_person || ''}
-          onChange={handleChangeMainasset}
+          value={updatedData?.mainAsset?.responsible_person || ''}  // ตรวจสอบให้แน่ใจว่าค่า value ตรงกับข้อมูลผู้รับผิดชอบ
+          onChange={handleChangeMainasset1}  // ตรวจสอบว่า handleChangeMainasset ถูกต้อง
         >
           <option value="">-- เลือกผู้รับผิดชอบ --</option>
-          {usersInDepartment.map((users) => (
-            <option key={users.user_id} value={users.user_name}>
-              {users.user_name}
+          {usersInDepartment.map((user) => (
+            <option key={user.user_id} value={user.user_name}>
+              {user.user_name}  
             </option>
           ))}
         </select>
-
       </div>
     ) : (
-      <p className="text-gray-600">{updatedData?.mainAsset?.responsible_person || 'ไม่ระบุ'}</p>
+      <p className="text-gray-600">
+        {updatedData?.mainAsset?.responsible_person || 'ไม่ระบุ'}  
+      </p>
     )}
 
     <div className="flex justify-end space-x-4">
       {!isEditing ? (
         <button
           className="px-4 py-2 mt-4 bg-gray-300 hover:bg-orange-500 text-white rounded-xl"
-          onClick={handleButtonClickMainasset}
+          onClick={handleButtonClickMainasset}  // เรียกฟังก์ชันเมื่อกดปุ่มแก้ไข
         >
           แก้ไข
         </button>
       ) : (
         <button
           className="px-4 py-2 mt-4 bg-blue-400 hover:bg-blue-700 text-white rounded-xl"
-          onClick={handleSaveMainasset}
+          onClick={handleSaveMainasset}  // เรียกฟังก์ชันเมื่อบันทึก
         >
           บันทึก
         </button>
@@ -516,6 +570,7 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
     </div>
   </div>
 )}
+
 
 
 

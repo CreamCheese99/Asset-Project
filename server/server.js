@@ -1091,21 +1091,26 @@ app.get('/api/users/:id', async (req, res) => {
   }
 });
 
-
 app.get('/api/users/by-department/:departmentId', async (req, res) => {
-  const { departmentId } = req.params;  // departmentId คือพารามิเตอร์ที่ได้รับจาก URL
-  try {
-    // ตรวจสอบว่า departmentId มีค่าหรือไม่
-    console.log(departmentId);  // ลอง log ค่าดู
+  const { departmentId } = req.params;
 
-    const result = await pool.query('SELECT user_name FROM users WHERE department_id = $1 AND role_id = 4', [departmentId]);
-    res.json(result.rows);
+  console.log('Received departmentId:', departmentId);
+
+  if (!departmentId || isNaN(departmentId)) {
+    return res.status(400).json({ message: 'Invalid or missing departmentId' });
+  }
+
+  try {
+    const query = 'SELECT user_id, user_name FROM users WHERE department_id = $1';
+    const values = [parseInt(departmentId)];
+
+    const result = await pool.query(query, values);
+    res.json(result.rows);  // ส่งข้อมูลผู้ใช้ใน department
   } catch (error) {
-    console.error(error);
+    console.error('Database query error:', error);
     res.status(500).json({ message: 'Error fetching department users' });
   }
 });
-
 
 
 //*************************************** */
