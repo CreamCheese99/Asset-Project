@@ -40,7 +40,7 @@ const PieChart = ({ data }) => {
         {chartData ? <Pie data={chartData} options={{ responsive: true }} /> : <p>กำลังโหลดข้อมูล...</p>}
       </div>
     </div>
-  );
+  );s
 };
 
 export default PieChart;

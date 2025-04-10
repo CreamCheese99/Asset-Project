@@ -3,130 +3,130 @@ import { useNavigate } from "react-router-dom";
 import Filters from "./Filters";
 import BarChart from "./BarChart";
 import PieChart from "./PieChart";
-import { 
-  summaryDepartmentDetails, 
-  summaryDepartmentAssets, 
-  summaryFilterDepartmentAssets, 
-  summaryFilterDepartmentDetails 
+import {
+  summaryDepartmentDetails,
+  summaryDepartmentAssets,
+  summaryFilterDepartmentDetails,
+  summaryFilterDepartmentAssets
 } from "./dataUtils";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
-  const [selectedDepartment, setSelectedDepartment] = useState("");
-  const [selectedAssetStatus, setSelectedAssetStatus] = useState("");
-  const [selectedFund, setSelectedFund] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
+
+  // State สำหรับตัวกรอง
+  const [filters, setFilters] = useState({
+    department: "",
+    assetStatus: "",
+    fund: "",
+    year: ""
+  });
+
+  // State สำหรับข้อมูล
   const [barData, setBarData] = useState(null);
   const [pieData, setPieData] = useState(null);
   const [totalAssets, setTotalAssets] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Function to fetch data from API
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
   const fetchData = async () => {
     setLoading(true);
     setErrorMessage("");
+
     try {
-      const response = await fetch("http://localhost:5000/api/getData"); // API URL
-      if (!response.ok) {
-        throw new Error("ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์");
-      }
+      const res = await fetch("http://localhost:5000/api/getData");
+      if (!res.ok) throw new Error("ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์");
 
-      const data = await response.json();
-      console.log("Data received from API:", data);
+      const data = await res.json();
 
-      // Calculate chart data based on filters
-      if (selectedDepartment || selectedAssetStatus || selectedFund || selectedYear) {
-        setBarData(
-          summaryFilterDepartmentDetails(data, selectedDepartment, selectedFund, selectedYear)
-        );
-        setPieData(
-          summaryFilterDepartmentAssets(data, selectedDepartment, selectedAssetStatus, selectedYear)
-        );
-      } else {
-        setBarData(summaryDepartmentDetails(data));
-        setPieData(summaryDepartmentAssets(data)); 
-      }
+      const { department, assetStatus, fund, year } = filters;
 
-      // Calculate total assets
-      const totalAssets = Object.values(data.departmentAssets).reduce((sum, department) => {
-        return sum + Object.values(department).reduce((subSum, assetStatus) => {
-          return subSum + Object.values(assetStatus).reduce((finalSum, yearData) => {
-            return finalSum + yearData.reduce((acc, val) => acc + val, 0);
-          }, 0);
-        }, 0);
-      }, 0);
+      // สรุปข้อมูลจาก filter หรือทั้งหมด
+      setBarData(
+        department || fund || year
+          ? summaryFilterDepartmentDetails(data, department, fund, year)
+          : summaryDepartmentDetails(data)
+      );
 
-      setTotalAssets(totalAssets);
+      setPieData(
+        department || assetStatus || year
+          ? summaryFilterDepartmentAssets(data, department, assetStatus, year)
+          : summaryDepartmentAssets(data)
+      );
 
-    } catch (error) {
+      // รวมยอดครุภัณฑ์ทั้งหมด
+      const total = Object.values(data.departmentAssets).flatMap(dep =>
+        Object.values(dep).flatMap(status =>
+          Object.values(status).flatMap(yearData => yearData)
+        )
+      ).reduce((sum, val) => sum + val, 0);
+
+      setTotalAssets(total);
+
+    } catch (err) {
       setErrorMessage("ไม่สามารถดึงข้อมูลได้จากเซิร์ฟเวอร์");
-      console.error("Error fetching data:", error);
+      console.error("Error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Use effect hook to fetch data when filters change
   useEffect(() => {
     fetchData();
-  }, [selectedDepartment, selectedAssetStatus, selectedFund, selectedYear]);
+  }, [filters]);
 
-  // Handle year change
-  const handleYearChange = (e) => {
-    setSelectedYear(e.target.value);
-  };
-
-  // Navigate to the status page with filter parameters
-  const handleStatusPage = () => {
+  const handleNavigateStatus = () => {
     navigate("/status", {
       state: {
-        selectedDepartment,
-        selectedAssetStatus,
-        selectedFund,
-        selectedYear
+        selectedDepartment: filters.department,
+        selectedAssetStatus: filters.assetStatus,
+        selectedFund: filters.fund,
+        selectedYear: filters.year
       }
     });
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto", fontFamily: "Arial, sans-serif" }}>
-      {/* Filters Section */}
-      <div style={{ marginBottom: "20px" }}>
+    <div style={styles.container}>
+      {/* ส่วนตัวกรอง */}
+      <div style={styles.filterSection}>
         <Filters
-          selectedDepartment={selectedDepartment}
-          setSelectedDepartment={setSelectedDepartment}
-          selectedAssetStatus={selectedAssetStatus}
-          setSelectedAssetStatus={setSelectedAssetStatus}
-          selectedFund={selectedFund}
-          setSelectedFund={setSelectedFund}
-          selectedYear={selectedYear}
-          handleYearChange={handleYearChange}
+          selectedDepartment={filters.department}
+          setSelectedDepartment={(val) => handleFilterChange("department", val)}
+          selectedAssetStatus={filters.assetStatus}
+          setSelectedAssetStatus={(val) => handleFilterChange("assetStatus", val)}
+          selectedFund={filters.fund}
+          setSelectedFund={(val) => handleFilterChange("fund", val)}
+          selectedYear={filters.year}
+          handleYearChange={(e) => handleFilterChange("year", e.target.value)}
           errorMessage={errorMessage}
         />
       </div>
 
-      {/* Total Assets Display */}
-      <div style={{ textAlign: "center", marginTop: "20px", backgroundColor: "#f1f1f1", padding: "10px", borderRadius: "8px" }}>
-        <h3 style={{ margin: "0", fontSize: "24px" }}>จำนวนครุภัณฑ์ทั้งหมดในระบบ: {totalAssets}</h3>
+      {/* สรุปจำนวนทั้งหมด */}
+      <div style={styles.totalAssetsBox}>
+        <h3 style={styles.totalAssetsText}>จำนวนครุภัณฑ์ทั้งหมดในระบบ: {totalAssets}</h3>
       </div>
 
-      {/* Main Content (Charts & Data) */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginTop: "20px" }}>
+      {/* ส่วนกราฟ */}
+      <div style={styles.chartGrid}>
         {loading ? (
           <p style={{ textAlign: "center" }}>กำลังโหลดข้อมูล...</p>
         ) : errorMessage ? (
           <p style={{ textAlign: "center", color: "red" }}>{errorMessage}</p>
         ) : (
           <>
-            {/* Bar Chart Section */}
+            {/* กราฟแท่ง */}
             <div>
-              <h3 style={{ textAlign: "center", fontSize: "22px" }}>กราฟแท่งเปรียบเทียบ</h3>
-              {barData && barData.datasets && barData.datasets.length > 0 ? (
+              <h3 style={styles.chartTitle}>กราฟแท่งเปรียบเทียบ</h3>
+              {barData?.datasets?.length ? (
                 <>
-                  <h4 style={{ fontSize: "18px", textAlign: "center" }}>งบประมาณ/แหล่งเงินในแต่ละปี</h4>
+                  <h4 style={styles.chartSubtitle}>งบประมาณ/แหล่งเงินในแต่ละปี</h4>
                   <BarChart data={barData} />
-                  <h4 style={{ fontSize: "18px", textAlign: "center" }}>ครุภัณฑ์ตามหมวดหมู่ในแต่ละปีของแต่ละภาควิชา</h4>
+                  <h4 style={styles.chartSubtitle}>ครุภัณฑ์ตามหมวดหมู่ในแต่ละปีของแต่ละภาควิชา</h4>
                   <BarChart data={barData} />
                 </>
               ) : (
@@ -134,39 +134,101 @@ const DashboardPage = () => {
               )}
             </div>
 
-            {/* Pie Chart Section */}
+            {/* กราฟวงกลม */}
             <div>
-              <h3 style={{ textAlign: "center", fontSize: "22px" }}>กราฟวงกลม</h3>
-              {pieData && pieData.datasets && pieData.datasets.length > 0 ? (
+              <h3 style={styles.chartTitle}>กราฟวงกลม</h3>
+              {pieData?.datasets?.length ? (
                 <PieChart data={pieData} />
               ) : (
                 <p style={{ textAlign: "center" }}>ไม่มีข้อมูลกราฟวงกลมที่ตรงกับตัวกรอง</p>
               )}
-            </div>
 
-            {/* Button to check asset status below Pie chart */}
-            <div style={{ textAlign: "center", marginTop: "20px" }}>
-              <button
-                onClick={handleStatusPage}
-                style={{
-                  backgroundColor: "#00aaff",
-                  color: "white",
-                  padding: "15px 25px",
-                  fontSize: "18px",
-                  borderRadius: "12px",
-                  cursor: "pointer",
-                  border: "none",
-                  whiteSpace: "nowrap"
-                }}
-              >
-                ตรวจสอบสภาพครุภัณฑ์ <br /> คลิก
-              </button>
+              <div style={{ textAlign: "center", marginTop: "20px" }}>
+                <button onClick={handleNavigateStatus} style={styles.statusButton}>
+                  ตรวจสอบสภาพครุภัณฑ์ <br /> คลิก
+                </button>
+              </div>
             </div>
           </>
         )}
       </div>
     </div>
   );
+};
+
+// 💡 แยก Style ออกมาให้อ่านง่ายขึ้น
+const styles = {
+  container: {
+    padding: "30px",
+    maxWidth: "1280px",
+    margin: "0 auto",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    color: "#2c3e50"
+  },
+  filterSection: {
+    marginBottom: "30px",
+    backgroundColor: "#f9f9f9",
+    padding: "20px",
+    borderRadius: "12px",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.05)"
+  },
+  totalAssetsBox: {
+    textAlign: "center",
+    marginTop: "20px",
+    backgroundColor: "#dff0ff",
+    padding: "16px",
+    borderRadius: "12px",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
+  },
+  totalAssetsText: {
+    margin: 0,
+    fontSize: "20px",  // ลดขนาดฟอนต์ให้เล็กลง
+    fontWeight: "bold",
+    color: "#1f618d"
+  },
+  chartGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "24px",
+    marginTop: "30px"
+  },
+  chartCard: {
+    backgroundColor: "#ffffff",
+    padding: "20px",
+    borderRadius: "12px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+    transition: "transform 0.3s ease, box-shadow 0.3s ease"
+  },
+  chartCardHover: {
+    transform: "translateY(-5px)",
+    boxShadow: "0 6px 15px rgba(0,0,0,0.15)"
+  },
+  chartTitle: {
+    textAlign: "center",
+    fontSize: "22px",
+    color: "#2c3e50",
+    fontWeight: "bold",
+    marginBottom: "12px"
+  },
+  chartSubtitle: {
+    fontSize: "16px",
+    textAlign: "center",
+    color: "#7f8c8d",
+    fontWeight: "500",
+    marginBottom: "10px"
+  },
+  statusButton: {
+    backgroundColor: "#3498db",
+    color: "white",
+    padding: "12px 20px",
+    fontSize: "16px",
+    fontWeight: "bold",
+    borderRadius: "10px",
+    cursor: "pointer",
+    border: "none",
+    marginTop: "20px",
+    transition: "background-color 0.3s ease",
+  }
 };
 
 export default DashboardPage;
