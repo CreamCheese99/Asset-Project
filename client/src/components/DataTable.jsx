@@ -426,12 +426,15 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
     }
   }, []); // Runs only once when the component is mounted
 
+  
+
   useEffect(() => {
     console.log("roleId:", roleId);
     console.log("userName:", userName);
-  
     let displayData = (filteredData && filteredData.length > 0) ? filteredData : data;
   
+
+
     // ถ้า roleId เป็น 5 ให้กรองข้อมูลตาม responsible_person
     if (roleId === "5") {
       console.log("Filtering data for role 5...");
@@ -440,6 +443,7 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
           console.log("Checking responsible_person:", item.responsible_person, "against userName:", userName);
           return item.responsible_person.trim() === userName.trim(); // ตรวจสอบการกรอง
         }
+        console.log(item.responsible_person);
         return false; // ถ้า responsible_person เป็น undefined หรือ null
       });
     } else if (roleId !== "3" && departmentName) {
@@ -468,6 +472,7 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
       item.main_asset_name,
       item.department_name || "-",
       item.asset_type || "-",
+      item.responsible_person|| "-",
       item.subamount || 0,
       item.budget_type || "-",
       item.fiscal_year || "-",
@@ -475,7 +480,7 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
     ]);
 
     doc.autoTable({
-      head: [["รหัสทรัพย์สิน", "ชื่อทรัพย์สิน", "ภาควิชา", "ประเภทสินทรัพย์", "จำนวน", "ประเภทเงิน", "ปีงบประมาณ", "สภาพการครุภัณฑ์"]],
+      head: [["รหัสทรัพย์สิน", "ชื่อทรัพย์สิน", "ภาควิชา", "ประเภทสินทรัพย์", "ผู้รับผิดชอบ", "จำนวน", "ประเภทเงิน", "ปีงบประมาณ", "สภาพการครุภัณฑ์"]],
       body: tableData,
     });
 
@@ -492,6 +497,7 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
             <th className="border px-4 py-2 hidden lg:table-cell">ชื่อทรัพย์สิน</th>
             <th className="border px-4 py-2">ภาควิชา</th>
             <th className="border px-4 py-2">ประเภทสินทรัพย์</th>
+            <th className="border px-4 py-2">ผู้รับผิดชอบ</th>
             <th className="border px-4 py-2">จำนวน</th>
             <th className="border px-4 py-2">ประเภทเงิน</th>
             <th className="border px-4 py-2 cursor-pointer flex items-center justify-center" onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
@@ -516,10 +522,12 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
                 <td className="border px-4 py-2 hidden lg:table-cell">{item.main_asset_name}</td>
                 <td className="border px-4 py-2">{item.department_name || "-"}</td>
                 <td className="border px-4 py-2">{item.asset_type || "-"}</td>
+                <td className="border px-4 py-2">{item.responsible_person || "-"}</td>
                 <td className="border px-4 py-2">{item.subamount || 0}</td>
                 <td className="border px-4 py-2">{item.budget_type || "-"}</td>
                 <td className="border px-4 py-2">{item.fiscal_year || "-"}</td>
                 <td className="border px-4 py-2">{item.usage}</td>
+                
                 <td className="border px-4 py-2 flex justify-center space-x-2">
                   <Link to={`/show-info/${encodeURIComponent(item.main_asset_id)}`} className="text-blue-500 hover:text-blue-700 bg-gray-100 rounded-lg p-2">
                     <FaEye />

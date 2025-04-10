@@ -213,6 +213,7 @@ const SearchForm = ({ onFilter }) => {
     asset_type: "",
     fiscal_year: "",
     budget_type: "",
+    // responsible_person:"",
   });
 
   const [assetType, setAssetType] = useState([]);
@@ -264,6 +265,7 @@ const SearchForm = ({ onFilter }) => {
       asset_type: filters.asset_type,
       fiscal_year: filters.fiscal_year,
       budget_type: filters.budget_type,
+      // responsible_person : "Teacher1",
     };
 
     console.log("Filters ส่งออก:", formattedFilters);
