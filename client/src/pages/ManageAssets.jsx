@@ -153,8 +153,6 @@ const ManageAssets = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [roleId, setRoleId] = useState(localStorage.getItem("roleId"));
-
-  
   const [departmentId, setDepartmentId] = useState(localStorage.getItem("departmentId"));
   const [userName, setUserName] = useState(localStorage.getItem("departmentId"));
 
