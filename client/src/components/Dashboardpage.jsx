@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Filters from "./Filters";
 import BarChart from "./BarChart";
-import BarChart from "./Barchart2";
 import PieChart from "./PieChart";
 import {
   summaryDepartmentDetails,
@@ -14,7 +13,6 @@ import {
 const DashboardPage = () => {
   const navigate = useNavigate();
 
-  // State สำหรับตัวกรอง
   const [filters, setFilters] = useState({
     department: "",
     assetStatus: "",
@@ -22,8 +20,7 @@ const DashboardPage = () => {
     year: ""
   });
 
-  // State สำหรับข้อมูล
-  const [barData, setBarData] = useState(null);
+  const [barGraphs, setBarGraphs] = useState([]);
   const [pieData, setPieData] = useState(null);
   const [totalAssets, setTotalAssets] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
@@ -31,6 +28,77 @@ const DashboardPage = () => {
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const renderLoadingState = () => {
+    return <p style={{ textAlign: "center" }}>กำลังโหลดข้อมูล...</p>;
+  };
+
+  const renderErrorState = () => {
+    return <p style={{ textAlign: "center", color: "red" }}>{errorMessage}</p>;
+  };
+
+  const processBarGraphData = (data) => {
+    const { fund, year, department } = filters;
+    const barData1 = fund || year
+      ? summaryFilterDepartmentDetails(data, fund, year)
+      : summaryDepartmentDetails(data);
+
+    const barData2 = department || year
+      ? summaryFilterDepartmentAssets(data, department, year)
+      : summaryDepartmentAssets(data);
+
+    setBarGraphs([
+      {
+        title: "งบประมาณ/แหล่งเงินในแต่ละปี",
+        data: barData1,
+        options: {
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: "ปีงบประมาณ"
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: "จำนวนงบประมาณ"
+              }
+            }
+          }
+        }
+      },
+      {
+        title: "ครุภัณฑ์ตามสถานะในแต่ละปีของแต่ละภาควิชา",
+        data: barData2,
+        options: {
+          indexAxis: "y",
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: "จำนวนครุภัณฑ์"
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: "ปีงบประมาณ"
+              }
+            }
+          }
+        }
+      }
+    ]);
+  };
+
+  const processTotalAssets = (data) => {
+    const total = Object.values(data.departmentAssets).flatMap(dep =>
+      Object.values(dep).flatMap(status =>
+        Object.values(status).flatMap(yearData => yearData || []))
+    ).reduce((sum, val) => sum + val, 0);
+    setTotalAssets(total);
   };
 
   const fetchData = async () => {
@@ -42,31 +110,31 @@ const DashboardPage = () => {
       if (!res.ok) throw new Error("ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์");
 
       const data = await res.json();
+      const { department = "", assetStatus = "", fund = "", year = "" } = filters ? filters : {};
 
-      const { department, assetStatus, fund, year } = filters;
+      if (!data.departmentAssets) {
+        setErrorMessage("ข้อมูลภาควิชาและสถานะครุภัณฑ์ไม่พร้อมใช้งาน");
+        return;
+      }
 
-      // กราฟแรก: ใช้ summaryFilterDepartmentDetails สำหรับแหล่งเงินและปี
-      setBarData(
-        fund || year
-          ? summaryFilterDepartmentDetails(data, fund, year)  // กราฟแหล่งเงินและปี
-          : summaryDepartmentDetails(data)
-      );
+      processBarGraphData(data);
+      processTotalAssets(data);
 
-      // กราฟที่สอง: ใช้ summaryFilterDepartmentDetails สำหรับภาควิชาและปี
-      setPieData(
-        department || year
-          ? summaryFilterDepartmentAssets(data, department, year) // กราฟภาควิชาและปี
-          : summaryDepartmentAssets(data)
-      );
-
-      // รวมยอดครุภัณฑ์ทั้งหมด
-      const total = Object.values(data.departmentAssets).flatMap(dep =>
-        Object.values(dep).flatMap(status =>
-          Object.values(status).flatMap(yearData => yearData)
-        )
-      ).reduce((sum, val) => sum + val, 0);
-
-      setTotalAssets(total);
+      if (data.departmentAssets) {
+        setPieData({
+          labels: Object.keys(data.departmentAssets),
+          datasets: [
+            {
+              label: "ครุภัณฑ์ตามสถานะ",
+              data: Object.values(data.departmentAssets).map(dep =>
+                Object.values(dep).reduce((sum, status) =>
+                  sum + Object.values(status).reduce((s, yearData) => s + (yearData || 0), 0), 0)
+              ),
+              backgroundColor: ["#FF9999", "#66B3FF", "#99FF99", "#FFCC99"]
+            }
+          ]
+        });
+      }
 
     } catch (err) {
       setErrorMessage("ไม่สามารถดึงข้อมูลได้จากเซิร์ฟเวอร์");
@@ -77,7 +145,9 @@ const DashboardPage = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    if (filters.department || filters.assetStatus || filters.fund || filters.year) {
+      fetchData();
+    }
   }, [filters]);
 
   const handleNavigateStatus = () => {
@@ -91,9 +161,43 @@ const DashboardPage = () => {
     });
   };
 
+  const renderContent = () => {
+    if (loading) return renderLoadingState();
+    if (errorMessage) return renderErrorState();
+
+    return (
+      <>
+        {/* กราฟแท่ง */}
+        <div>
+          <h3 style={styles.chartTitle}>กราฟแท่งเปรียบเทียบ</h3>
+          {barGraphs?.length ? (
+            <BarChart graphs={barGraphs} />
+          ) : (
+            <p style={{ textAlign: "center" }}>ไม่มีข้อมูลกราฟแท่งที่ตรงกับตัวกรอง</p>
+          )}
+        </div>
+
+        {/* กราฟวงกลม */}
+        <div>
+          <h3 style={styles.chartTitle}>กราฟวงกลม</h3>
+          {pieData?.datasets?.length ? (
+            <PieChart data={pieData} />
+          ) : (
+            <p style={{ textAlign: "center" }}>ไม่มีข้อมูลกราฟวงกลมที่ตรงกับตัวกรอง</p>
+          )}
+          <div style={{ textAlign: "center", marginTop: "20px" }}>
+            <button onClick={handleNavigateStatus} style={styles.statusButton}>
+              ตรวจสอบสภาพครุภัณฑ์ <br /> คลิก
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  };
+
   return (
     <div style={styles.container}>
-      {/* ส่วนตัวกรอง */}
+      {/* ตัวกรอง */}
       <div style={styles.filterSection}>
         <Filters
           selectedDepartment={filters.department}
@@ -108,57 +212,19 @@ const DashboardPage = () => {
         />
       </div>
 
-      {/* สรุปจำนวนทั้งหมด */}
+      {/* สรุปจำนวนครุภัณฑ์ */}
       <div style={styles.totalAssetsBox}>
         <h3 style={styles.totalAssetsText}>จำนวนครุภัณฑ์ทั้งหมดในระบบ: {totalAssets}</h3>
       </div>
 
-      {/* ส่วนกราฟ */}
+      {/* ส่วนแสดงกราฟ */}
       <div style={styles.chartGrid}>
-        {loading ? (
-          <p style={{ textAlign: "center" }}>กำลังโหลดข้อมูล...</p>
-        ) : errorMessage ? (
-          <p style={{ textAlign: "center", color: "red" }}>{errorMessage}</p>
-        ) : (
-          <>
-            {/* กราฟแท่ง */}
-            <div>
-              <h3 style={styles.chartTitle}>กราฟแท่งเปรียบเทียบ</h3>
-              {barData?.datasets?.length ? (
-                <>
-                  <h4 style={styles.chartSubtitle}>งบประมาณ/แหล่งเงินในแต่ละปี</h4>
-                  <BarChart data={barData} />
-                  <h4 style={styles.chartSubtitle}>ครุภัณฑ์ตามหมวดหมู่ในแต่ละปีของแต่ละภาควิชา</h4>
-                  <BarChart data={barData} />
-                </>
-              ) : (
-                <p style={{ textAlign: "center" }}>ไม่มีข้อมูลกราฟแท่งที่ตรงกับตัวกรอง</p>
-              )}
-            </div>
-
-            {/* กราฟวงกลม */}
-            <div>
-              <h3 style={styles.chartTitle}>กราฟวงกลม</h3>
-              {pieData?.datasets?.length ? (
-                <PieChart data={pieData} />
-              ) : (
-                <p style={{ textAlign: "center" }}>ไม่มีข้อมูลกราฟวงกลมที่ตรงกับตัวกรอง</p>
-              )}
-
-              <div style={{ textAlign: "center", marginTop: "20px" }}>
-                <button onClick={handleNavigateStatus} style={styles.statusButton}>
-                  ตรวจสอบสภาพครุภัณฑ์ <br /> คลิก
-                </button>
-              </div>
-            </div>
-          </>
-        )}
+        {renderContent()}
       </div>
     </div>
   );
 };
 
-// 💡 แยก Style ออกมาให้อ่านง่ายขึ้น
 const styles = {
   container: {
     padding: "30px",
@@ -184,55 +250,34 @@ const styles = {
   },
   totalAssetsText: {
     margin: 0,
-    fontSize: "20px",  // ขนาดฟอนต์เล็กลง
+    fontSize: "20px",
     fontWeight: "bold",
     color: "#1f618d"
   },
   chartGrid: {
     display: "grid",
-    gridTemplateColumns: "1fr",  // เปลี่ยนจาก "1fr 1fr" เป็น "1fr" เพื่อให้กราฟเรียงกันในแนวตั้ง
-    gap: "16px",  // ลดช่องว่างระหว่างกราฟ
+    gridTemplateColumns: "1fr",
+    gap: "16px",
     marginTop: "30px"
-  },
-  chartCard: {
-    backgroundColor: "#ffffff",
-    padding: "15px",  // ลดขนาด padding
-    borderRadius: "12px",
-    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",  // ลดความชัดเจนของเงา
-    transition: "transform 0.3s ease, box-shadow 0.3s ease",
-    height: "300px",  // ปรับความสูงกราฟที่นี่
-    overflow: "hidden",  // ป้องกันกราฟล้น
-    marginBottom: "20px",  // ช่องว่างระหว่างกราฟ
-  },
-  chartCardHover: {
-    transform: "translateY(-5px)",
-    boxShadow: "0 6px 15px rgba(0,0,0,0.15)"
   },
   chartTitle: {
     textAlign: "center",
-    fontSize: "20px",  // ลดขนาดฟอนต์หัวข้อ
+    fontSize: "20px",
     color: "#2c3e50",
     fontWeight: "bold",
-    marginBottom: "8px"
-  },
-  chartSubtitle: {
-    fontSize: "14px",  // ลดขนาดฟอนต์ของคำบรรยาย
-    textAlign: "center",
-    color: "#7f8c8d",
-    fontWeight: "500",
     marginBottom: "8px"
   },
   statusButton: {
     backgroundColor: "#3498db",
     color: "white",
-    padding: "10px 18px",  // ลดขนาด padding
-    fontSize: "14px",  // ลดขนาดฟอนต์
+    padding: "10px 18px",
+    fontSize: "14px",
     fontWeight: "bold",
     borderRadius: "10px",
     cursor: "pointer",
     border: "none",
     marginTop: "20px",
-    transition: "background-color 0.3s ease",
+    transition: "background-color 0.3s ease"
   }
 };
 

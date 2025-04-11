@@ -840,3 +840,12 @@ const data = {
     }
   }
 };
+//  API ที่ส่งข้อมูล mock
+app.get('/api/getData', (req, res) => {
+res.json(data);
+});
+
+// เริ่มต้นเซิร์ฟเวอร์ที่พอร์ต 5000
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});

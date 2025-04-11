@@ -17,7 +17,7 @@
     "@mui/x-date-pickers-pro": "^7.27.3",
     "asset-project": "file:",
     "axios": "^1.7.9",
-    "chart.js": "^4.4.7",
+    "chart.js": "^4.4.8",
     "chartjs-plugin-datalabels": "^2.2.0",
     "dayjs": "^1.11.13",
     "lucide-react": "^0.474.0",
