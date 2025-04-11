@@ -425,32 +425,41 @@ export const summaryDepartmentAssets = (data) => {
 
   return result;
 };
-// ใน dataUtils.jsx
 export const summaryDepartmentDetails = (data) => {
-  const result = [];
+  const years = new Set();
+  const departments = Object.keys(data.departmentDetails);
+  const datasetMap = {};
 
-  for (const department in data.departmentDetails) {
-    for (const year in data.departmentDetails[department]) {
-      const departmentData = data.departmentDetails[department][year];
+  departments.forEach((department) => {
+    const yearlyData = data.departmentDetails[department];
+    datasetMap[department] = {};
 
-      // ตรวจสอบว่า departmentData เป็น Array หรือไม่
-      if (Array.isArray(departmentData)) {
-        const total = departmentData.reduce((sum, val) => sum + val, 0);
-        result.push({
-          label: `${department} - ${year}`,
-          total
-        });
-      } else {
-        console.warn(`Warning: Expected an array but found ${typeof departmentData} for ${department} in ${year}`);
-      }
+    for (const year in yearlyData) {
+      years.add(year);
+      const values = yearlyData[year];
+      const total = Array.isArray(values) ? values.reduce((sum, v) => sum + v, 0) : 0;
+      datasetMap[department][year] = total;
     }
+  });
+
+  const sortedYears = Array.from(years).sort(); // ['2565', '2566', ...]
+  const datasets = [];
+
+  for (const department in datasetMap) {
+    const dataPerYear = sortedYears.map((year) => datasetMap[department][year] || 0);
+    datasets.push({
+      label: department,
+      data: dataPerYear,
+      backgroundColor: getColorByTotal(dataPerYear.reduce((a, b) => a + b, 0))
+    });
   }
 
-  return result;
+  return {
+    labels: sortedYears,
+    datasets
+  };
 };
 
-
-// ใน dataUtils.jsx
 export const summaryFilterDepartmentAssets = (data, selectedDepartment, selectedYear) => {
   const result = [];
 
@@ -537,5 +546,21 @@ export const summaryFilterDepartmentAssetsByStatus = (data, selectedDepartment, 
   } catch (error) {
     console.error("Error in summaryFilterDepartmentAssetsByStatus:", error);
     return { label: "Error", total: 0, color: '#FF0000' }; // สีแดงถ้ามีข้อผิดพลาด
+  }
+};
+// dataUtils.js
+export const fetchDataFromAPI = async () => {
+  try {
+    const response = await fetch("URL_TO_YOUR_API"); // ใส่ URL ของ API ที่ต้องการ
+    const result = await response.json();
+
+    if (result && result.data) {
+      return result.data;  // ส่งข้อมูลที่ได้จาก API กลับไป
+    } else {
+      throw new Error("ข้อมูลไม่ถูกต้องจาก API");
+    }
+  } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูลจาก API:", error);
+    throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูลจาก API");
   }
 };

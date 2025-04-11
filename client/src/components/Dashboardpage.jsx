@@ -145,6 +145,7 @@ const DashboardPage = () => {
   };
 
   useEffect(() => {
+    
     if (filters.department || filters.assetStatus || filters.fund || filters.year) {
       fetchData();
     }
