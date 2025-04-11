@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Filters from "./Filters";
 import BarChart from "./BarChart";
+import BarChart from "./Barchart2";
 import PieChart from "./PieChart";
 import {
   summaryDepartmentDetails,
@@ -44,16 +45,17 @@ const DashboardPage = () => {
 
       const { department, assetStatus, fund, year } = filters;
 
-      // สรุปข้อมูลจาก filter หรือทั้งหมด
+      // กราฟแรก: ใช้ summaryFilterDepartmentDetails สำหรับแหล่งเงินและปี
       setBarData(
-        department || fund || year
-          ? summaryFilterDepartmentDetails(data, department, fund, year)
+        fund || year
+          ? summaryFilterDepartmentDetails(data, fund, year)  // กราฟแหล่งเงินและปี
           : summaryDepartmentDetails(data)
       );
 
+      // กราฟที่สอง: ใช้ summaryFilterDepartmentDetails สำหรับภาควิชาและปี
       setPieData(
-        department || assetStatus || year
-          ? summaryFilterDepartmentAssets(data, department, assetStatus, year)
+        department || year
+          ? summaryFilterDepartmentAssets(data, department, year) // กราฟภาควิชาและปี
           : summaryDepartmentAssets(data)
       );
 
@@ -182,22 +184,25 @@ const styles = {
   },
   totalAssetsText: {
     margin: 0,
-    fontSize: "20px",  // ลดขนาดฟอนต์ให้เล็กลง
+    fontSize: "20px",  // ขนาดฟอนต์เล็กลง
     fontWeight: "bold",
     color: "#1f618d"
   },
   chartGrid: {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "24px",
+    gridTemplateColumns: "1fr",  // เปลี่ยนจาก "1fr 1fr" เป็น "1fr" เพื่อให้กราฟเรียงกันในแนวตั้ง
+    gap: "16px",  // ลดช่องว่างระหว่างกราฟ
     marginTop: "30px"
   },
   chartCard: {
     backgroundColor: "#ffffff",
-    padding: "20px",
+    padding: "15px",  // ลดขนาด padding
     borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-    transition: "transform 0.3s ease, box-shadow 0.3s ease"
+    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",  // ลดความชัดเจนของเงา
+    transition: "transform 0.3s ease, box-shadow 0.3s ease",
+    height: "300px",  // ปรับความสูงกราฟที่นี่
+    overflow: "hidden",  // ป้องกันกราฟล้น
+    marginBottom: "20px",  // ช่องว่างระหว่างกราฟ
   },
   chartCardHover: {
     transform: "translateY(-5px)",
@@ -205,23 +210,23 @@ const styles = {
   },
   chartTitle: {
     textAlign: "center",
-    fontSize: "22px",
+    fontSize: "20px",  // ลดขนาดฟอนต์หัวข้อ
     color: "#2c3e50",
     fontWeight: "bold",
-    marginBottom: "12px"
+    marginBottom: "8px"
   },
   chartSubtitle: {
-    fontSize: "16px",
+    fontSize: "14px",  // ลดขนาดฟอนต์ของคำบรรยาย
     textAlign: "center",
     color: "#7f8c8d",
     fontWeight: "500",
-    marginBottom: "10px"
+    marginBottom: "8px"
   },
   statusButton: {
     backgroundColor: "#3498db",
     color: "white",
-    padding: "12px 20px",
-    fontSize: "16px",
+    padding: "10px 18px",  // ลดขนาด padding
+    fontSize: "14px",  // ลดขนาดฟอนต์
     fontWeight: "bold",
     borderRadius: "10px",
     cursor: "pointer",

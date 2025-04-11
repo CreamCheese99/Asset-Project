@@ -321,8 +321,6 @@ export function summaryFilterDepartmentAssets(data, department = "", assetStatus
     datasets: datasets.length ? datasets : []
   };
 }
-// dataUtils.jsx
-
 export const summaryFilterDepartmentAssetsByStatus = (data, selectedDepartment, selectedAssetStatus, selectedYear) => {
   // Logic for filtering the data based on department, status, and year
   const filteredData = data.departmentAssets.filter(department => {
@@ -348,3 +346,30 @@ export const summaryFilterDepartmentAssetsByStatus = (data, selectedDepartment, 
     datasets: result
   };
 };
+// // ฟังก์ชันสำหรับสรุปสถานะสินทรัพย์ตามภาควิชา
+// function summarizeAssetStatusesByDepartment(departmentAssets, assetStatuses, departments) {
+//   const summary = {};
+
+//   // Loop through each department
+//   departments.forEach(department => {
+//     // Initialize the summary for the department
+//     summary[department] = {};
+
+//     // Loop through each asset status
+//     assetStatuses.forEach(status => {
+//       // Initialize the total count for each status
+//       summary[department][status] = 0;
+
+//       // Loop through each year to sum up the counts for the specific status
+//       Object.keys(departmentAssets[department][status]).forEach(year => {
+//         const count = departmentAssets[department][status][year].reduce((acc, curr) => acc + curr, 0);
+//         summary[department][status] += count;
+//       });
+//     });
+//   });
+
+//   return summary;
+// }
+
+// const summary = summarizeAssetStatusesByDepartment(data.departmentAssets, data.assetStatuses, data.departments);
+// console.log(summary);
