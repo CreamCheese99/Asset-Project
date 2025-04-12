@@ -375,232 +375,295 @@
 // // console.log(summary);
 // สรุปยอดรวมแหล่งเงินแยกตามปีและกรองตามแหล่งเงินและปี
 // ฟังก์ชันสำหรับเลือกสีตาม total
-const getColorByTotal = (total) => {
-  // สามารถเลือกสีตามค่า total ที่คำนวณได้
-  if (total > 1000) return '#FF5733'; // สีแดง ถ้ามีค่า total สูง
-  if (total > 500) return '#FFC300'; // สีเหลือง ถ้ามีค่า total กลาง
-  return '#33FF57'; // สีเขียว ถ้ามีค่า total ต่ำ
-};
-
-// ฟังก์ชัน summaryFilterFundPerYear
-export const summaryFilterFundPerYear = (data, selectedFunds, selectedYears) => {
-  const result = [];
-
-  selectedYears.forEach((year) => {
-    let total = 0;
-
-    selectedFunds.forEach((fund) => {
-      const fundData = data.fundPerYear[fund]?.[year];
-      if (fundData) {
-        total += fundData.reduce((sum, val) => sum + val, 0);
-      }
-    });
-
-    result.push({ year, total, color: getColorByTotal(total) }); // เพิ่ม color
-  });
-
-  return result;
-};
-
-// ฟังก์ชัน summaryDepartmentAssets
-export const summaryDepartmentAssets = (data) => {
-  const result = [];
-
-  for (const department in data.departmentAssets) {
-    for (const status in data.departmentAssets[department]) {
-      let total = 0;
-
-      const statusData = data.departmentAssets[department][status];
-      for (const year in statusData) {
-        total += statusData[year].reduce((sum, val) => sum + val, 0);
-      }
-
-      result.push({
-        label: `${department} - ${status}`,
-        total,
-        color: getColorByTotal(total) // เพิ่ม color
-      });
-    }
-  }
-
-  return result;
-};
-export const summaryDepartmentDetails = (data) => {
-  const years = new Set();
-  const departments = Object.keys(data.departmentDetails);
-  const datasetMap = {};
-
-  departments.forEach((department) => {
-    const yearlyData = data.departmentDetails[department];
-    datasetMap[department] = {};
-
-    for (const year in yearlyData) {
-      years.add(year);
-      const values = yearlyData[year];
-      const total = Array.isArray(values) ? values.reduce((sum, v) => sum + v, 0) : 0;
-      datasetMap[department][year] = total;
-    }
-  });
-
-  const sortedYears = Array.from(years).sort(); // ['2565', '2566', ...]
-  const datasets = [];
-
-  for (const department in datasetMap) {
-    const dataPerYear = sortedYears.map((year) => datasetMap[department][year] || 0);
-    datasets.push({
-      label: department,
-      data: dataPerYear,
-      backgroundColor: getColorByTotal(dataPerYear.reduce((a, b) => a + b, 0))
-    });
-  }
-
-  return {
-    labels: sortedYears,
-    datasets
-  };
-};
-
-export const summaryFilterDepartmentAssets = (data, selectedDepartment, selectedYear) => {
-  const result = [];
-
-  // คำนวณตามข้อมูลที่เลือก
-  for (const department in data.departmentAssets) {
-    if (selectedDepartment && department !== selectedDepartment) continue;
-
-    for (const status in data.departmentAssets[department]) {
-      let total = 0;
-      const statusData = data.departmentAssets[department][status];
-
-      if (selectedYear) {
-        // คำนวณเฉพาะปีที่เลือก
-        const yearData = statusData[selectedYear];
-        if (Array.isArray(yearData)) {
-          total = yearData.reduce((sum, val) => sum + val, 0);
-        }
-      } else {
-        // คำนวณทั้งหมดหากไม่มีการเลือกปี
-        for (const year in statusData) {
-          total += statusData[year].reduce((sum, val) => sum + val, 0);
-        }
-      }
-
-      result.push({
-        label: `${department} - ${status}`,
-        total
-      });
-    }
-  }
-
-  return result;
-};
-// ใน dataUtils.jsx
-export const summaryFilterDepartmentDetails = (data, selectedDepartment, selectedYear) => {
-  const result = [];
-
-  // คำนวณตามข้อมูลที่เลือก
-  for (const department in data.departmentDetails) {
-    if (selectedDepartment && department !== selectedDepartment) continue;
-
-    for (const year in data.departmentDetails[department]) {
-      if (selectedYear && year !== selectedYear) continue;
-
-      const departmentData = data.departmentDetails[department][year];
-      let total = 0;
-      
-      if (Array.isArray(departmentData)) {
-        total = departmentData.reduce((sum, val) => sum + val, 0);
-      }
-
-      result.push({
-        label: `${department} - ${year}`,
-        total
-      });
-    }
-  }
-
-  return result;
-};
-
-
-// ฟังก์ชัน summaryFilterDepartmentAssetsByStatus
-export const summaryFilterDepartmentAssetsByStatus = (data, selectedDepartment, selectedAssetStatus) => {
-  try {
-    const statusData = data.departmentAssets?.[selectedDepartment]?.[selectedAssetStatus];
-    if (!statusData) {
-      return { label: `${selectedDepartment} - ${selectedAssetStatus}`, total: 0, color: '#CCCCCC' }; // สีเทา ถ้าไม่มีข้อมูล
-    }
-
-    let total = 0;
-
-    Object.values(statusData).forEach((yearData) => {
-      if (Array.isArray(yearData)) {
-        total += yearData.reduce((sum, val) => sum + val, 0);
-      }
-    });
-
-    return {
-      label: `${selectedDepartment} - ${selectedAssetStatus}`,
-      total,
-      color: getColorByTotal(total) // เพิ่ม color
-    };
-  } catch (error) {
-    console.error("Error in summaryFilterDepartmentAssetsByStatus:", error);
-    return { label: "Error", total: 0, color: '#FF0000' }; // สีแดงถ้ามีข้อผิดพลาด
-  }
-};
 // dataUtils.js
-export const fetchDataFromAPI = async () => {
-  try {
-    const response = await fetch("URL_TO_YOUR_API"); // ใส่ URL ของ API ที่ต้องการ
-    const result = await response.json();
 
-    if (result && result.data) {
-      return result.data;  // ส่งข้อมูลที่ได้จาก API กลับไป
-    } else {
-      throw new Error("ข้อมูลไม่ถูกต้องจาก API");
-    }
-  } catch (error) {
-    console.error("เกิดข้อผิดพลาดในการดึงข้อมูลจาก API:", error);
-    throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูลจาก API");
-  }
+// ฟังก์ชันกำหนดสีตามค่า total
+// const getColorByTotal = (total) => {
+//   if (total > 1000) return '#FF5733'; // สีแดง
+//   if (total > 500) return '#FFC300'; // สีเหลือง
+//   return '#33FF57'; // สีเขียว
+// };
+
+// // ฟังก์ชันสุ่มสี
+// const getRandomColor = () =>
+//   `rgba(${Math.floor(Math.random() * 255)},${Math.floor(
+//     Math.random() * 255
+//   )},${Math.floor(Math.random() * 255)},0.6)`;
+
+// // 1. summaryFilterFundPerYear: สรุปยอดรวมแหล่งเงินตามปี
+// export const summaryFilterFundPerYear = (data, selectedFunds, selectedYears) => {
+//   const result = [];
+
+//   selectedYears.forEach((year) => {
+//     let total = 0;
+
+//     selectedFunds.forEach((fund) => {
+//       const fundData = data.fundPerYear[fund]?.[year];
+//       if (fundData) {
+//         total += fundData.reduce((sum, val) => sum + val, 0);
+//       }
+//     });
+
+//     result.push({ year, total, color: getColorByTotal(total) });
+//   });
+
+//   return result;
+// };
+
+// // 2. summaryDepartmentAssets: สรุปยอดรวมของสถานะทรัพย์สินในแต่ละภาควิชา
+// export const summaryDepartmentAssets = (data) => {
+//   const result = [];
+
+//   for (const department in data.departmentAssets) {
+//     for (const status in data.departmentAssets[department]) {
+//       let total = 0;
+//       const statusData = data.departmentAssets[department][status];
+//       for (const year in statusData) {
+//         total += statusData[year].reduce((sum, val) => sum + val, 0);
+//       }
+
+//       result.push({
+//         label: `${department} - ${status}`,
+//         total,
+//         color: getColorByTotal(total)
+//       });
+//     }
+//   }
+
+//   return result;
+// };
+
+// // 3. summaryDepartmentDetails: สรุปข้อมูลภาควิชารายปีในรูปแบบกราฟ
+// export const summaryDepartmentDetails = (data) => {
+//   const years = new Set();
+//   const departments = Object.keys(data.departmentDetails);
+//   const datasetMap = {};
+
+//   departments.forEach((department) => {
+//     const yearlyData = data.departmentDetails[department];
+//     datasetMap[department] = {};
+
+//     for (const year in yearlyData) {
+//       years.add(year);
+//       const values = yearlyData[year];
+//       const total = Array.isArray(values) ? values.reduce((sum, v) => sum + v, 0) : 0;
+//       datasetMap[department][year] = total;
+//     }
+//   });
+
+//   const sortedYears = Array.from(years).sort();
+//   const datasets = [];
+
+//   for (const department in datasetMap) {
+//     const dataPerYear = sortedYears.map((year) => datasetMap[department][year] || 0);
+//     datasets.push({
+//       label: department,
+//       data: dataPerYear,
+//       backgroundColor: getColorByTotal(dataPerYear.reduce((a, b) => a + b, 0))
+//     });
+//   }
+
+//   return {
+//     labels: sortedYears,
+//     datasets
+//   };
+// };
+
+// // 4. summaryFilterDepartmentAssets: สรุปข้อมูลภาควิชาตามสถานะและปีที่เลือก
+// export const summaryFilterDepartmentAssets = (data, selectedDepartment, selectedYear) => {
+//   const result = [];
+
+//   for (const department in data.departmentAssets) {
+//     if (selectedDepartment && department !== selectedDepartment) continue;
+
+//     for (const status in data.departmentAssets[department]) {
+//       let total = 0;
+//       const statusData = data.departmentAssets[department][status];
+
+//       if (selectedYear) {
+//         const yearData = statusData[selectedYear];
+//         if (Array.isArray(yearData)) {
+//           total = yearData.reduce((sum, val) => sum + val, 0);
+//         }
+//       } else {
+//         for (const year in statusData) {
+//           total += statusData[year].reduce((sum, val) => sum + val, 0);
+//         }
+//       }
+
+//       result.push({
+//         label: `${department} - ${status}`,
+//         total
+//       });
+//     }
+//   }
+
+//   return result;
+// };
+
+// // 5. summaryFilterDepartmentDetails: สรุปข้อมูลภาควิชาตามปี
+// export const summaryFilterDepartmentDetails = (data, selectedDepartment, selectedYear) => {
+//   const result = [];
+
+//   for (const department in data.departmentDetails) {
+//     if (selectedDepartment && department !== selectedDepartment) continue;
+
+//     for (const year in data.departmentDetails[department]) {
+//       if (selectedYear && year !== selectedYear) continue;
+
+//       const departmentData = data.departmentDetails[department][year];
+//       let total = 0;
+
+//       if (Array.isArray(departmentData)) {
+//         total = departmentData.reduce((sum, val) => sum + val, 0);
+//       }
+
+//       result.push({
+//         label: `${department} - ${year}`,
+//         total
+//       });
+//     }
+//   }
+
+//   return result;
+// };
+
+// // 6. summaryFilterDepartmentAssetsByStatus: สรุปเฉพาะสถานะทรัพย์สิน
+// export const summaryFilterDepartmentAssetsByStatus = (data, selectedDepartment, selectedAssetStatus) => {
+//   try {
+//     const statusData = data.departmentAssets?.[selectedDepartment]?.[selectedAssetStatus];
+//     if (!statusData) {
+//       return { label: `${selectedDepartment} - ${selectedAssetStatus}`, total: 0, color: '#CCCCCC' };
+//     }
+
+//     let total = 0;
+
+//     Object.values(statusData).forEach((yearData) => {
+//       if (Array.isArray(yearData)) {
+//         total += yearData.reduce((sum, val) => sum + val, 0);
+//       }
+//     });
+
+//     return {
+//       label: `${selectedDepartment} - ${selectedAssetStatus}`,
+//       total,
+//       color: getColorByTotal(total)
+//     };
+//   } catch (error) {
+//     console.error("Error in summaryFilterDepartmentAssetsByStatus:", error);
+//     return { label: "Error", total: 0, color: '#FF0000' };
+//   }
+// };
+
+// // 7. summaryDepartmentAssetsPerYear: สรุปครุภัณฑ์ของแต่ละภาควิชารายปี
+// export const summaryDepartmentAssetsPerYear = (data) => {
+//   const result = {};
+
+//   if (!data || !data.departmentAssets) return [];
+
+//   Object.entries(data.departmentAssets).forEach(([department, statuses]) => {
+//     Object.values(statuses).forEach(yearsObj => {
+//       Object.entries(yearsObj).forEach(([year, value]) => {
+//         if (!result[year]) result[year] = {};
+//         if (!result[year][department]) result[year][department] = 0;
+//         result[year][department] += Array.isArray(value) ? value.reduce((a, b) => a + b, 0) : 0;
+//       });
+//     });
+//   });
+
+//   const years = Object.keys(result).sort();
+//   const departments = new Set();
+
+//   years.forEach(year => {
+//     Object.keys(result[year]).forEach(dep => departments.add(dep));
+//   });
+
+//   const datasets = Array.from(departments).map(dep => ({
+//     label: dep,
+//     data: years.map(year => result[year][dep] || 0),
+//     backgroundColor: getRandomColor()
+//   }));
+
+//   return {
+//     labels: years,
+//     datasets
+//   };
+// };
+
+// // 8. fetchDataFromAPI: ดึงข้อมูลจาก API
+// export const fetchDataFromAPI = async () => {
+//   try {
+//     const response = await fetch("URL_TO_YOUR_API"); // <-- เปลี่ยน URL ตรงนี้
+//     const result = await response.json();
+
+//     if (result && result.data) {
+//       return result.data;
+//     } else {
+//       throw new Error("ข้อมูลไม่ถูกต้องจาก API");
+//     }
+//   } catch (error) {
+//     console.error("เกิดข้อผิดพลาดในการดึงข้อมูลจาก API:", error);
+//     throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูลจาก API");
+//   }
+// };
+// dataUtils.js
+
+// ฟังก์ชันสำหรับสรุปยอดแหล่งเงินตามปี
+export const summaryFilterFundPerYear = (data, selectedFund, selectedYear) => {
+  const fundData = data[selectedFund];
+  if (!fundData) return [];
+
+  // กรองข้อมูลแหล่งเงินตามปีที่เลือก
+  return Object.keys(fundData)
+    .filter(year => selectedYear ? year === selectedYear : true)  // ถ้ามีการเลือกปี ให้กรองตามปี
+    .map(year => ({
+      year,
+      total: fundData[year].reduce((sum, item) => sum + item.amount, 0) // คำนวณยอดรวมของแหล่งเงิน
+    }));
 };
-// สรุปจำนวนครุภัณฑ์จำแนกตามปีและภาควิชา
-export const summaryDepartmentAssetsPerYear = (data) => {
-  const result = {};
 
-  if (!data || !data.departmentAssets) return [];
+// ฟังก์ชันสำหรับสรุปยอดข้อมูลจากภาควิชาและแหล่งเงิน
+export const summaryDepartmentDetails = (data, selectedDepartment) => {
+  const departmentData = data.departmentDetails[selectedDepartment];
+  if (!departmentData) return [];
 
-  Object.entries(data.departmentAssets).forEach(([department, statuses]) => {
-    Object.values(statuses).forEach(yearsObj => {
-      Object.entries(yearsObj).forEach(([year, value]) => {
-        if (!result[year]) result[year] = {};
-        if (!result[year][department]) result[year][department] = 0;
-        result[year][department] += Array.isArray(value) ? value.reduce((a, b) => a + b, 0) : 0;
-      });
-    });
-  });
-
-  const years = Object.keys(result).sort();
-  const departments = new Set();
-
-  years.forEach(year => {
-    Object.keys(result[year]).forEach(dep => departments.add(dep));
-  });
-
-  const datasets = Array.from(departments).map(dep => ({
-    label: dep,
-    data: years.map(year => result[year][dep] || 0),
-    backgroundColor: getRandomColor()
+  // สรุปข้อมูลจำนวนพัสดุแยกตามปี
+  return Object.keys(departmentData).map(year => ({
+    year,
+    total: departmentData[year].reduce((sum, item) => sum + item.amount, 0)
   }));
-
-  return {
-    labels: years,
-    datasets
-  };
 };
 
-// ฟังก์ชันสุ่มสี
-const getRandomColor = () =>
-  `rgba(${Math.floor(Math.random() * 255)},${Math.floor(
-    Math.random() * 255
-  )},${Math.floor(Math.random() * 255)},0.6)`;
+// ฟังก์ชันสำหรับสรุปสถานะพัสดุ (กราฟพาย)
+export const summaryStatusByDepartment = (data, selectedYear) => {
+  // สรุปข้อมูลสถานะพัสดุที่กรองตามปี
+  const filteredData = Object.keys(data.statusSummaryByDepartment).reduce((acc, status) => {
+    const statusData = data.statusSummaryByDepartment[status];
+    const yearFilteredData = selectedYear ? statusData[selectedYear] : statusData;
+    const total = Object.values(yearFilteredData).reduce((sum, count) => sum + count, 0);
+
+    acc.push({ name: status, value: total });
+    return acc;
+  }, []);
+  
+  return filteredData;
+};
+
+// ฟังก์ชันสำหรับกรองข้อมูลตามปี
+export const filterDataByYear = (data, year) => {
+  return data.filter(item => item.year === year);
+};
+
+// ฟังก์ชันสำหรับกรองข้อมูลแหล่งเงิน
+export const filterDataByFund = (data, fund) => {
+  return data.filter(item => item.fund === fund);
+};
+
+// ฟังก์ชันสำหรับการคำนวณจำนวนพัสดุจากสถานะ
+export const calculateAssetStatus = (data, status) => {
+  return Object.keys(data).reduce((acc, key) => {
+    const statusCount = data[key][status] || 0;
+    acc[key] = statusCount;
+    return acc;
+  }, {});
+};

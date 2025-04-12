@@ -54,12 +54,8 @@ const DashboardPage = () => {
         data: barData1,
         options: {
           scales: {
-            x: {
-              title: { display: true, text: "ปีงบประมาณ" }
-            },
-            y: {
-              title: { display: true, text: "จำนวนงบประมาณ" }
-            }
+            x: { title: { display: true, text: "ปีงบประมาณ" } },
+            y: { title: { display: true, text: "จำนวนงบประมาณ" } }
           }
         }
       },
@@ -68,12 +64,8 @@ const DashboardPage = () => {
         data: barData2,
         options: {
           scales: {
-            x: {
-              title: { display: true, text: "ปี" }
-            },
-            y: {
-              title: { display: true, text: "จำนวนครุภัณฑ์" }
-            }
+            x: { title: { display: true, text: "ปี" } },
+            y: { title: { display: true, text: "จำนวนครุภัณฑ์" } }
           }
         }
       }
@@ -97,8 +89,8 @@ const DashboardPage = () => {
       if (!res.ok) throw new Error("ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์");
 
       const data = await res.json();
+      console.log(data);  // เพิ่ม log เพื่อตรวจสอบข้อมูลที่ได้จาก API
 
-      // ตรวจสอบข้อมูลก่อนการประมวลผล
       if (!data || !data.departmentAssets) {
         setErrorMessage("ข้อมูลไม่พร้อมใช้งาน");
         return;
@@ -130,12 +122,19 @@ const DashboardPage = () => {
       setLoading(false);
     }
   };
-
+  
   useEffect(() => {
-    // เรียก fetchData เมื่อหน้าโหลดขึ้น
-    fetchData();
-  }, []); // ทำงานเพียงครั้งเดียวเมื่อหน้าโหลดขึ้น
-
+    if (
+      filters.department ||
+      filters.assetStatus ||
+      filters.fund ||
+      filters.year
+    ) {
+      fetchData();
+    }
+  }, [filters]);
+  
+  
   const handleNavigateStatus = () => {
     navigate("/status", {
       state: {
