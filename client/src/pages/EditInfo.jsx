@@ -29,8 +29,6 @@ const EditInfo = () => {
   const [newNote, setNewNote] = useState("");
   const [newTypeSubAsset, setNewTypeSubAsset] = useState("");
   const [isClicked, setIsClicked] = useState(false);
-
-
   const [currentUser, setCurrentUser] = useState(null);
   const [usersInDepartment, setUsersInDepartment] = useState([]);
 
@@ -524,6 +522,8 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
               )}
             </div>
           )}
+
+          
 {roleId === "4" && (
   <div className="bg-white mt-4 p-4 rounded-md shadow-md">
     <h3 className="text-lg font-bold text-gray-700 mb-4">ผู้รับผิดชอบ</h3>

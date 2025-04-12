@@ -163,38 +163,6 @@ app.get("/mainasset", async (req, res) => {
     let values = [];
 
 
-    // if (main_asset_id) {
-    //   conditions.push(`mainasset.main_asset_id ILIKE $${values.length + 1}`);
-    //   values.push(`%${main_asset_id}%`);
-    // }
-    // if (department_name) {
-    //   conditions.push(`department_name ILIKE $${values.length + 1}`);
-    //   values.push(`%${department_name}%`);
-    // }
-    // if (usage) {
-    //   conditions.push(`mainasset.usage ILIKE $${values.length + 1}`);
-    //   values.push(`%${usage}%`);
-    // }
-    // if (asset_type) {
-    //   conditions.push(`mainasset.asset_type ILIKE $${values.length + 1}`);
-    //   values.push(`%${asset_type}%`);
-    // }
-    // if (budget_type) {
-    //   conditions.push(`mainasset.budget_type ILIKE $${values.length + 1}`);
-    //   values.push(`%${budget_type}%`);
-    // }
-    // if (fiscal_year) {
-    //   conditions.push(`mainasset.fiscal_year::TEXT ILIKE $${values.length + 1}`);
-    //   values.push(`%${fiscal_year}%`);
-    // }
-
-    // กรองข้อมูลตาม responsible_person
-
-    // console.log(responsible_person);
-    // if (responsible_person) {
-    //   conditions.push(`mainasset.responsible_person ILIKE $${values.length + 1}`);
-    //   values.push(`%${responsible_person}%`);
-    // }
 
     if (conditions.length > 0) {
       query += " WHERE " + conditions.join(" AND ");
@@ -265,6 +233,9 @@ app.get('/api/mainasset-assetlist', async (req, res) => {
   }
 });
 
+
+
+
 const path = require('path');  // เพิ่มบรรทัดนี้
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get("/mainasset/:id", async (req, res) => {
@@ -275,7 +246,6 @@ app.get("/mainasset/:id", async (req, res) => {
 
     const mainAssetQuery = `SELECT * FROM public.mainasset WHERE main_asset_id = $1`;
     const mainAssetResult = await pool.query(mainAssetQuery, [id]);
-
     if (mainAssetResult.rows.length === 0) {
       return res.status(404).json({ message: "Main asset not found" });
     }
@@ -302,10 +272,6 @@ app.get("/mainasset/:id", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
-
-
-
 
 
 

@@ -153,8 +153,11 @@ const ManageAssets = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [roleId, setRoleId] = useState(localStorage.getItem("roleId"));
+
+
   const [departmentId, setDepartmentId] = useState(localStorage.getItem("departmentId"));
   const [userName, setUserName] = useState(localStorage.getItem("departmentId"));
+
 
   // ฟังก์ชันกรองข้อมูล
   const handleFilterChange = (newFilters) => {
@@ -162,7 +165,6 @@ const ManageAssets = () => {
     setFilters(newFilters); // อัปเดต filters
     
     const hasActiveFilter = Object.values(newFilters).some((value) => value !== "");
-  
     // ถ้าไม่มีฟิลเตอร์แอคทีฟให้แสดงข้อมูลทั้งหมด
     if (!hasActiveFilter) {
       setFilteredData(data);
@@ -181,6 +183,24 @@ const ManageAssets = () => {
     setFilteredData(filtered); // อัปเดตข้อมูลที่กรองแล้ว
   };
 
+
+  // const filtered = data.filter((item) => {
+  //   return Object.entries(newFilters).every(([key, value]) => {
+  //     if (!value) return true;
+  
+  //     // เทียบแบบ exact สำหรับคีย์ที่กำหนด
+  //     if (["department_id", "asset_type", "fiscal_year", "budget_type", "usage"].includes(key)) {
+  //       return item[key]?.toString() === value.toString();
+  //     }
+  
+  //     // ค้นหาแบบบางส่วน
+  //     return item[key]?.toString().toLowerCase().includes(value.toString().toLowerCase());
+  //   });
+  // });
+  //     setFilteredData(filtered); // อัปเดตข้อมูลที่กรองแล้ว
+  // };
+
+  
   // ดึงข้อมูลจาก API
   useEffect(() => {
     const fetchData = async () => {
@@ -217,6 +237,8 @@ const ManageAssets = () => {
     }
   };
 
+  
+
   return (
     <div style={{ backgroundColor: "#f1f8e9" }} className="min-h-screen font-sans">
       <Breadcrumb2 />
@@ -231,12 +253,6 @@ const ManageAssets = () => {
 };
 
 export default ManageAssets;
-
-
-
-
-
-
 
 
 
