@@ -1,25 +1,42 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const DropdownPopup = ({ label, items, selectedItems, onSelectAll, onItemChange, selectAllChecked }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef();
+
+  // เมื่อคลิกที่ไหนก็ปิด dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
 
   return (
-    <div style={{ position: "relative", marginBottom: "6px", fontSize: "13px" }}>
-      <label>{label}</label>
+    <div ref={dropdownRef} style={{ position: "relative", fontSize: "14px" }}>
+      <label style={{ fontWeight: "bold", marginRight: "10px" }}>{label}</label>
       <div
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          marginTop: "4px",
-          padding: "6px 10px",
+          padding: "8px 12px",
           backgroundColor: "#fff",
-          borderRadius: "6px",
-          boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+          borderRadius: "8px",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
           cursor: "pointer",
-          userSelect: "none",
-          fontSize: "13px"
+          fontSize: "14px",
+          border: "1px solid #ddd",
+          width: "150px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center"
         }}
       >
         {selectedItems.length > 0 ? `${selectedItems.length} รายการที่เลือก` : "เลือก..."}
+        <span style={{ fontSize: "16px" }}>▼</span>
       </div>
 
       {isOpen && (
@@ -31,22 +48,34 @@ const DropdownPopup = ({ label, items, selectedItems, onSelectAll, onItemChange,
             left: 0,
             width: "100%",
             backgroundColor: "#fff",
-            borderRadius: "6px",
+            borderRadius: "8px",
             boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-            maxHeight: "160px",
+            maxHeight: "180px",
             overflowY: "auto",
-            marginTop: "4px",
-            padding: "8px",
-            fontSize: "13px"
+            marginTop: "6px",
+            padding: "8px 0"
           }}
         >
-          <label style={{ fontWeight: "bold", display: "flex", alignItems: "center", marginBottom: "6px" }}>
-            <input type="checkbox" checked={selectAllChecked} onChange={onSelectAll} style={{ marginRight: "6px" }} />
+          <label style={{ fontWeight: "bold", display: "flex", alignItems: "center", paddingLeft: "10px" }}>
+            <input
+              type="checkbox"
+              checked={selectAllChecked}
+              onChange={onSelectAll}
+              style={{ marginRight: "6px" }}
+            />
             เลือกทั้งหมด
           </label>
-          <hr />
+          <hr style={{ margin: "0", borderColor: "#f0f0f0" }} />
           {items.map((item) => (
-            <label key={item} style={{ display: "flex", alignItems: "center", marginTop: "6px" }}>
+            <label
+              key={item}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                paddingLeft: "10px",
+                marginTop: "8px"
+              }}
+            >
               <input
                 type="checkbox"
                 checked={selectedItems.includes(item)}
@@ -85,6 +114,24 @@ const Filters = ({
   const [selectedDeptsInternal, setSelectedDeptsInternal] = useState([]);
   const [selectAllAssets, setSelectAllAssets] = useState(false);
   const [selectedAssetsInternal, setSelectedAssetsInternal] = useState([]);
+
+  const [selectedYearState, setSelectedYearState] = useState(selectedYear || "");
+
+  const handleReset = () => {
+    setSelectedDeptsInternal([]);
+    setSelectedDepartment("");
+    setSelectAllDepts(false);
+
+    setSelectedAssetsInternal([]);
+    setSelectedAssetStatus("");
+    setSelectAllAssets(false);
+
+    setSelectedFundsInternal([]);
+    setSelectedFund("");
+    setSelectAllFunds(false);
+
+    setSelectedYearState(""); // รีเซ็ตค่า selectedYear
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -154,98 +201,114 @@ const Filters = ({
     <div
       style={{
         background: "#f5f5f5",
-        padding: "15px",
-        borderRadius: "10px",
-        marginBottom: "15px",
-        display: "grid",
-        gap: "16px",
-        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-        fontSize: "13px"
+        padding: "20px",
+        borderRadius: "12px",
+        marginBottom: "20px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: "10px",
+        flexWrap: "wrap"
       }}
     >
-      {apiError && <div style={{ color: "red", gridColumn: "span 3" }}>{apiError}</div>}
+      {apiError && <div style={{ color: "red", width: "100%" }}>{apiError}</div>}
 
-      <DropdownPopup
-        label="ภาควิชา"
-        items={departments}
-        selectedItems={selectedDeptsInternal}
-        onSelectAll={() => {
-          if (selectAllDepts) {
-            setSelectedDeptsInternal([]);
-            setSelectedDepartment("");
-            setSelectAllDepts(false);
-          } else {
-            setSelectedDeptsInternal(departments);
-            setSelectedDepartment(departments.join(","));
-            setSelectAllDepts(true);
-          }
-        }}
-        onItemChange={(dept) =>
-          toggleSelection(dept, selectedDeptsInternal, setSelectedDeptsInternal, setSelectedDepartment, departments, setSelectAllDepts)
-        }
-        selectAllChecked={selectAllDepts}
-      />
-
-      <DropdownPopup
-        label="สถานะสินทรัพย์"
-        items={assetStatus}
-        selectedItems={selectedAssetsInternal}
-        onSelectAll={() => {
-          if (selectAllAssets) {
-            setSelectedAssetsInternal([]);
-            setSelectedAssetStatus("");
-            setSelectAllAssets(false);
-          } else {
-            setSelectedAssetsInternal(assetStatus);
-            setSelectedAssetStatus(assetStatus.join(","));
-            setSelectAllAssets(true);
-          }
-        }}
-        onItemChange={(status) =>
-          toggleSelection(status, selectedAssetsInternal, setSelectedAssetsInternal, setSelectedAssetStatus, assetStatus, setSelectAllAssets)
-        }
-        selectAllChecked={selectAllAssets}
-      />
-
-      <DropdownPopup
-        label="แหล่งเงิน"
-        items={fundTypes}
-        selectedItems={selectedFundsInternal}
-        onSelectAll={() => {
-          if (selectAllFunds) {
-            setSelectedFundsInternal([]);
-            setSelectedFund("");
-            setSelectAllFunds(false);
-          } else {
-            setSelectedFundsInternal(fundTypes);
-            setSelectedFund(fundTypes.join(","));
-            setSelectAllFunds(true);
-          }
-        }}
-        onItemChange={(fund) =>
-          toggleSelection(fund, selectedFundsInternal, setSelectedFundsInternal, setSelectedFund, fundTypes, setSelectAllFunds)
-        }
-        selectAllChecked={selectAllFunds}
-      />
-
-      <div>
-        <label>ปี</label>
-        <input
-          type="text"
-          value={selectedYear}
-          onChange={handleYearChange}
-          placeholder="2565 หรือ 2565-2568"
-          style={{
-            width: "100%",
-            padding: "8px",
-            borderRadius: "6px",
-            border: "1px solid #ccc",
-            marginTop: "4px",
-            fontSize: "13px"
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+        <DropdownPopup
+          label="ภาควิชา"
+          items={departments}
+          selectedItems={selectedDeptsInternal}
+          onSelectAll={() => {
+            if (selectAllDepts) {
+              setSelectedDeptsInternal([]);
+              setSelectedDepartment("");
+              setSelectAllDepts(false);
+            } else {
+              setSelectedDeptsInternal(departments);
+              setSelectedDepartment(departments.join(","));
+              setSelectAllDepts(true);
+            }
           }}
+          onItemChange={(dept) =>
+            toggleSelection(dept, selectedDeptsInternal, setSelectedDeptsInternal, setSelectedDepartment, departments, setSelectAllDepts)
+          }
+          selectAllChecked={selectAllDepts}
         />
-        {errorMessage && <div style={{ color: "red", marginTop: "5px" }}>{errorMessage}</div>}
+
+        <DropdownPopup
+          label="สถานะสินทรัพย์"
+          items={assetStatus}
+          selectedItems={selectedAssetsInternal}
+          onSelectAll={() => {
+            if (selectAllAssets) {
+              setSelectedAssetsInternal([]);
+              setSelectedAssetStatus("");
+              setSelectAllAssets(false);
+            } else {
+              setSelectedAssetsInternal(assetStatus);
+              setSelectedAssetStatus(assetStatus.join(","));
+              setSelectAllAssets(true);
+            }
+          }}
+          onItemChange={(status) =>
+            toggleSelection(status, selectedAssetsInternal, setSelectedAssetsInternal, setSelectedAssetStatus, assetStatus, setSelectAllAssets)
+          }
+          selectAllChecked={selectAllAssets}
+        />
+
+        <DropdownPopup
+          label="แหล่งเงิน"
+          items={fundTypes}
+          selectedItems={selectedFundsInternal}
+          onSelectAll={() => {
+            if (selectAllFunds) {
+              setSelectedFundsInternal([]);
+              setSelectedFund("");
+              setSelectAllFunds(false);
+            } else {
+              setSelectedFundsInternal(fundTypes);
+              setSelectedFund(fundTypes.join(","));
+              setSelectAllFunds(true);
+            }
+          }}
+          onItemChange={(fund) =>
+            toggleSelection(fund, selectedFundsInternal, setSelectedFundsInternal, setSelectedFund, fundTypes, setSelectAllFunds)
+          }
+          selectAllChecked={selectAllFunds}
+        />
+
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <label style={{ fontWeight: "bold", marginRight: "10px" }}>ปี</label>
+          <input
+            type="text"
+            value={selectedYearState}
+            onChange={(e) => setSelectedYearState(e.target.value)}
+            placeholder="2565 หรือ 2565-2568"
+            style={{
+              padding: "8px",
+              borderRadius: "8px",
+              border: "1px solid #ccc",
+              fontSize: "14px",
+              color: "#2c3e50"
+            }}
+          />
+        </div>
       </div>
+
+      <button
+        onClick={handleReset}
+        style={{
+          padding: "10px 15px",
+          backgroundColor: "#ff4c4c",
+          color: "#fff",
+          border: "none",
+          borderRadius: "8px",
+          cursor: "pointer",
+          fontSize: "14px",
+        }}
+      >
+        รีเซ็ต
+      </button>
     </div>
   );
 };

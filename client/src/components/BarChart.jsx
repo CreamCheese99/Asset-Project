@@ -25,7 +25,7 @@ const BarChart = ({ graphs = [] }) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    console.log('📊 Graphs ที่ได้รับ:', graphs);
+    console.log(' Graphs ที่ได้รับ:', graphs);  // ดูข้อมูลที่ส่งมาว่าถูกต้องหรือไม่
     const hasInvalidData = graphs.some(
       (g) => !g.data || !g.data.labels || !g.data.datasets || g.data.labels.length === 0
     );
@@ -35,6 +35,7 @@ const BarChart = ({ graphs = [] }) => {
       setErrorMessage("");
     }
   }, [graphs]);
+  
 
   if (errorMessage) {
     return <p>{errorMessage}</p>;

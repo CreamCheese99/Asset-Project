@@ -564,3 +564,43 @@ export const fetchDataFromAPI = async () => {
     throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูลจาก API");
   }
 };
+// สรุปจำนวนครุภัณฑ์จำแนกตามปีและภาควิชา
+export const summaryDepartmentAssetsPerYear = (data) => {
+  const result = {};
+
+  if (!data || !data.departmentAssets) return [];
+
+  Object.entries(data.departmentAssets).forEach(([department, statuses]) => {
+    Object.values(statuses).forEach(yearsObj => {
+      Object.entries(yearsObj).forEach(([year, value]) => {
+        if (!result[year]) result[year] = {};
+        if (!result[year][department]) result[year][department] = 0;
+        result[year][department] += Array.isArray(value) ? value.reduce((a, b) => a + b, 0) : 0;
+      });
+    });
+  });
+
+  const years = Object.keys(result).sort();
+  const departments = new Set();
+
+  years.forEach(year => {
+    Object.keys(result[year]).forEach(dep => departments.add(dep));
+  });
+
+  const datasets = Array.from(departments).map(dep => ({
+    label: dep,
+    data: years.map(year => result[year][dep] || 0),
+    backgroundColor: getRandomColor()
+  }));
+
+  return {
+    labels: years,
+    datasets
+  };
+};
+
+// ฟังก์ชันสุ่มสี
+const getRandomColor = () =>
+  `rgba(${Math.floor(Math.random() * 255)},${Math.floor(
+    Math.random() * 255
+  )},${Math.floor(Math.random() * 255)},0.6)`;

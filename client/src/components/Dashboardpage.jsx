@@ -7,7 +7,8 @@ import {
   summaryDepartmentDetails,
   summaryDepartmentAssets,
   summaryFilterDepartmentDetails,
-  summaryFilterDepartmentAssets
+  summaryFilterDepartmentAssets,
+  summaryDepartmentAssetsPerYear 
 } from "./dataUtils";
 
 const DashboardPage = () => {
@@ -39,53 +40,39 @@ const DashboardPage = () => {
   };
 
   const processBarGraphData = (data) => {
-    const { fund, year, department } = filters;
+    const { fund, year } = filters;
+  
     const barData1 = fund || year
       ? summaryFilterDepartmentDetails(data, fund, year)
       : summaryDepartmentDetails(data);
-
-    const barData2 = department || year
-      ? summaryFilterDepartmentAssets(data, department, year)
-      : summaryDepartmentAssets(data);
-
-    setBarGraphs([
+  
+    const barData2 = summaryDepartmentAssetsPerYear(data); // แก้ตรงนี้
+  
+    setBarGraphs([ 
       {
         title: "งบประมาณ/แหล่งเงินในแต่ละปี",
         data: barData1,
         options: {
           scales: {
             x: {
-              title: {
-                display: true,
-                text: "ปีงบประมาณ"
-              }
+              title: { display: true, text: "ปีงบประมาณ" }
             },
             y: {
-              title: {
-                display: true,
-                text: "จำนวนงบประมาณ"
-              }
+              title: { display: true, text: "จำนวนงบประมาณ" }
             }
           }
         }
       },
       {
-        title: "ครุภัณฑ์ตามสถานะในแต่ละปีของแต่ละภาควิชา",
+        title: "จำนวนครุภัณฑ์ของแต่ละภาควิชาในแต่ละปี",
         data: barData2,
         options: {
-          indexAxis: "y",
           scales: {
             x: {
-              title: {
-                display: true,
-                text: "จำนวนครุภัณฑ์"
-              }
+              title: { display: true, text: "ปี" }
             },
             y: {
-              title: {
-                display: true,
-                text: "ปีงบประมาณ"
-              }
+              title: { display: true, text: "จำนวนครุภัณฑ์" }
             }
           }
         }
@@ -110,10 +97,10 @@ const DashboardPage = () => {
       if (!res.ok) throw new Error("ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์");
 
       const data = await res.json();
-      const { department = "", assetStatus = "", fund = "", year = "" } = filters ? filters : {};
 
-      if (!data.departmentAssets) {
-        setErrorMessage("ข้อมูลภาควิชาและสถานะครุภัณฑ์ไม่พร้อมใช้งาน");
+      // ตรวจสอบข้อมูลก่อนการประมวลผล
+      if (!data || !data.departmentAssets) {
+        setErrorMessage("ข้อมูลไม่พร้อมใช้งาน");
         return;
       }
 
@@ -145,11 +132,9 @@ const DashboardPage = () => {
   };
 
   useEffect(() => {
-    
-    if (filters.department || filters.assetStatus || filters.fund || filters.year) {
-      fetchData();
-    }
-  }, [filters]);
+    // เรียก fetchData เมื่อหน้าโหลดขึ้น
+    fetchData();
+  }, []); // ทำงานเพียงครั้งเดียวเมื่อหน้าโหลดขึ้น
 
   const handleNavigateStatus = () => {
     navigate("/status", {
