@@ -391,7 +391,9 @@ const getRandomColor = () =>
   )},${Math.floor(Math.random() * 255)},0.6)`;
 
 // 1. summaryFilterFundPerYear: สรุปยอดรวมแหล่งเงินตามปี
+// 1. summaryFilterFundPerYear: สรุปยอดรวมแหล่งเงินตามปี
 export const summaryFilterFundPerYear = (data, selectedFunds, selectedYears) => {
+  if (!data || !data.fundPerYear) return []; // ตรวจสอบว่า data และ fundPerYear มีข้อมูล
   const result = [];
 
   selectedYears.forEach((year) => {
@@ -409,6 +411,7 @@ export const summaryFilterFundPerYear = (data, selectedFunds, selectedYears) => 
 
   return result;
 };
+
 
 // 2. summaryDepartmentAssets: สรุปยอดรวมของสถานะทรัพย์สินในแต่ละภาควิชา
 export const summaryDepartmentAssets = (data) => {
@@ -594,8 +597,9 @@ export const summaryDepartmentAssetsPerYear = (data) => {
 // 8. fetchDataFromAPI: ดึงข้อมูลจาก API
 export const fetchDataFromAPI = async () => {
   try {
-    const response = await fetch("URL_TO_YOUR_API"); // <-- เปลี่ยน URL ตรงนี้
+    const response = await fetch("http://localhost:5000/api/getData"); 
     const result = await response.json();
+    
 
     if (result && result.data) {
       return result.data;
@@ -607,6 +611,7 @@ export const fetchDataFromAPI = async () => {
     throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูลจาก API");
   }
 };
+
 // dataUtils.js
 
 // // ฟังก์ชันสำหรับสรุปยอดแหล่งเงินตามปี

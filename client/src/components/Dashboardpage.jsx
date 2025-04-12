@@ -5,11 +5,9 @@ import BarChart from "./BarChart";
 import PieChart from "./PieChart";
 import {
   summaryDepartmentDetails,
-  // summaryDepartmentAssets,
   summaryFilterDepartmentDetails,
-  summaryFilterDepartmentAssets,
   summaryDepartmentAssetsPerYear,
-  summaryFilterDepartmentAssetsByStatus 
+  summaryFilterDepartmentAssetsByStatus
 } from "./dataUtils";
 
 const DashboardPage = () => {
@@ -42,13 +40,16 @@ const DashboardPage = () => {
 
   const processBarGraphData = (data) => {
     const { fund, year } = filters;
-  
+
     const barData1 = fund || year
       ? summaryFilterDepartmentDetails(data, fund, year)
       : summaryDepartmentDetails(data);
-  
-    const barData2 = summaryDepartmentAssetsPerYear(data); // แก้ตรงนี้
-  
+
+    const barData2 = summaryDepartmentAssetsPerYear(data);
+
+    console.log("Bar Data 1:", barData1); // ตรวจสอบข้อมูล barData1
+    console.log("Bar Data 2:", barData2); // ตรวจสอบข้อมูล barData2
+
     setBarGraphs([ 
       {
         title: "งบประมาณ/แหล่งเงินในแต่ละปี",
@@ -90,7 +91,7 @@ const DashboardPage = () => {
       if (!res.ok) throw new Error("ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์");
 
       const data = await res.json();
-      console.log(data);  // เพิ่ม log เพื่อตรวจสอบข้อมูลที่ได้จาก API
+      console.log("Data from API:", data); // เพิ่ม log เพื่อตรวจสอบข้อมูลจาก API
 
       if (!data || !data.departmentAssets) {
         setErrorMessage("ข้อมูลไม่พร้อมใช้งาน");
@@ -123,7 +124,7 @@ const DashboardPage = () => {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     if (
       filters.department ||
@@ -134,8 +135,7 @@ const DashboardPage = () => {
       fetchData();
     }
   }, [filters]);
-  
-  
+
   const handleNavigateStatus = () => {
     navigate("/status", {
       state: {
@@ -150,7 +150,6 @@ const DashboardPage = () => {
   const renderContent = () => {
     if (loading) return renderLoadingState();
     if (errorMessage) return renderErrorState();
-    console.log(barGraphs);
     return (
       <>
         {/* กราฟแท่ง */}
@@ -268,6 +267,7 @@ const styles = {
 };
 
 export default DashboardPage;
+
 // import React, { useState, useEffect } from "react";
 // import Filters from "./Filters"; // ไฟล์ Filters
 // import BarChart from "./BarChart"; // ไฟล์ BarChart
