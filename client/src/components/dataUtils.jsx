@@ -389,8 +389,16 @@ const getRandomColor = () =>
   `rgba(${Math.floor(Math.random() * 255)},${Math.floor(
     Math.random() * 255
   )},${Math.floor(Math.random() * 255)},0.6)`;
-
-// 1. summaryFilterFundPerYear: สรุปยอดรวมแหล่งเงินตามปี
+// ฟังก์ชันนี้ใช้เพื่อกำหนดสีตามค่า total ของข้อมูล
+export const getColorByTotal = (total) => {
+  if (total > 1000) {
+    return 'green'; // ค่า total มากกว่า 1000 ให้สีเขียว
+  } else if (total > 500) {
+    return 'orange'; // ค่า total มากกว่า 500 ให้สีส้ม
+  } else {
+    return 'red'; // ค่า total น้อยกว่าหรือเท่ากับ 500 ให้สีแดง
+  }
+};
 // 1. summaryFilterFundPerYear: สรุปยอดรวมแหล่งเงินตามปี
 export const summaryFilterFundPerYear = (data, selectedFunds, selectedYears) => {
   if (!data || !data.fundPerYear) return []; // ตรวจสอบว่า data และ fundPerYear มีข้อมูล
@@ -612,64 +620,3 @@ export const fetchDataFromAPI = async () => {
   }
 };
 
-// dataUtils.js
-
-// // ฟังก์ชันสำหรับสรุปยอดแหล่งเงินตามปี
-// export const summaryFilterFundPerYear = (data, selectedFund, selectedYear) => {
-//   const fundData = data[selectedFund];
-//   if (!fundData) return [];
-
-//   // กรองข้อมูลแหล่งเงินตามปีที่เลือก
-//   return Object.keys(fundData)
-//     .filter(year => selectedYear ? year === selectedYear : true)  // ถ้ามีการเลือกปี ให้กรองตามปี
-//     .map(year => ({
-//       year,
-//       total: fundData[year].reduce((sum, item) => sum + item.amount, 0) // คำนวณยอดรวมของแหล่งเงิน
-//     }));
-// };
-
-// // ฟังก์ชันสำหรับสรุปยอดข้อมูลจากภาควิชาและแหล่งเงิน
-// export const summaryDepartmentDetails = (data, selectedDepartment) => {
-//   const departmentData = data.departmentDetails[selectedDepartment];
-//   if (!departmentData) return [];
-
-//   // สรุปข้อมูลจำนวนพัสดุแยกตามปี
-//   return Object.keys(departmentData).map(year => ({
-//     year,
-//     total: departmentData[year].reduce((sum, item) => sum + item.amount, 0)
-//   }));
-// };
-
-// // ฟังก์ชันสำหรับสรุปสถานะพัสดุ (กราฟพาย)
-// export const summaryStatusByDepartment = (data, selectedYear) => {
-//   // สรุปข้อมูลสถานะพัสดุที่กรองตามปี
-//   const filteredData = Object.keys(data.statusSummaryByDepartment).reduce((acc, status) => {
-//     const statusData = data.statusSummaryByDepartment[status];
-//     const yearFilteredData = selectedYear ? statusData[selectedYear] : statusData;
-//     const total = Object.values(yearFilteredData).reduce((sum, count) => sum + count, 0);
-
-//     acc.push({ name: status, value: total });
-//     return acc;
-//   }, []);
-  
-//   return filteredData;
-// };
-
-// // ฟังก์ชันสำหรับกรองข้อมูลตามปี
-// export const filterDataByYear = (data, year) => {
-//   return data.filter(item => item.year === year);
-// };
-
-// // ฟังก์ชันสำหรับกรองข้อมูลแหล่งเงิน
-// export const filterDataByFund = (data, fund) => {
-//   return data.filter(item => item.fund === fund);
-// };
-
-// // ฟังก์ชันสำหรับการคำนวณจำนวนพัสดุจากสถานะ
-// export const calculateAssetStatus = (data, status) => {
-//   return Object.keys(data).reduce((acc, key) => {
-//     const statusCount = data[key][status] || 0;
-//     acc[key] = statusCount;
-//     return acc;
-//   }, {});
-// };
