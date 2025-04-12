@@ -117,6 +117,14 @@ const Filters = ({
 
   const [selectedYearState, setSelectedYearState] = useState(selectedYear || "");
 
+  // เพิ่มฟังก์ชันเพื่อส่งค่าปีออกไปเมื่อมีการเปลี่ยนแปลงในช่อง input
+  const onYearInputChange = (e) => {
+    const value = e.target.value;
+    setSelectedYearState(value);
+    // ส่งค่าไปยัง parent component
+    handleYearChange(value);
+  };
+
   const handleReset = () => {
     setSelectedDeptsInternal([]);
     setSelectedDepartment("");
@@ -130,7 +138,8 @@ const Filters = ({
     setSelectedFund("");
     setSelectAllFunds(false);
 
-    setSelectedYearState(""); // รีเซ็ตค่า selectedYear
+    setSelectedYearState(""); // รีเซ็ตค่า selectedYear ในคอมโพเนนต์
+    handleYearChange(""); // ส่งค่าว่างไปยัง parent component
   };
 
   useEffect(() => {
@@ -140,11 +149,12 @@ const Filters = ({
         if (!response.ok) throw new Error("ไม่สามารถดึงข้อมูลได้");
 
         const data = await response.json();
-        setDepartments(data.departments);
-        setFundTypes(data.fundTypes);
-        setAssetStatus(data.assetStatuses);
+        setDepartments(data.departments || []);
+        setFundTypes(data.fundTypes || []);
+        setAssetStatus(data.assetStatuses || []);
         setLoading(false);
       } catch (error) {
+        console.error("Error fetching filter data:", error);
         setApiError("เกิดข้อผิดพลาดในการดึงข้อมูล");
         setLoading(false);
       }
@@ -185,6 +195,11 @@ const Filters = ({
       setSelectAllAssets(false);
     }
   }, [selectedAssetStatus, assetStatus]);
+
+  // ปรับ useEffect เพื่อติดตามการเปลี่ยนแปลงของ selectedYear จาก parent
+  useEffect(() => {
+    setSelectedYearState(selectedYear || "");
+  }, [selectedYear]);
 
   const toggleSelection = (item, selectedList, setList, setValue, fullList, setSelectAll) => {
     const updatedList = selectedList.includes(item)
@@ -282,7 +297,7 @@ const Filters = ({
           <input
             type="text"
             value={selectedYearState}
-            onChange={(e) => setSelectedYearState(e.target.value)}
+            onChange={onYearInputChange}
             placeholder="2565 หรือ 2565-2568"
             style={{
               padding: "8px",
