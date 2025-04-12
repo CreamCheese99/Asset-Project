@@ -190,9 +190,8 @@ const ShowInfo = () => {
           </div>
 
             <div >
-            
               <label className="label block mb-2 mt-4">รูปภาพ</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4 mt-4">
                   {[data.mainAsset?.image1, data.mainAsset?.image2, data.mainAsset?.image3, data.mainAsset?.image4, data.mainAsset?.image5].map((img, index) => (
                     <div key={index} className="border rounded p-2 shadow-sm bg-white">
                       {img ? (

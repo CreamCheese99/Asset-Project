@@ -498,8 +498,26 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
                 name="location_deliver"
               />
             </div>
-           
           </div>
+
+          <div >
+              <label className="label block mb-2 mt-4">รูปภาพ</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4 mt-4">
+                  {[data.mainAsset?.image1, data.mainAsset?.image2, data.mainAsset?.image3, data.mainAsset?.image4, data.mainAsset?.image5].map((img, index) => (
+                    <div key={index} className="border rounded p-2 shadow-sm bg-white">
+                      {img ? (
+                        <img
+                          src={`http://localhost:5000/uploads/${img}`}
+                          alt={`รูปภาพ ${index + 1}`}
+                          className="w-full h-40 object-cover rounded"
+                        />
+                      ) : (
+                        <p className="text-sm text-gray-500 text-center">ไม่มีรูปภาพ</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
         </div>
 
         
@@ -523,7 +541,7 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
             </div>
           )}
 
-          
+
 {roleId === "4" && (
   <div className="bg-white mt-4 p-4 rounded-md shadow-md">
     <h3 className="text-lg font-bold text-gray-700 mb-4">ผู้รับผิดชอบ</h3>
