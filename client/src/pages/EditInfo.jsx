@@ -166,7 +166,6 @@ const handleSaveMainasset = async () => {
 };
   
 
-
   const handleChangeMainasset = (e) => {
     const { name, value } = e.target;
     setUpdatedData((prevData) => ({
@@ -177,9 +176,6 @@ const handleSaveMainasset = async () => {
       },
     }));
   };
-  
-
-
    const handleButtonClickMainasset = () => {
      setIsEditing(true);  // เปลี่ยนสถานะการแก้ไข
    };

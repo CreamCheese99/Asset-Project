@@ -3,8 +3,9 @@ import FormLogin from "../components/FormLogin"
 
 function Login() {
   return (
-    <div   className="  flex justify-center items-center h-screen">
-      <div className="w-full h-auto pt-1 pb-[37px]  flex flex-col justify-start items-center gap-[100px]">
+    // <div   className="  flex justify-center items-center h-screen">
+   <div className= "flex justify-center items-start min-h-screen pt-10">
+      <div className="w-full h-auto pt-2 pb-6 flex flex-col justify-start items-center gap-6">
         <FormLogin />
       </div>
     </div>
