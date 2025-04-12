@@ -5,10 +5,11 @@ import BarChart from "./BarChart";
 import PieChart from "./PieChart";
 import {
   summaryDepartmentDetails,
-  summaryDepartmentAssets,
+  // summaryDepartmentAssets,
   summaryFilterDepartmentDetails,
   summaryFilterDepartmentAssets,
-  summaryDepartmentAssetsPerYear 
+  summaryDepartmentAssetsPerYear,
+  summaryFilterDepartmentAssetsByStatus 
 } from "./dataUtils";
 
 const DashboardPage = () => {
@@ -73,7 +74,7 @@ const DashboardPage = () => {
   };
 
   const processTotalAssets = (data) => {
-    const total = Object.values(data.departmentAssets).flatMap(dep =>
+    const total = Object.values(data.statusSummaryByDepartment).flatMap(dep =>
       Object.values(dep).flatMap(status =>
         Object.values(status).flatMap(yearData => yearData || []))
     ).reduce((sum, val) => sum + val, 0);
@@ -99,13 +100,13 @@ const DashboardPage = () => {
       processBarGraphData(data);
       processTotalAssets(data);
 
-      if (data.departmentAssets) {
+      if (data.statusSummaryByDepartment) {
         setPieData({
-          labels: Object.keys(data.departmentAssets),
+          labels: Object.keys(data.statusSummaryByDepartment),
           datasets: [
             {
               label: "ครุภัณฑ์ตามสถานะ",
-              data: Object.values(data.departmentAssets).map(dep =>
+              data: Object.values(data.statusSummaryByDepartment).map(dep =>
                 Object.values(dep).reduce((sum, status) =>
                   sum + Object.values(status).reduce((s, yearData) => s + (yearData || 0), 0), 0)
               ),
@@ -149,7 +150,7 @@ const DashboardPage = () => {
   const renderContent = () => {
     if (loading) return renderLoadingState();
     if (errorMessage) return renderErrorState();
-
+    console.log(barGraphs);
     return (
       <>
         {/* กราฟแท่ง */}
@@ -267,3 +268,109 @@ const styles = {
 };
 
 export default DashboardPage;
+// import React, { useState, useEffect } from "react";
+// import Filters from "./Filters"; // ไฟล์ Filters
+// import BarChart from "./BarChart"; // ไฟล์ BarChart
+// import PieChart from "./PieChart"; // ไฟล์ PieChart
+
+// const Dashboard = () => {
+//   const [selectedDepartment, setSelectedDepartment] = useState("");
+//   const [selectedAssetStatus, setSelectedAssetStatus] = useState("");
+//   const [selectedFund, setSelectedFund] = useState("");
+//   const [selectedYear, setSelectedYear] = useState("");
+
+//   const [graphData, setGraphData] = useState([]);
+
+//   // ดึงข้อมูลจาก API เพื่อแสดงกราฟ
+//   useEffect(() => {
+//     const fetchGraphData = async () => {
+//       try {
+//         const response = await fetch("http://localhost:5000/api/getGraphData", {
+//           method: "POST",
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//           body: JSON.stringify({
+//             selectedDepartment,
+//             selectedAssetStatus,
+//             selectedFund,
+//             selectedYear,
+//           }),
+//         });
+
+//         if (!response.ok) {
+//           throw new Error("ไม่สามารถดึงข้อมูลกราฟ");
+//         }
+
+//         const data = await response.json();
+//         setGraphData(data); // ค่าที่ได้รับจาก API จะถูกใช้ในการสร้างกราฟ
+//       } catch (error) {
+//         console.error(error);
+//       }
+//     };
+
+//     fetchGraphData();
+//   }, [selectedDepartment, selectedAssetStatus, selectedFund, selectedYear]);
+
+//   return (
+//     <div style={{ padding: "20px" }}>
+//       <h1>Dashboard</h1>
+
+//       {/* Filters Component */}
+//       <Filters
+//         selectedDepartment={selectedDepartment}
+//         setSelectedDepartment={setSelectedDepartment}
+//         selectedAssetStatus={selectedAssetStatus}
+//         setSelectedAssetStatus={setSelectedAssetStatus}
+//         selectedFund={selectedFund}
+//         setSelectedFund={setSelectedFund}
+//         selectedYear={selectedYear}
+//         handleYearChange={(e) => setSelectedYear(e.target.value)}
+//       />
+
+//       {/* Bar Chart */}
+//       <BarChart
+//         graphs={[
+//           {
+//             title: "ยอดรวมแหล่งเงินแยกตามปี",
+//             data: {
+//               labels: graphData.years || [],
+//               datasets: [
+//                 {
+//                   label: "แหล่งเงิน",
+//                   data: graphData.fundData || [],
+//                   backgroundColor: "rgba(75, 192, 192, 0.6)",
+//                 },
+//               ],
+//             },
+//             options: {
+//               title: "กราฟยอดรวมแหล่งเงินแยกตามปี",
+//               xTitle: "ปี",
+//               yTitle: "ยอดรวม",
+//             },
+//           },
+//         ]}
+//       />
+
+//       {/* Pie Chart */}
+//       <PieChart
+//         data={{
+//           labels: graphData.assetStatusLabels || [],
+//           datasets: [
+//             {
+//               data: graphData.assetStatusData || [],
+//               backgroundColor: [
+//                 "#FF6384",
+//                 "#36A2EB",
+//                 "#FFCE56",
+//                 "#4BC0C0",
+//               ],
+//             },
+//           ],
+//         }}
+//       />
+//     </div>
+//   );
+// };
+
+// export default Dashboard;
