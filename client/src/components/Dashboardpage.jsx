@@ -62,7 +62,7 @@ const DashboardPage = () => {
   
       setBarGraphs([
         {
-          title: "แหล่งเงิน",
+          title: "จำนวนเงินตามแหล่งเงิน แยกตามปีงบประมาณ",
           data: barData1,
           options: {
             xTitle: "ปีงบประมาณ",
@@ -70,7 +70,7 @@ const DashboardPage = () => {
           }
         },
         {
-          title: "งบประมาณแต่ละภาควิชา",
+          title: "จำนวนเงินของแต่ละภาควิชา แยกตามปีงบประมาณ",
           data: barData2,
           options: {
             xTitle: "ปี",
@@ -422,7 +422,7 @@ const styles = {
     textAlign: "center",
     fontSize: "18px",
     color: "#2c3e50",
-    fontWeight: "bold",
+    fontWeight: "bold", 
     marginBottom: "10px"
   }
 };

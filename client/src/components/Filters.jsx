@@ -220,12 +220,15 @@ const Filters = ({
         borderRadius: "12px",
         marginBottom: "20px",
         display: "flex",
-        justifyContent: "space-between",
+        justifyContent: "center", // ปรับตรงนี้ให้จัดกึ่งกลาง
         alignItems: "center",
         gap: "10px",
-        flexWrap: "wrap"
+        flexWrap: "wrap",
+        maxWidth: "1000px", // จำกัดความกว้างให้อยู่กลางได้ง่าย
+        margin: "0 auto" // ให้ container อยู่ตรงกลาง
       }}
     >
+    
       {apiError && <div style={{ color: "red", width: "100%" }}>{apiError}</div>}
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
@@ -248,27 +251,6 @@ const Filters = ({
             toggleSelection(dept, selectedDeptsInternal, setSelectedDeptsInternal, setSelectedDepartment, departments, setSelectAllDepts)
           }
           selectAllChecked={selectAllDepts}
-        />
-
-        <DropdownPopup
-          label="สถานะสินทรัพย์"
-          items={assetStatus}
-          selectedItems={selectedAssetsInternal}
-          onSelectAll={() => {
-            if (selectAllAssets) {
-              setSelectedAssetsInternal([]);
-              setSelectedAssetStatus("");
-              setSelectAllAssets(false);
-            } else {
-              setSelectedAssetsInternal(assetStatus);
-              setSelectedAssetStatus(assetStatus.join(","));
-              setSelectAllAssets(true);
-            }
-          }}
-          onItemChange={(status) =>
-            toggleSelection(status, selectedAssetsInternal, setSelectedAssetsInternal, setSelectedAssetStatus, assetStatus, setSelectAllAssets)
-          }
-          selectAllChecked={selectAllAssets}
         />
 
         <DropdownPopup
