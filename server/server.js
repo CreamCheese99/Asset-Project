@@ -147,30 +147,55 @@ app.post('/mainasset', upload.fields([
 });
 
 
-
-// API สำหรับดึงข้อมูลทั้งหมดจากตาราง MainAsset
 app.get("/mainasset", async (req, res) => {
   try {
-    const { main_asset_id, department_name, usage, asset_type, budget_type, fiscal_year, responsible_person } = req.query;
+    const {
+      main_asset_id,
+      department_name,
+      usage,
+      asset_type,
+      budget_type,
+      fiscal_year,
+      responsible_person,
+    } = req.query;
 
-    let query = `SELECT mainasset.main_asset_id, main_asset_name, mainasset.usage, department_name, mainasset.asset_type,  mainasset.responsible_person,
-                 mainasset.budget_type, mainasset.fiscal_year, COUNT(subasset.sub_asset_id) AS subamount 
-                 FROM mainasset  
-                 LEFT JOIN subasset ON mainasset.main_asset_id = subasset.main_asset_id 
-                 INNER JOIN department ON department.department_id = mainasset.department_id `;
+    let query = `
+      SELECT 
+        mainasset.main_asset_id, 
+        main_asset_name, 
+        mainasset.usage,  
+        mainasset.department_id,
+        department.department_name, 
+        mainasset.asset_type, 
+        mainasset.responsible_person,
+        mainasset.budget_type, 
+        mainasset.fiscal_year, 
+        COUNT(subasset.sub_asset_id) AS subamount 
+      FROM mainasset  
+      LEFT JOIN subasset ON mainasset.main_asset_id = subasset.main_asset_id 
+      INNER JOIN department ON department.department_id = mainasset.department_id
+    `;
 
     let conditions = [];
     let values = [];
-
-
 
     if (conditions.length > 0) {
       query += " WHERE " + conditions.join(" AND ");
     }
 
-    query += ` GROUP BY mainasset.main_asset_id, main_asset_name, mainasset.usage, department_name, mainasset.responsible_person,
-               mainasset.asset_type, mainasset.budget_type, mainasset.fiscal_year
-               ORDER BY mainasset.fiscal_year ASC;`;
+    query += `
+      GROUP BY 
+        mainasset.main_asset_id, 
+        main_asset_name, 
+        mainasset.usage, 
+        mainasset.department_id, 
+        department.department_name, 
+        mainasset.responsible_person,
+        mainasset.asset_type, 
+        mainasset.budget_type, 
+        mainasset.fiscal_year
+      ORDER BY mainasset.fiscal_year ASC;
+    `;
 
     const result = await pool.query(query, values);
     res.status(200).json(result.rows);
@@ -179,7 +204,6 @@ app.get("/mainasset", async (req, res) => {
     res.status(500).json({ error: "Server Error" });
   }
 });
-
 
 
 //API หน้า AllAsset

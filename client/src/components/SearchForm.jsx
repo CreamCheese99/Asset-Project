@@ -406,6 +406,8 @@ const SearchForm = ({ onFilter }) => {
     // responsible_person:"",
   });
 
+
+  //เก็บข้อมูลประเภทสินทรัพย์และภาควิชา (จาก API)
   const [assetType, setAssetType] = useState([]);
   const [department, setDepartment] = useState([]);
 
@@ -437,7 +439,6 @@ const SearchForm = ({ onFilter }) => {
     fetchDepartment();
   }, []);
 
-  
 
   const getYearOptions = () => {
     const currentYear = new Date().getFullYear();
@@ -449,6 +450,7 @@ const SearchForm = ({ onFilter }) => {
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
+
   const handleSearch = () => {
     const formattedFilters = {
       main_asset_id: filters.main_asset_id.trim(),
@@ -457,7 +459,7 @@ const SearchForm = ({ onFilter }) => {
       asset_type: filters.asset_type,
       fiscal_year: filters.fiscal_year,
       budget_type: filters.budget_type,
-      // responsible_person : "Teacher1",
+  
     };
 
     console.log("Filters ส่งออก:", formattedFilters);
