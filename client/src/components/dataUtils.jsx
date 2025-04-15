@@ -245,22 +245,22 @@ export const summaryFundPerYear = (data, selectedYear = "", selectedFund = "") =
 // สรุปครุภัณฑ์ของแต่ละภาควิชารายปี
 export const summaryDepartmentAssetsPerYear = (data, selectedYear = "", selectedDepartment = "") => {
   try {
-    if (!data || !data.departmentAssets) {
-      console.error("ไม่มีข้อมูล departmentAssets");
+    if (!data || !data.departmentDetails) {
+      console.error("ไม่มีข้อมูลdepartmentDetails");
       return { labels: [], datasets: [] };
     }
 
     // แยกช่วงปีที่เลือก
     const yearRange = parseYearRange(selectedYear);
-    const departments = selectedDepartment ? selectedDepartment.split(",") : Object.keys(data.departmentAssets);
+    const departments = selectedDepartment ? selectedDepartment.split(",") : Object.keys(data.departmentDetails);
     const allYears = new Set();
     
     // รวบรวมปีทั้งหมดจากข้อมูล
-    Object.keys(data.departmentAssets).forEach(department => {
+    Object.keys(data.departmentDetails).forEach(department => {
       // ถ้าเลือกภาควิชาและไม่ตรงกับภาควิชานี้ ให้ข้าม
       if (selectedDepartment && !departments.includes(department)) return;
       
-      const statusData = data.departmentAssets[department];
+      const statusData = data.departmentDetails[department];
       if (typeof statusData === 'object') {
         Object.keys(statusData).forEach(status => {
           const yearData = statusData[status];
@@ -284,9 +284,9 @@ export const summaryDepartmentAssetsPerYear = (data, selectedYear = "", selected
     
     // สร้าง datasets สำหรับแต่ละภาควิชา
     departments.forEach((department, index) => {
-      if (!data.departmentAssets[department]) return;
+      if (!data.departmentDetails[department]) return;
       
-      const statusData = data.departmentAssets[department];
+      const statusData = data.departmentDetails[department];
       const departmentYearlyData = {};
       
       // เริ่มต้นค่า 0 สำหรับทุกปี
@@ -461,13 +461,13 @@ export const createAssetStatusPieCharts = (data, selectedDepartment = "", select
         let value = 0;
         
         // ถ้ามีการกรองตามปี
-        if (yearRange.start && data.departmentAssets) {
+        if (yearRange.start && data.departmentDetails) {
           // ตรวจสอบว่ามีข้อมูลที่ต้องการหรือไม่
-          if (data.departmentAssets[dept] && data.departmentAssets[dept][status]) {
+          if (data.departmentDetails[dept] && data.departmentDetails[dept][status]) {
             // รวมค่าเฉพาะปีที่อยู่ในช่วง
-            Object.keys(data.departmentAssets[dept][status]).forEach(year => {
+            Object.keys(data.departmentDetails[dept][status]).forEach(year => {
               if (isYearInRange(year, yearRange)) {
-                const yearData = data.departmentAssets[dept][status][year];
+                const yearData = data.departmentDetails[dept][status][year];
                 if (Array.isArray(yearData)) {
                   value += yearData.reduce((sum, val) => sum + val, 0);
                 } else if (typeof yearData === "number") {

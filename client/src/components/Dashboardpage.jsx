@@ -219,7 +219,7 @@ const DashboardPage = () => {
         {/* Bar Chart 1 - งบประมาณ/แหล่งเงินในแต่ละปี */}
         {barGraphs?.length > 0 && barGraphs[0]?.data?.datasets?.length ? (
           <div className="chart-container">
-            <h3 style={styles.chartTitle}>{barGraphs[0].title}</h3>
+            {/* <h3 style={styles.chartTitle}>{barGraphs[0].title}</h3> */}
             <BarChart graphs={[barGraphs[0]]} />
           </div>
         ) : (
@@ -229,7 +229,7 @@ const DashboardPage = () => {
         {/* Bar Chart 2 - เปรียบเทียบจำนวนแหล่งเงินของแต่ละภาควิชา */}
         {barGraphs?.length > 1 && barGraphs[1]?.data?.datasets?.length ? (
           <div className="chart-container">
-            <h3 style={styles.chartTitle}>{barGraphs[1].title}</h3>
+            {/* <h3 style={styles.chartTitle}>{barGraphs[1].title}</h3> */}
             <BarChart graphs={[barGraphs[1]]} />
           </div>
         ) : (

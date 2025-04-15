@@ -8,23 +8,25 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 import { useState, useEffect } from "react";
 
-// ลงทะเบียนประเภทกราฟ
+// ลงทะเบียนประเภทกราฟและ plugin
 ChartJS.register(
   CategoryScale,
   LinearScale,
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ChartDataLabels
 );
 
 const BarChart = ({ graphs = [] }) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    console.log('Graphs ที่ได้รับ:', graphs);  // ดูข้อมูลที่ส่งมาว่าถูกต้องหรือไม่
+    console.log('Graphs ที่ได้รับ:', graphs);  // ตรวจสอบข้อมูลที่ส่งเข้ามา
     const hasInvalidData = graphs.some(
       (g) => !g.data || !g.data.labels || !g.data.datasets || g.data.labels.length === 0
     );
@@ -34,7 +36,6 @@ const BarChart = ({ graphs = [] }) => {
       setErrorMessage("");
     }
   }, [graphs]);
-  
 
   if (errorMessage) {
     return <p style={{ textAlign: "center", color: "red" }}>{errorMessage}</p>;
@@ -74,6 +75,16 @@ const BarChart = ({ graphs = [] }) => {
                 maintainAspectRatio: false,
                 responsive: true,
                 plugins: {
+                  datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value) => value,
+                    font: {
+                      weight: 'bold',
+                      size: 12
+                    },
+                    color: '#000'
+                  },
                   legend: {
                     position: "top",
                     labels: {
@@ -116,7 +127,7 @@ const BarChart = ({ graphs = [] }) => {
                         size: 14,
                         weight: "bold",
                       },
-                      padding: {top: 10, bottom: 0}
+                      padding: { top: 10, bottom: 0 }
                     },
                     ticks: {
                       maxRotation: 45,
@@ -131,7 +142,7 @@ const BarChart = ({ graphs = [] }) => {
                         size: 14,
                         weight: "bold",
                       },
-                      padding: {top: 0, bottom: 0}
+                      padding: { top: 0, bottom: 0 }
                     },
                     beginAtZero: true,
                   },
