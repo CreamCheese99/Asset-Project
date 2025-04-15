@@ -151,7 +151,7 @@ app.get("/mainasset", async (req, res) => {
   try {
     const {
       main_asset_id,
-      department_name,
+      department_id,
       usage,
       asset_type,
       budget_type,
@@ -206,6 +206,8 @@ app.get("/mainasset", async (req, res) => {
 });
 
 
+
+
 //API หน้า AllAsset
 app.get('/api/mainasset', async (req, res) => {
   try {
@@ -234,6 +236,7 @@ app.get('/api/mainasset', async (req, res) => {
     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลจากฐานข้อมูล", message: err.message });
   }
 });
+
 app.get('/api/mainasset-assetlist', async (req, res) => {
   try {
     // คำสั่ง SQL สำหรับดึงข้อมูลพร้อม URL ของรูปภาพ
