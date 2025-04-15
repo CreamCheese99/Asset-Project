@@ -1030,31 +1030,6 @@ app.post("/api/users", async (req, res) => {
 
 
 
-// app.get("/api/users", async (req, res) => {
-//   try {
-//     const result = await pool.query(`
-//       SELECT 
-//         u.user_id,
-//         u.user_name, 
-//         u.user_email, 
-//         d.department_name, 
-//         r.role_name 
-//       FROM "users" u
-//       LEFT JOIN department d ON u.department_id = d.department_id
-//       LEFT JOIN userrole ur ON u.user_id = ur.user_id
-//       LEFT JOIN role r ON ur.role_id = r.role_id
-//       ORDER BY u.user_id ASC
-//     `);
-
-//     res.json(result.rows);
-//   } catch (err) {
-//     console.error("Error fetching users:", err);
-//     res.status(500).json({ error: "Failed to fetch users" });
-//   }
-// });
-
-
-
 app.get("/api/users", async (req, res) => {
   try {
     const result = await pool.query(`
@@ -1137,46 +1112,88 @@ app.delete('/api/users/:id', async (req, res) => {
   }
 });
 
-app.put('/api/users/:id/role', async (req, res) => {
-  const { id } = req.params;  // รับ user_id จาก URL
-  const { role } = req.body;  // รับ role_name จาก request body
+// app.put('/api/users/:id/role', async (req, res) => {
+//   const { id } = req.params;  // รับ user_id จาก URL
+//   const { role } = req.body;  // รับ role_name จาก request body
 
-  const client = await pool.connect(); // ใช้ client เพื่อจัดการ connection
+//   const client = await pool.connect(); // ใช้ client เพื่อจัดการ connection
   
+//   try {
+//     // ดึง role_id จากฐานข้อมูลโดยใช้ role_name
+//     const queryRoleId = 'SELECT role_id FROM role WHERE role_name = $1';
+//     const roleResult = await client.query(queryRoleId, [role]);
+
+//     if (roleResult.rowCount === 0) {
+//       return res.status(404).json({ error: 'ไม่พบบทบาทในฐานข้อมูล' });
+//     }
+
+//     const roleId = roleResult.rows[0].role_id; // ✅ แก้ไขจาก .id เป็น .role_id
+
+//     // ตรวจสอบว่ามี user_id ที่ต้องการแก้ไขหรือไม่
+//     const userResult = await client.query('SELECT * FROM users WHERE user_id = $1', [id]);
+
+//     if (userResult.rowCount === 0) {
+//       return res.status(404).json({ message: 'ไม่พบผู้ใช้ที่ต้องการแก้ไข' });
+//     }
+
+//     // อัปเดต role_id ใหม่ และคืนค่าข้อมูลที่อัปเดต
+//     const updateQuery = 'UPDATE users SET role_id = $1 WHERE user_id = $2 RETURNING user_id, role_id';
+//     const result = await client.query(updateQuery, [roleId, id]);
+
+//     res.status(200).json({ 
+//       message: 'อัปเดตบทบาทผู้ใช้สำเร็จ',
+//       user: result.rows[0] // คืนค่าข้อมูลที่อัปเดตกลับไป
+//     });
+
+//   } catch (err) {
+//     console.error("เกิดข้อผิดพลาดในการอัปเดตบทบาทผู้ใช้:", err);
+//     res.status(500).json({ message: 'ไม่สามารถอัปเดตบทบาทผู้ใช้ได้' });
+//   } finally {
+//     client.release(); // ปิดการเชื่อมต่อฐานข้อมูล
+//   }
+// });
+
+
+app.put('/api/users/:id/role', async (req, res) => {
+  const { id } = req.params;
+  const { role_id } = req.body;
+
+  if (!role_id) {
+    return res.status(400).json({ message: 'กรุณาระบุ role_id' });
+  }
+
+  const client = await pool.connect();
+
   try {
-    // ดึง role_id จากฐานข้อมูลโดยใช้ role_name
-    const queryRoleId = 'SELECT role_id FROM role WHERE role_name = $1';
-    const roleResult = await client.query(queryRoleId, [role]);
-
-    if (roleResult.rowCount === 0) {
-      return res.status(404).json({ error: 'ไม่พบบทบาทในฐานข้อมูล' });
-    }
-
-    const roleId = roleResult.rows[0].role_id; // ✅ แก้ไขจาก .id เป็น .role_id
-
-    // ตรวจสอบว่ามี user_id ที่ต้องการแก้ไขหรือไม่
     const userResult = await client.query('SELECT * FROM users WHERE user_id = $1', [id]);
 
     if (userResult.rowCount === 0) {
       return res.status(404).json({ message: 'ไม่พบผู้ใช้ที่ต้องการแก้ไข' });
     }
 
-    // อัปเดต role_id ใหม่ และคืนค่าข้อมูลที่อัปเดต
     const updateQuery = 'UPDATE users SET role_id = $1 WHERE user_id = $2 RETURNING user_id, role_id';
-    const result = await client.query(updateQuery, [roleId, id]);
+    const result = await client.query(updateQuery, [role_id, id]);
 
     res.status(200).json({ 
       message: 'อัปเดตบทบาทผู้ใช้สำเร็จ',
-      user: result.rows[0] // คืนค่าข้อมูลที่อัปเดตกลับไป
+      user: result.rows[0]
     });
-
   } catch (err) {
     console.error("เกิดข้อผิดพลาดในการอัปเดตบทบาทผู้ใช้:", err);
     res.status(500).json({ message: 'ไม่สามารถอัปเดตบทบาทผู้ใช้ได้' });
   } finally {
-    client.release(); // ปิดการเชื่อมต่อฐานข้อมูล
+    client.release();
   }
 });
+
+
+
+
+
+
+
+
+
 
 // API สำหรับดึงข้อมูลบทบาททั้งหมด
 app.get('/api/role', async (req, res) => {
