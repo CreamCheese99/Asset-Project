@@ -140,13 +140,15 @@
 
 
 //**************************************************************ใช้งานได้************************************** */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Breadcrumb2 from "../components/Breadcrumb2";
 import SearchForm from "../components/SearchForm";
 import ActionButtons from "../components/ActionButtons";
 import DataTable from "../components/DataTable";
 import axios from "axios";
 import ActionButtons4 from "../components/ActionButtons4";
+
+
 
 const ManageAssets = () => {
   const [filters, setFilters] = useState({});
@@ -157,6 +159,10 @@ const ManageAssets = () => {
 
   const [departmentId, setDepartmentId] = useState(localStorage.getItem("departmentId"));
   const [userName, setUserName] = useState(localStorage.getItem("departmentId"));
+
+
+  const printRef = useRef(); // ✅ เพิ่ม ref สำหรับพิมพ์
+
 
 
   // ฟังก์ชันกรองข้อมูล
@@ -182,24 +188,6 @@ const ManageAssets = () => {
   
     setFilteredData(filtered); // อัปเดตข้อมูลที่กรองแล้ว
   };
-
-
-  // const filtered = data.filter((item) => {
-  //   return Object.entries(newFilters).every(([key, value]) => {
-  //     if (!value) return true;
-  
-  //     // เทียบแบบ exact สำหรับคีย์ที่กำหนด
-  //     if (["department_id", "asset_type", "fiscal_year", "budget_type", "usage"].includes(key)) {
-  //       return item[key]?.toString() === value.toString();
-  //     }
-  
-  //     // ค้นหาแบบบางส่วน
-  //     return item[key]?.toString().toLowerCase().includes(value.toString().toLowerCase());
-  //   });
-  // });
-  //     setFilteredData(filtered); // อัปเดตข้อมูลที่กรองแล้ว
-  // };
-
   
   // ดึงข้อมูลจาก API
   useEffect(() => {
@@ -239,19 +227,36 @@ const ManageAssets = () => {
 
   
 
-  return (
-    <div style={{ backgroundColor: "#f1f8e9" }} className="min-h-screen font-sans">
-      <Breadcrumb2 />
-      <div className="container mx-auto p-4">
-        <SearchForm onFilter={handleFilterChange} /> {/* ส่งฟังก์ชันกรองไปยัง SearchForm */}
-        <ActionButtons data={data} roleId={roleId} />
-        <DataTable data={filteredData} handleDelete={handleDelete} /> {/* ใช้ข้อมูลที่กรองแล้ว */}
-        <ActionButtons4 />
-      </div>
-    </div>
-  );
-};
+//   return (
+//     <div style={{ backgroundColor: "#f1f8e9" }} className="min-h-screen font-sans">
+//       <Breadcrumb2 />
+//       <div className="container mx-auto p-4">
+//         <SearchForm onFilter={handleFilterChange} /> {/* ส่งฟังก์ชันกรองไปยัง SearchForm */}
+//         <ActionButtons data={data} roleId={roleId} />
+//         <DataTable data={filteredData} handleDelete={handleDelete} /> {/* ใช้ข้อมูลที่กรองแล้ว */}
+//         <ActionButtons4 />
+//       </div>
+//     </div>
+//   );
+// };
 
+
+return (
+  <div style={{ backgroundColor: "#f1f8e9" }} className="min-h-screen font-sans">
+    <Breadcrumb2 />
+    <div className="container mx-auto p-4">
+      <SearchForm onFilter={handleFilterChange} />
+      <ActionButtons data={data} roleId={roleId} printRef={printRef} /> {/* ✅ ส่ง ref ไป */}
+      
+      <div ref={printRef}> {/* ✅ ครอบตาราง */}
+        <DataTable data={filteredData} handleDelete={handleDelete} />
+      </div>
+
+      <ActionButtons4 />
+    </div>
+  </div>
+);
+};
 export default ManageAssets;
 
 
