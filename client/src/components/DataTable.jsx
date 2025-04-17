@@ -1041,7 +1041,7 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
         body: tableData,
         styles: {
           font: "THSarabun",  // Use Thai font
-          fontSize: 12,
+          fontSize: 14,
         },
         headStyles: {
           font: "THSarabun",
@@ -1076,7 +1076,7 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
     }
   };
   
-
+  
 
 
 const exportPDFAllRow = () => {
@@ -1092,8 +1092,6 @@ const exportPDFAllRow = () => {
   doc.setFont("THSarabun");
   doc.setFontSize(12);
 
-  doc.text(`รายการครุภัณฑ์ทั้งหมดของภาควิชา ${departmentName}`, 14, 20);
-
   const tableData = departmentData.map((item) => [
     item.main_asset_id,
     item.main_asset_name,
@@ -1106,8 +1104,12 @@ const exportPDFAllRow = () => {
     item.usage || "-",
   ]);
 
+
+  
+  doc.text(`ข้อมูลรายการครุภัณฑ์ทั้งหมดของภาควิชา ${departmentName}`, 14, 20);
   // ✅ เรียกผ่าน autoTable() โดยส่ง doc เข้าไป
   autoTable(doc, {
+    startY: 30,
     head: [[
       "รหัสทรัพย์สิน",
       "ชื่อทรัพย์สิน",
@@ -1122,7 +1124,7 @@ const exportPDFAllRow = () => {
     body: tableData,
     styles: {
       font: "THSarabun",  // Use Thai font
-      fontSize: 12,
+      fontSize: 14,
     },
     headStyles: {
       font: "THSarabun",
