@@ -913,13 +913,7 @@ import { FaEye, FaEdit, FaTrash, FaFilePdf, FaSortUp, FaSortDown } from "react-i
 import axios from "axios";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-// import THSarabunNew from "./fonts/THSarabunNew-normal.js";
 import THSarabunNew from "./fonts/THSarabunNew-normal";
-
-// import THSarabunNew from './fonts/THSarabunNew-normal.ttf';
-
-// // ใช้ฟอนต์ที่รองรับภาษาไทย
-// import THSarabunNew from './fonts/THSarabunNew-normal.ttf';
 
 const DataTable = ({ data, filteredData, handleDelete }) => {
   const [sortOrder, setSortOrder] = useState("asc");
@@ -980,11 +974,13 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
       ? a.fiscal_year - b.fiscal_year
       : b.fiscal_year - a.fiscal_year;
   });
+
+
   const exportPDF = async (mainAssetId) => {
     const token = localStorage.getItem("token");
   
     try {
-      const response = await axios.get(`http://localhost:5000/api/subasset/${mainAssetId}`, {
+      const response = await axios.get(`http://localhost:5000/api/subasset/${encodeURIComponent(mainAssetId)}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
   
@@ -1011,16 +1007,6 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
       // Initialize jsPDF instance
       const doc = new jsPDF();
   
-      // // Load Thai font and use it
-      // try {
-      //   doc.addFileToVFS("THSarabun.ttf", THSarabunNew);
-      //   doc.addFont("THSarabun.ttf", "THSarabun", "normal");
-      //   doc.setFont("THSarabun");
-
-      // } catch (fontError) {
-      //   console.error("Error loading font:", fontError);
-      //   doc.setFont("helvetica");  // Fallback to default font if there's an issue with Thai font
-      // }
       doc.addFileToVFS("THSarabun.ttf", THSarabunNew);
       doc.addFont("THSarabun.ttf", "THSarabun", "normal");
       doc.setFont("THSarabun"); // ✅ ต้องมาก่อน
@@ -1086,12 +1072,67 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
   
 
 
+
+const exportPDFAllRow = () => {
+  const doc = new jsPDF();
+  doc.addFileToVFS("THSarabun.ttf", THSarabunNew);
+  doc.addFont("THSarabun.ttf", "THSarabun", "normal");
+  doc.setFont("THSarabun");
+  doc.setFontSize(12);
+
+  doc.text(`รายการครุภัณฑ์ทั้งหมดของภาควิชา ${departmentName}`, 14, 20);
+
+  const tableData = departmentData.map((item) => [
+    item.main_asset_id,
+    item.main_asset_name,
+    item.department_name || "-",
+    item.asset_type || "-",
+    item.responsible_person || "-",
+    item.subamount || 0,
+    item.budget_type || "-",
+    item.fiscal_year || "-",
+    item.usage || "-",
+  ]);
+
+  // ✅ เรียกผ่าน autoTable() โดยส่ง doc เข้าไป
+  autoTable(doc, {
+    head: [[
+      "รหัสทรัพย์สิน",
+      "ชื่อทรัพย์สิน",
+      "ภาควิชา",
+      "ประเภทสินทรัพย์",
+      "ผู้รับผิดชอบ",
+      "จำนวน",
+      "ประเภทเงิน",
+      "ปีงบประมาณ",
+      "สภาพการครุภัณฑ์",
+    ]],
+    body: tableData,
+    styles: { font: "THSarabun", fontSize: 12 },
+    headStyles: { halign: 'center', fillColor: [230, 230, 230], textColor: [0, 0, 0] },
+    bodyStyles: { halign: 'center' },
+  });
+
+  doc.save(`mainasset_${departmentName}.pdf`);
+};
+
   
   
   return (
     <div className="bg-white mt-4 p-4 rounded-md shadow-md overflow-x-auto">
       <h1 className="text-lg font-bold mb-4">รายการพัสดุ</h1>
+      <div className="flex justify-between items-center mb-4 space-x-2">
+          <button
+            onClick={exportPDFAllRow}
+            className="bg-green-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
+          >
+            <FaFilePdf />
+            <span>Export to PDF</span>
+          </button>
+       </div>
+  
       {departmentData.length > 0 ? (
+        
         <table className="table-auto w-full border-collapse text-sm">
           <thead>
             <tr className="bg-gray-200 text-gray-700">
