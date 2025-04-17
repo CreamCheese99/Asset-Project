@@ -618,6 +618,21 @@ app.get('/api/subasset', async (req, res) => {
   }
 });
 
+// Express route
+app.get('/api/subasset/:mainAssetId', async (req, res) => {
+  const mainAssetId = req.params.mainAssetId;
+  try {
+    const result = await pool.query(
+      'SELECT * FROM subasset WHERE main_asset_id = $1',
+      [mainAssetId]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
 // API สำหรับลบ SubAsset โดยใช้ sub_asset_id
 app.delete('/api/subasset/:id', async (req, res) => {
   const { id } = req.params;

@@ -621,13 +621,13 @@ const Permissions = () => {
                     <>
                       <button
                         onClick={() => handleSave(user.user_id)} // บันทึกการเปลี่ยนแปลง
-                        className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600"
+                        className="text-blue-500 hover:text-blue-700 bg-gray-100 rounded-lg p-2"
                       >
                         <FaSave />
                       </button>
                       <button
                           onClick={() => handleCancelEdit(user.role_name)}
-                          className="bg-gray-500 text-white px-3 py-1 rounded-md hover:bg-gray-600"
+                          className="text-gray-500 hover:text-gray-700 bg-gray-100 rounded-lg p-2"
                         >
                           <FaTimes />
                         </button>
@@ -635,14 +635,14 @@ const Permissions = () => {
                     ) : (
                       <button
                         onClick={() => handleEdit(user.user_id)}
-                         className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600"
+                         className="text-yellow-500 hover:text-yellow-700 bg-gray-100 rounded-lg p-2"
                       >
                         <FaEdit />
                       </button>
                   )}
                   <button
                     onClick={() => handleDelete(user.user_id)} // ลบผู้ใช้
-                    className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                    className="text-red-500 hover:text-red-700 bg-gray-200 rounded-lg p-2"
                   >
                     <FaTrash />
                   </button>

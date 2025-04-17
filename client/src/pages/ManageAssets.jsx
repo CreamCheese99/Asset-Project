@@ -161,7 +161,7 @@ const ManageAssets = () => {
   const [userName, setUserName] = useState(localStorage.getItem("departmentId"));
 
 
-  const printRef = useRef(); // ✅ เพิ่ม ref สำหรับพิมพ์
+  // const printRef = useRef(); // ✅ เพิ่ม ref สำหรับพิมพ์
 
 
 
@@ -227,36 +227,36 @@ const ManageAssets = () => {
 
   
 
-//   return (
-//     <div style={{ backgroundColor: "#f1f8e9" }} className="min-h-screen font-sans">
-//       <Breadcrumb2 />
-//       <div className="container mx-auto p-4">
-//         <SearchForm onFilter={handleFilterChange} /> {/* ส่งฟังก์ชันกรองไปยัง SearchForm */}
-//         <ActionButtons data={data} roleId={roleId} />
-//         <DataTable data={filteredData} handleDelete={handleDelete} /> {/* ใช้ข้อมูลที่กรองแล้ว */}
-//         <ActionButtons4 />
-//       </div>
-//     </div>
-//   );
-// };
-
-
-return (
-  <div style={{ backgroundColor: "#f1f8e9" }} className="min-h-screen font-sans">
-    <Breadcrumb2 />
-    <div className="container mx-auto p-4">
-      <SearchForm onFilter={handleFilterChange} />
-      <ActionButtons data={data} roleId={roleId} printRef={printRef} /> {/* ✅ ส่ง ref ไป */}
-      
-      <div ref={printRef}> {/* ✅ ครอบตาราง */}
-        <DataTable data={filteredData} handleDelete={handleDelete} />
+  return (
+    <div style={{ backgroundColor: "#f1f8e9" }} className="min-h-screen font-sans">
+      <Breadcrumb2 />
+      <div className="container mx-auto p-4">
+        <SearchForm onFilter={handleFilterChange} /> {/* ส่งฟังก์ชันกรองไปยัง SearchForm */}
+        <ActionButtons data={data} roleId={roleId} />
+        <DataTable data={filteredData} handleDelete={handleDelete} /> {/* ใช้ข้อมูลที่กรองแล้ว */}
+        <ActionButtons4 />
       </div>
-
-      <ActionButtons4 />
     </div>
-  </div>
-);
+  );
 };
+
+
+// return (
+//   <div style={{ backgroundColor: "#f1f8e9" }} className="min-h-screen font-sans">
+//     <Breadcrumb2 />
+//     <div className="container mx-auto p-4">
+//       <SearchForm onFilter={handleFilterChange} />
+//       <ActionButtons data={data} roleId={roleId} printRef={printRef} /> {/* ✅ ส่ง ref ไป */}
+      
+//       <div ref={printRef}> {/* ✅ ครอบตาราง */}
+//         <DataTable data={filteredData} handleDelete={handleDelete} />
+//       </div>
+
+//       <ActionButtons4 />
+//     </div>
+//   </div>
+// );
+// };
 export default ManageAssets;
 
 
