@@ -1005,7 +1005,13 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
       ]);
   
       // Initialize jsPDF instance
-      const doc = new jsPDF();
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4',
+      });
+      
+
   
       doc.addFileToVFS("THSarabun.ttf", THSarabunNew);
       doc.addFont("THSarabun.ttf", "THSarabun", "normal");
@@ -1074,7 +1080,13 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
 
 
 const exportPDFAllRow = () => {
-  const doc = new jsPDF();
+  const doc = new jsPDF({
+    orientation: 'landscape',
+    unit: 'mm',
+    format: 'a4',
+  });
+  
+
   doc.addFileToVFS("THSarabun.ttf", THSarabunNew);
   doc.addFont("THSarabun.ttf", "THSarabun", "normal");
   doc.setFont("THSarabun");
@@ -1108,9 +1120,33 @@ const exportPDFAllRow = () => {
       "สภาพการครุภัณฑ์",
     ]],
     body: tableData,
-    styles: { font: "THSarabun", fontSize: 12 },
-    headStyles: { halign: 'center', fillColor: [230, 230, 230], textColor: [0, 0, 0] },
-    bodyStyles: { halign: 'center' },
+    styles: {
+      font: "THSarabun",  // Use Thai font
+      fontSize: 12,
+    },
+    headStyles: {
+      font: "THSarabun",
+      fontStyle: "normal",
+      fillColor: [230, 230, 230],
+      textColor: [0, 0, 0],
+      halign: 'center'
+    },
+    bodyStyles: {
+      font: "THSarabun",
+      fontStyle: "normal",
+      halign: 'center'
+    },
+    columnStyles: {
+      0: { cellWidth: 'auto' },
+      1: { cellWidth: 'auto' },
+      2: { cellWidth: 'auto' },
+      3: { cellWidth: 'auto' },
+      4: { cellWidth: 'auto' },
+      5: { cellWidth: 'auto' },
+      6: { cellWidth: 'auto' },
+      7: { cellWidth: 'auto' },
+      8: { cellWidth: 'auto' },
+    },
   });
 
   doc.save(`mainasset_${departmentName}.pdf`);
@@ -1127,7 +1163,7 @@ const exportPDFAllRow = () => {
             className="bg-green-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
           >
             <FaFilePdf />
-            <span>Export to PDF</span>
+            <span>PDF</span>
           </button>
        </div>
   
