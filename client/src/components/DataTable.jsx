@@ -1213,7 +1213,7 @@ const exportPDFAllRow = () => {
                   <td className="border px-4 py-2">{item.subamount || 0}</td>
                   <td className="border px-4 py-2">{item.budget_type || "-"}</td>
                   <td className="border px-4 py-2">{item.fiscal_year || "-"}</td>
-                  <td className="border px-4 py-2">{item.usage}</td>
+                  <td className="border px-4 py-2">{item.status}</td>
                   <td className="border px-4 py-2 flex justify-center space-x-2">
                     <Link to={`/show-info/${encodeURIComponent(item.main_asset_id)}`} className="text-blue-500 hover:text-blue-700 bg-gray-100 rounded-lg p-2">
                       <FaEye />
