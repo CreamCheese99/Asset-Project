@@ -25,8 +25,29 @@ ChartJS.register(
 const BarChart = ({ graphs = [] }) => {
   const [errorMessage, setErrorMessage] = useState("");
 
+  // ฟังก์ชันแปลงค่าจากบาท → ล้าน
+  const convertToMillion = (num) => {
+    if (!num || isNaN(num)) return 0;
+    return parseFloat(num / 1_000_000).toFixed(2);
+  };
+
+  // แปลงค่าภายใน datasets ให้เป็นหน่วยล้าน
+  const processedGraphs = graphs.map((graph) => {
+    const convertedDatasets = graph.data.datasets.map((dataset) => ({
+      ...dataset,
+      data: dataset.data.map(convertToMillion)
+    }));
+
+    return {
+      ...graph,
+      data: {
+        ...graph.data,
+        datasets: convertedDatasets
+      }
+    };
+  });
+
   useEffect(() => {
-    console.log('Graphs ที่ได้รับ:', graphs);  // ตรวจสอบข้อมูลที่ส่งเข้ามา
     const hasInvalidData = graphs.some(
       (g) => !g.data || !g.data.labels || !g.data.datasets || g.data.labels.length === 0
     );
@@ -43,7 +64,7 @@ const BarChart = ({ graphs = [] }) => {
 
   return (
     <div className="space-y-6">
-      {graphs.map((graph, index) => (
+      {processedGraphs.map((graph, index) => (
         <div
           key={index}
           style={{
@@ -78,7 +99,7 @@ const BarChart = ({ graphs = [] }) => {
                   datalabels: {
                     anchor: 'end',
                     align: 'top',
-                    formatter: (value) => value,
+                    formatter: (value) => `${value} `,
                     font: {
                       weight: 'bold',
                       size: 12
@@ -110,10 +131,10 @@ const BarChart = ({ graphs = [] }) => {
                   },
                   tooltip: {
                     callbacks: {
-                      label: function(context) {
+                      label: function (context) {
                         const label = context.dataset.label || '';
                         const value = context.raw || 0;
-                        return `${label}: ${value}`;
+                        return `${label}: ${value} ล้านบาท`;
                       }
                     }
                   }
@@ -134,7 +155,26 @@ const BarChart = ({ graphs = [] }) => {
                       minRotation: 45
                     }
                   },
+                  // y: {
+                  //   title: {
+                  //     display: !!graph.options?.yTitle,
+                  //     text: graph.options?.yTitle || "",
+                  //     font: {
+                  //       size: 14,
+                  //       weight: "bold",
+                  //     },
+                  //     padding: { top: 0, bottom: 0 }
+                  //   },
+                  //   beginAtZero: true,
+                  // },
+
                   y: {
+                    min: 0,              // เริ่มต้นที่ 1 ล้านบาท
+                    max: 5,              // สิ้นสุดที่ 6 ล้านบาท
+                    ticks: {
+                      callback: (value) => `${value} `,
+                      stepSize: 1        // ระยะห่างระหว่างเส้น
+                    },
                     title: {
                       display: !!graph.options?.yTitle,
                       text: graph.options?.yTitle || "",
@@ -144,7 +184,7 @@ const BarChart = ({ graphs = [] }) => {
                       },
                       padding: { top: 0, bottom: 0 }
                     },
-                    beginAtZero: true,
+                    beginAtZero: false,  // เริ่มที่ 1 ไม่ต้องเริ่มที่ 0
                   },
                 },
               }}

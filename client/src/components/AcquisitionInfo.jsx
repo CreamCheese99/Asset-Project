@@ -78,10 +78,6 @@
 // export default AcquisitionInfo;
 
 
-
-
-
-
 import React from "react";
 import "../css/AcquisitionInfo.css";
 
@@ -93,63 +89,47 @@ const AcquisitionInfo = ({ value, onChange }) => {
     return `${day}/${month}/${year}`;
   };
 
-  // ฟังก์ชันแปลงจาก dd/mm/yyyy → yyyy-mm-dd (เก็บค่า)
-  const formatDateToISO = (displayDate) => {
-    if (!displayDate) return "";
-    const [day, month, year] = displayDate.split("/");
-    return `${year}-${month}-${day}`;
+  // ฟังก์ชันแปลงเป็นตัวเลขที่อ่านง่าย เช่น 1000000 → "1,000,000"
+  const formatCurrency = (num) => {
+    if (!num) return "";
+    return Number(num).toLocaleString("th-TH");
+  };
+  
+  const formatMillionBaht = (num) => {
+    if (!num || isNaN(num)) return "";
+    const million = parseFloat(num) / 1_000_000;
+    return `${million.toFixed(2)} ล้านบาท`;
+  };
+  
+
+  // เมื่อมีการกรอกค่าใหม่ จะแปลงกลับเป็นตัวเลขเพื่อนำไปใช้ต่อ
+  const handleBudgetChange = (input) => {
+    const rawValue = input.replace(/,/g, ""); // ลบเครื่องหมายจุลภาคออก
+    onChange("budget_limit", rawValue); // ส่งค่าเป็นตัวเลขกลับไปเก็บ
   };
 
-  // Handle เมื่อค่าของวันที่เปลี่ยน
-  const handleDateChange = (e) => {
-    const isoDate = e.target.value; // ได้ค่า yyyy-mm-dd
-    onChange("date_received", isoDate); // เก็บเป็น ISO format
+  // เมื่อมีการกรอกค่าใหม่ จะแปลงกลับเป็นตัวเลขเพื่อนำไปใช้ต่อ
+  const handleAverangeChange = (input) => {
+    const rawValue = input.replace(/,/g, ""); // ลบเครื่องหมายจุลภาคออก
+    onChange("averange_price", rawValue); // ส่งค่าเป็นตัวเลขกลับไปเก็บ
   };
-
-
-  // แปลงเป็นตัวเลขที่อ่านง่าย เช่น 1000000 → "1,000,000"
-const formatCurrency = (num) => {
-  if (!num) return "";
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // ใส่เครื่องหมายจุลภาคทุก 3 หลัก
-};
-
-// เมื่อมีการกรอกค่าใหม่ จะแปลงกลับเป็นตัวเลขเพื่อนำไปใช้ต่อ
-const handleBudgetChange = (input) => {
-  const rawValue = input.replace(/,/g, ""); // ลบเครื่องหมายจุลภาคออก
-  onChange("budget_limit", rawValue); // ส่งค่าเป็นตัวเลขกลับไปเก็บ
-};
-
-// เมื่อมีการกรอกค่าใหม่ จะแปลงกลับเป็นตัวเลขเพื่อนำไปใช้ต่อ
-const handleAverangeChange = (input) => {
-  const rawValue = input.replace(/,/g, ""); // ลบเครื่องหมายจุลภาคออก
-  onChange("averange_price", rawValue); // ส่งค่าเป็นตัวเลขกลับไปเก็บ
-};
-
-
-const getYearOptions = () => {
-  const currentYear = new Date().getFullYear();
-  return Array.from({ length: 21 }, (_, i) => currentYear - 10 + i + 543);
-};
-
-
 
   return (
     <div className="acquisition-container">
       <h3 className="acquisition-title">วิธีการได้มา</h3>
       <div className="grid-2-cols">
-      <div>
-        <label className="acquisition-label">ปีงบประมาณ</label>
-        <input
-          type="number"
-          className="acquisition-select" // ถ้าต้องการให้สไตล์เหมือนเดิม
-          value={value.fiscal_year || ""}
-          onChange={(e) => onChange("fiscal_year", e.target.value)}
-          placeholder="เช่น 2567"
-          min="2500"
-          max="2700" // หรือจะไม่ใส่ก็ได้ ถ้าปล่อยให้กรอกอิสระ
-        />
-      </div>
-
+        <div>
+          <label className="acquisition-label">ปีงบประมาณ</label>
+          <input
+            type="number"
+            className="acquisition-select"
+            value={value.fiscal_year || ""}
+            onChange={(e) => onChange("fiscal_year", e.target.value)}
+            placeholder="กรอกปี พ.ศ"
+            min="2500"
+            max="2700"
+          />
+        </div>
 
         {/* วันที่ตรวจรับ */}
         <div>
@@ -158,7 +138,7 @@ const getYearOptions = () => {
             type="date"
             className="acquisition-input"
             value={value.date_received || ""}
-            onChange={handleDateChange}
+            onChange={(e) => onChange("date_received", e.target.value)}
           />
           <p className="text-gray-500 text-sm mt-1">
             แสดงผล: {formatDateToDisplay(value.date_received)}
@@ -180,35 +160,32 @@ const getYearOptions = () => {
           </select>
         </div>
 
-        {/* <div>
-          <label className="acquisition-label">วงเงินงบประมาณ</label>
+        <div>
+          <label className="acquisition-label">วงเงินงบประมาณ (บาท)</label>
           <input
             type="text"
             className="acquisition-input"
-            value={value.budget_limit || ""}
-            onChange={(e) => onChange("budget_limit", e.target.value)}
+            value={formatCurrency(value.budget_limit)} // ใช้ฟังก์ชัน formatCurrency ใส่จุลภาค
+            onChange={(e) => handleBudgetChange(e.target.value)} // ส่งค่าเป็นตัวเลขโดยลบจุลภาค
+            placeholder="กรอกจำนวนเงิน (บาท)"
           />
-        </div> */}
-
-        <div>
-          <label className="acquisition-label">วงเงินงบประมาณ</label>
-          <input
-            type="text"
-            className="acquisition-input" // ชิดขวาเพื่อให้อ่านง่ายขึ้น
-            value={formatCurrency(value.budget_limit)}
-            onChange={(e) => handleBudgetChange(e.target.value)}
-          />
+          <p className="text-gray-500 text-sm mt-1">
+            {formatMillionBaht(value.budget_limit)} {/* แสดงผลเป็นล้านบาท */}
+          </p>
         </div>
 
-
         <div>
-          <label className="acquisition-label">ราคากลาง</label>
+          <label className="acquisition-label">ราคากลาง (บาท)</label>
           <input
             type="text"
             className="acquisition-input"
-            value={formatCurrency(value.averange_price)}
-            onChange={(e) => handleAverangeChange(e.target.value)}
+            value={formatCurrency(value.averange_price)} // ใช้ฟังก์ชัน formatCurrency ใส่จุลภาค
+            onChange={(e) => handleAverangeChange(e.target.value)} // ส่งค่าเป็นตัวเลขโดยลบจุลภาค
+            placeholder="กรอกจำนวนเงิน (บาท)"
           />
+          <p className="text-gray-500 text-sm mt-1">
+            {formatMillionBaht(value.averange_price)} {/* แสดงผลเป็นล้านบาท */}
+          </p>
         </div>
       </div>
     </div>
