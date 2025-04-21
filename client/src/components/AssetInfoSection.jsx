@@ -466,8 +466,15 @@ const AssetInfoSection = ({ value, onChange }) => {
               </div>
               <div>
                 <label className="subasset-label">รายละเอียด</label>
-                <input type="text" className="subasset-input" value={newDetail} onChange={(e) => setNewDetail(e.target.value)} />
+                <textarea
+                  className="subasset-input"
+                  value={newDetail}
+                  onChange={(e) => setNewDetail(e.target.value)}
+                  rows={4} // ปรับความสูงเริ่มต้นตามต้องการ
+                  placeholder="กรอกรายละเอียดเพิ่มเติม เช่น รายการที่จัดซื้อ เงื่อนไข หรืออื่นๆ"
+                />
               </div>
+
               <div>
                 <label className="subasset-label">ราคาต่อหน่วย</label>
                 <input type="text" className="subasset-input" value={formatCurrency(newPrice)} onChange={(e) => handlePriceChange(e.target.value)} />
