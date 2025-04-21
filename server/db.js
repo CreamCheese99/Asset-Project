@@ -6,7 +6,11 @@ const pool = new Pool({
     host: 'localhost',         
     database: 'assets',   
     password: '1234',  
-    port: 5432,                 
+    port: 5434,                 
   });
+  
+pool.connect()
+  .then(() => console.log('Connected to PostgreSQL'))
+  .catch(err => console.error('PostgreSQL connection error:', err.message));
 
 module.exports = pool;

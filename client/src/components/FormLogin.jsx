@@ -43,37 +43,30 @@ function FormLogin() {
   
     try {
       const requestData = {
-        user_email: user_email,
+        username: user_email,
         password: password,
       };
   
       console.log('Sending request data:', requestData); // Log request data
   
       // Send the request to the login API
-      const response = await axios.post('http://localhost:5000/login', requestData);
+      const response = await axios.post('http://localhost:5000/api/login', requestData);
   
       console.log('Received response:', response); // ตรวจสอบการตอบกลับจาก API
   
       const data = response.data;
-      if (response.status === 200) {
-        // Store token and roleId in localStorage
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('roleId', data.roleId);
-        localStorage.setItem('userName', data.user_name);
-  
-        // Redirect based on roleId
-        if (data.roleId === 1) {
-          window.location.href = '/home';
-        } else if (data.roleId === 2) {
-          window.location.href = '/home';
-        } else if (data.roleId === 3) {
-          window.location.href = '/home';
-        } else if (data.roleId === 4) {
-          window.location.href = '/home';
-        }
+
+      if (response.status === 200 && data.success && data.user) {
+        // ตรวจสอบว่ามี data.user ก่อนใช้งาน
+        console.log('User data from login response:', data.user);  // เพิ่มการ log ข้อมูลที่ได้จาก API
+        localStorage.setItem('userName', data.user.cn || 'Guest');
+        localStorage.setItem('roleId', 1); // สมมุติ role ชั่วคราว หรือแยกมาจาก LDAP ถ้ามี
+        window.location.href = '/home';
       } else {
-        setError(data.message); // Display API error message
+        setError(data.message || 'เข้าสู่ระบบไม่สำเร็จ');
       }
+
+
     } catch (error) {
       console.error('Login error:', error);
       setError('เกิดข้อผิดพลาดขณะเข้าสู่ระบบ');  // แก้ไขข้อความผิดพลาดให้เป็นภาษาไทย
