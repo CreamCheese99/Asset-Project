@@ -25,8 +25,6 @@ const storage = multer.diskStorage({
 
 // สร้าง instance ของ multer
 const upload = multer({ storage: storage });
-
-
 //เพิ่ม mainasset
 app.post('/mainasset', upload.fields([ 
   { name: 'image1', maxCount: 1 },
@@ -51,19 +49,40 @@ app.post('/mainasset', upload.fields([
       usage,
       responsible_person,
       department_id,
-      curriculum
+      curriculum,
     } = req.body;
 
+    // แปลง curriculum ให้เป็น array หากจำเป็น
+    // ปลอดภัยในการแปลง curriculum
+let curriculumArray = [];
+
+try {
+  if (typeof curriculum === 'string') {
+    curriculumArray = JSON.parse(curriculum);
+  } else if (Array.isArray(curriculum)) {
+    curriculumArray = curriculum;
+  } else {
+    curriculumArray = [];
+  }
+} catch (err) {
+  return res.status(400).json({ error: 'Invalid curriculum format (must be JSON array)' });
+}
+
+// ตรวจสอบว่ามีข้อมูลหลักสูตรหรือไม่
+if (!Array.isArray(curriculumArray) || curriculumArray.length === 0) {
+  return res.status(400).json({ error: 'Missing or invalid curriculum data' });
+}
+
     // ตรวจสอบว่า curriculum ถูกส่งมาหรือไม่
-    if (!curriculum || curriculum.length === 0) {
+    if (!curriculumArray || curriculumArray.length === 0) {
       return res.status(400).json({ error: 'Missing or empty curriculum data' });
     }
 
-    // ตรวจสอบว่าไฟล์มีหรือไม่
+    // ตรวจสอบไฟล์
     const images = [];
     for (let i = 1; i <= 5; i++) {
       if (req.files[`image${i}`]) {
-        images.push(req.files[`image${i}`][0].filename); // ใช้ชื่อไฟล์
+        images.push(req.files[`image${i}`][0].filename);
       }
     }
 
@@ -72,7 +91,7 @@ app.post('/mainasset', upload.fields([
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // การบันทึกข้อมูลในฐานข้อมูล mainasset
+    // INSERT mainasset
     const newAsset = await pool.query(
       `INSERT INTO mainasset (
         main_asset_id, 
@@ -110,34 +129,29 @@ app.post('/mainasset', upload.fields([
         usage,
         responsible_person,
         department_id,
-        images[0] || null, // image1
-        images[1] || null, // image2
-        images[2] || null, // image3
-        images[3] || null, // image4
-        images[4] || null  // image5
+        images[0] || null,
+        images[1] || null,
+        images[2] || null,
+        images[3] || null,
+        images[4] || null
       ]
     );
+    
 
-    // บันทึกข้อมูลในตาราง assetcurriculum
-    const curriculumData = Array.isArray(curriculum) ? curriculum : []; // ตรวจสอบให้แน่ใจว่า curriculum เป็น array
-    for (const curriculumId of curriculumData) {
+    // INSERT assetcurriculum
+    for (const curriculumId of curriculumArray) {
       const result = await pool.query(
         `INSERT INTO assetcurriculum (
-          asset_curriculum_name, 
           curriculum_id, 
           main_asset_id
-        ) VALUES ($1, $2, $3) RETURNING *`,
-        [
-          main_asset_name, // เก็บ main_asset_name ใน asset_curriculum_name
-          curriculumId,
-          main_asset_id
-        ]
+        ) VALUES ($1, $2) RETURNING *`,
+        [curriculumId, main_asset_id]
       );
-
-      console.log('Inserted into assetcurriculum:', result.rows[0]); // เพิ่มการตรวจสอบ
+      console.log('Inserted into assetcurriculum:', result.rows[0]);
     }
 
     res.status(201).json({ message: 'Asset added successfully', data: newAsset.rows[0] });
+
   } catch (error) {
     console.error('Error adding asset:', error);
     if (error instanceof multer.MulterError) {

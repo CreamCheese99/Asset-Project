@@ -30,6 +30,7 @@ const AddAsset = () => {
     unit_price: '',
     counting_unit: '',
     department_id: '',
+    curriculum:'',
     note:'',
     type_sub_asset:'',
     image: null  // เพิ่มฟิลด์เก็บรูปภาพ
@@ -62,8 +63,12 @@ const AddAsset = () => {
   
     // เพิ่มข้อมูล assetData ลงใน formData
     for (const key in assetData) {
-      if (key.startsWith("image") && assetData[key] instanceof File) {
-        formData.append(key, assetData[key]); // ใช้ชื่อฟิลด์ตรงกับที่เซิร์ฟเวอร์คาดหวัง
+      if (key === 'curriculum' && Array.isArray(assetData[key])) {
+        // แปลง array เป็น JSON string
+        formData.append(key, JSON.stringify(assetData[key]));
+      } else if (key === 'image' && assetData[key]) {
+        // ถ้า image เป็นไฟล์เดี่ยว (หรือหลายไฟล์ก็ปรับตามได้)
+        formData.append('image', assetData[key]);
       } else {
         formData.append(key, assetData[key]);
       }
@@ -93,6 +98,7 @@ const AddAsset = () => {
   };
   
   
+  
   // รีเซ็ตข้อมูล
   const handleCancel = () => {
     setAssetData({
@@ -115,6 +121,7 @@ const AddAsset = () => {
       unit_price: '',
       counting_unit: '',
       department_id: '',
+      curriculum:'',
       note:'',
       type_sub_asset:'',
       image: null  // เปลี่ยนเป็น null เพื่อให้ไม่มีค่าเริ่มต้น

@@ -178,6 +178,7 @@ const AssetForm = ({ value = { curriculum: [] }, onChange }) => {
     onChange('curriculum', updatedList);
   };
 
+  
   return (
     <div className="asset-form-container">
       <h3 className="asset-form-title">ข้อมูลครุภัณฑ์</h3>

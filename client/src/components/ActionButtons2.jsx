@@ -11,18 +11,31 @@ const ActionButtons2 = ({ assetData, onCancel }) => {
   
     const formData = new FormData();   
   
-    // วนลูปเพิ่มข้อมูล assetData ลงใน formData
+    // // วนลูปเพิ่มข้อมูล assetData ลงใน formData
+    // for (const key in assetData) {
+    //   if (key === "image" && assetData[key] instanceof FileList) { 
+    //     // ถ้ามีหลายไฟล์
+    //     Array.from(assetData[key]).forEach((file, index) => {
+    //       formData.append(`image[${index}]`, file); // เพิ่มไฟล์แต่ละไฟล์ไปใน FormData
+    //     });
+    //   } else {
+    //     formData.append(key, assetData[key]);
+    //   }
+    // }
+  
+
     for (const key in assetData) {
       if (key === "image" && assetData[key] instanceof FileList) { 
-        // ถ้ามีหลายไฟล์
         Array.from(assetData[key]).forEach((file, index) => {
-          formData.append(`image[${index}]`, file); // เพิ่มไฟล์แต่ละไฟล์ไปใน FormData
+          formData.append(`image${index + 1}`, file); // ✅ เปลี่ยนชื่อให้ตรง backend
         });
+      } else if (key === "curriculum") {
+        formData.append("curriculum", JSON.stringify(assetData[key])); // ✅ แก้ตรงนี้
       } else {
         formData.append(key, assetData[key]);
       }
     }
-  
+    
     try {
       const response = await axios.post('http://localhost:5000/mainasset', formData, {
         headers: {
