@@ -497,46 +497,46 @@ const ShowInfo = () => {
                   ))}
                 </div>
               </div> */}
-<div>
-  <label className="label block mb-2 mt-4">รูปภาพ</label>
-  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4 mt-4">
-    {images.map((img, index) => (
-      <div key={index} className="border rounded p-2 shadow-sm bg-white">
-        {img ? (
-          <img
-            src={`http://localhost:5000/uploads/${img}`}
-            alt={`รูปภาพ ${index + 1}`}
-            className="w-full h-40 object-cover rounded cursor-pointer"
-            onClick={() => openModal(img)}
-          />
-        ) : (
-          <p className="text-sm text-gray-500 text-center">ไม่มีรูปภาพ</p>
-        )}
-      </div>
-    ))}
-  </div>
+            <div>
+              <label className="label block mb-2 mt-4">รูปภาพ</label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4 mt-4">
+                {images.map((img, index) => (
+                  <div key={index} className="border rounded p-2 shadow-sm bg-white">
+                    {img ? (
+                      <img
+                        src={`http://localhost:5000/uploads/${img}`}
+                        alt={`รูปภาพ ${index + 1}`}
+                        className="w-full h-40 object-cover rounded cursor-pointer"
+                        onClick={() => openModal(img)}
+                      />
+                    ) : (
+                      <p className="text-sm text-gray-500 text-center">ไม่มีรูปภาพ</p>
+                    )}
+                  </div>
+                ))}
+              </div>
 
-  {isOpen && (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-      onClick={closeModal}
-    >
-      <div className="relative max-w-4xl w-full px-4" onClick={(e) => e.stopPropagation()}>
-        <button
-          className="absolute top-2 right-2 text-white text-2xl"
-          onClick={closeModal}
-        >
-          &times;
-        </button>
-        <img
-          src={`http://localhost:5000/uploads/${selectedImage}`}
-          alt="ขยายรูป"
-          className="w-full max-h-[90vh] object-contain rounded"
-        />
-      </div>
-    </div>
-  )}
-</div>
+              {isOpen && (
+                <div
+                  className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+                  onClick={closeModal}
+                >
+                  <div className="relative max-w-4xl w-full px-4" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      className="absolute top-2 right-2 text-white text-2xl"
+                      onClick={closeModal}
+                    >
+                      &times;
+                    </button>
+                    <img
+                      src={`http://localhost:5000/uploads/${selectedImage}`}
+                      alt="ขยายรูป"
+                      className="w-full max-h-[90vh] object-contain rounded"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
         </div>
         
         <div className="bg-white mt-4 p-4 rounded-md shadow-md">

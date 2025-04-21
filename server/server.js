@@ -566,6 +566,34 @@ app.put('/mainasset/:id', async (req, res) => {
 });
 
 
+
+// const storage = multer.diskStorage({
+//   destination: 'public/uploads/',
+//   filename: (req, file, cb) => {
+//     cb(null, Date.now() + '-' + file.originalname);
+//   },
+// });
+
+// const upload = multer({ storage });
+
+app.post('/api/update-image', upload.single('image'), async (req, res) => {
+  const { index, asset_id } = req.body;
+  const filename = req.file.filename;
+
+  try {
+    // update mainasset.image1, image2, image3, etc.
+    const imageColumn = `image${parseInt(index) + 1}`;
+    await pool.query(
+      `UPDATE mainasset SET ${imageColumn} = $1 WHERE main_asset_id = $2`,
+      [filename, asset_id]
+    );
+    res.json({ filename });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('อัปโหลดไม่สำเร็จ');
+  }
+});
+
 // ************************************************************************************************
 //หน้า AddAsset เพิ่มพัสดุย่อย
 app.post('/api/subasset', async (req, res) => {
@@ -1140,46 +1168,6 @@ app.delete('/api/users/:id', async (req, res) => {
   }
 });
 
-// app.put('/api/users/:id/role', async (req, res) => {
-//   const { id } = req.params;  // รับ user_id จาก URL
-//   const { role } = req.body;  // รับ role_name จาก request body
-
-//   const client = await pool.connect(); // ใช้ client เพื่อจัดการ connection
-  
-//   try {
-//     // ดึง role_id จากฐานข้อมูลโดยใช้ role_name
-//     const queryRoleId = 'SELECT role_id FROM role WHERE role_name = $1';
-//     const roleResult = await client.query(queryRoleId, [role]);
-
-//     if (roleResult.rowCount === 0) {
-//       return res.status(404).json({ error: 'ไม่พบบทบาทในฐานข้อมูล' });
-//     }
-
-//     const roleId = roleResult.rows[0].role_id; // ✅ แก้ไขจาก .id เป็น .role_id
-
-//     // ตรวจสอบว่ามี user_id ที่ต้องการแก้ไขหรือไม่
-//     const userResult = await client.query('SELECT * FROM users WHERE user_id = $1', [id]);
-
-//     if (userResult.rowCount === 0) {
-//       return res.status(404).json({ message: 'ไม่พบผู้ใช้ที่ต้องการแก้ไข' });
-//     }
-
-//     // อัปเดต role_id ใหม่ และคืนค่าข้อมูลที่อัปเดต
-//     const updateQuery = 'UPDATE users SET role_id = $1 WHERE user_id = $2 RETURNING user_id, role_id';
-//     const result = await client.query(updateQuery, [roleId, id]);
-
-//     res.status(200).json({ 
-//       message: 'อัปเดตบทบาทผู้ใช้สำเร็จ',
-//       user: result.rows[0] // คืนค่าข้อมูลที่อัปเดตกลับไป
-//     });
-
-//   } catch (err) {
-//     console.error("เกิดข้อผิดพลาดในการอัปเดตบทบาทผู้ใช้:", err);
-//     res.status(500).json({ message: 'ไม่สามารถอัปเดตบทบาทผู้ใช้ได้' });
-//   } finally {
-//     client.release(); // ปิดการเชื่อมต่อฐานข้อมูล
-//   }
-// });
 
 
 app.put('/api/users/:id/role', async (req, res) => {
@@ -1236,44 +1224,7 @@ app.get('/api/role', async (req, res) => {
 
 
 //***********************Login************************* */
-// // Login API
-// app.post('/login', async (req, res) => {
-//   const { user_email, password,department_id } = req.body;
-//     const jwt = require('jsonwebtoken');
 
-    
-//   console.log('Received email:', user_email);  // ตรวจสอบ email ที่รับมา
-//   console.log('Received password:', password); // ตรวจสอบ password ที่รับมา
-//   console.log('Received department:', department_id);
-
-//   try {
-//     const result = await pool.query('SELECT * FROM users WHERE user_email = $1', [user_email]);
-//     const user = result.rows[0];
-
-//     if (!user) {
-//       return res.status(400).json({ message: 'Invalid credentials' });
-//     }
-
-//     if (password !== user.password) {
-//       return res.status(400).json({ message: 'Invalid credentials' });
-//     }
-
-    
-
-//     // สร้าง JWT token
-//     const token = jwt.sign({ userId: user.user_id, roleId: user.role_id }, 'your_jwt_secret', { expiresIn: '1h' });
-
-//     res.json({
-//       token,
-//       roleId: user.role_id ,
-//       dept: user.department_id
-//     });
-//   } catch (err) {
-//     console.error('Error:', err);
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// });
-// Login API
 app.post('/login', async (req, res) => {
   const { user_email, password } = req.body;
   const jwt = require('jsonwebtoken');
@@ -1343,48 +1294,6 @@ app.get("/api/department-assets", async (req, res) => {
   }
 });
 
-
-// // กำหนด API ที่จะดึงข้อมูล
-// app.get("/api/status-summary", async (req, res) => {
-//   try {
-//     // Query เพื่อดึงข้อมูลจากฐานข้อมูล
-//     const query = `
-//       SELECT m.status, m.fiscal_year, d.department_name AS department
-//       FROM mainasset m
-//       LEFT JOIN department d ON m.department_id = d.department_id;
-//     `;
-    
-//     // ดึงข้อมูลจากฐานข้อมูล
-//     const result = await pool.query(query);
-    
-//     // ส่งข้อมูลกลับไปยัง client
-//     res.json(result.rows);
-//   } catch (err) {
-//     console.error("Error fetching status summary:", err);
-//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
-//   }
-// });
-
-
-
-
-// app.get("/api/status-summary", async (req, res) => {
-//   try {
-//     const result = await pool.query(
-//       `SELECT status, fiscal_year, COUNT(*) as count 
-//       FROM mainasset 
-//       GROUP BY status, fiscal_year;`
-//     );
-
-//     const labels = result.rows.map((row) => row.status);
-//     const data = result.rows.map((row) => parseInt(row.count));
-    
-
-//   } catch (error) {
-//     console.error("Database error:", error);
-//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
-//   }
-// });
 
 app.get("/api/status-summary", async (req, res) => {
   try {
@@ -1678,8 +1587,6 @@ app.get("/api/mainasset-dash", async (req, res) => {
 // res.json(data);
 // });
 
-
-
 app.get('/api/getData', async (req, res) => {
   try {
     // ดึงรายชื่อภาควิชา
@@ -1705,20 +1612,18 @@ app.get('/api/getData', async (req, res) => {
         for (const year of years) {
           const assetsResult = await pool.query(
             `
-            SELECT budget_limit, averange_price
+            SELECT budget_limit
             FROM mainasset ma
             JOIN department d ON ma.department_id = d.department_id
             WHERE d.department_name = $1 AND ma.budget_type = $2 AND ma.fiscal_year = $3
-          `,
+            `,
             [departmentName, fundType, year]
           );
 
-          // สมมุติว่าเราต้องการ return เป็น array 3 ค่า เช่น [รวมงบ, ค่าเฉลี่ย, จำนวนรายการ]
-          const total = assetsResult.rows.reduce((acc, row) => acc + Number(row.budget_limit), 0);
-          const avg = assetsResult.rows.reduce((acc, row) => acc + Number(row.averange_price), 0);
-          const count = assetsResult.rowCount;
+          // สร้าง array ที่มีเฉพาะ budget_limit
+          const budgetArray = assetsResult.rows.map(row => Number(row.budget_limit));
 
-          departmentDetails[departmentName][fundType][year] = [total, avg, count];
+          departmentDetails[departmentName][fundType][year] = budgetArray;
         }
       }
     }

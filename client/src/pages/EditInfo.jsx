@@ -310,6 +310,62 @@ const formatCurrency = (value) => {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" }).format(value);
 };
 
+  const [isOpen, setIsOpen] = useState(false); // <-- moved up
+  const [selectedImage, setSelectedImage] = useState(null); // <-- moved up
+const openModal = (img) => {
+  setSelectedImage(img);
+  setIsOpen(true);
+};
+
+const closeModal = () => {
+  setIsOpen(false);
+  setSelectedImage(null);
+};
+
+if (loading) {
+  return <div className="text-center py-10">Loading...</div>;
+}
+
+if (error) {
+  return <div className="text-center py-10 text-red-500">{error}</div>;
+}
+
+const images = [
+  data.mainAsset?.image1,
+  data.mainAsset?.image2,
+  data.mainAsset?.image3,
+  data.mainAsset?.image4,
+  data.mainAsset?.image5,
+];
+
+
+const handleImageChange = (e, index) => {
+  const file = e.target.files[0];
+  if (file) {
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("index", index);
+    formData.append("asset_id", updatedData.mainAsset.main_asset_id);
+
+    axios
+      .post("http://localhost:5000/api/update-image", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then((res) => {
+        // อัปเดตภาพใหม่ใน state
+        const updatedImages = [...images];
+        updatedImages[index] = res.data.filename;
+        setImages(updatedImages);
+      })
+      .catch((err) => {
+        console.error("อัปโหลดรูปภาพไม่สำเร็จ", err);
+      });
+  }
+};
+
+
+
+
 // Loading and error state
 if (loading) return <div className="text-center py-10">Loading...</div>;
 if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
@@ -496,24 +552,59 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
             </div>
           </div>
 
-          <div >
-              <label className="label block mb-2 mt-4">รูปภาพ</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4 mt-4">
-                  {[data.mainAsset?.image1, data.mainAsset?.image2, data.mainAsset?.image3, data.mainAsset?.image4, data.mainAsset?.image5].map((img, index) => (
-                    <div key={index} className="border rounded p-2 shadow-sm bg-white">
-                      {img ? (
-                        <img
-                          src={`http://localhost:5000/uploads/${img}`}
-                          alt={`รูปภาพ ${index + 1}`}
-                          className="w-full h-40 object-cover rounded"
-                        />
-                      ) : (
-                        <p className="text-sm text-gray-500 text-center">ไม่มีรูปภาพ</p>
-                      )}
-                    </div>
-                  ))}
+          <div>
+            <label className="label block mb-2 mt-4">รูปภาพ</label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4 mt-4">
+              {images.map((img, index) => (
+                <div key={index} className="border rounded p-2 shadow-sm bg-white">
+                  {img ? (
+                    <img
+                      src={`http://localhost:5000/uploads/${img}`}
+                      alt={`รูปภาพ ${index + 1}`}
+                      className="w-full h-40 object-cover rounded cursor-pointer"
+                      onClick={() => openModal(img)}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-500 text-center">ไม่มีรูปภาพ</p>
+                  )}
+
+                  {/* ✅ เพิ่ม input type file เมื่ออยู่ในโหมดแก้ไข */}
+                  {isEditing && (
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageChange(e, index)}
+                      className="mt-2 w-full text-sm"
+                    />
+                  )}
                 </div>
-              </div>
+              ))}
+            </div>
+
+  {/* Modal แสดงรูปภาพเดิม */}
+  {isOpen && (
+    <div
+      className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+      onClick={closeModal}
+    >
+      <div className="relative max-w-4xl w-full px-4" onClick={(e) => e.stopPropagation()}>
+        <button
+          className="absolute top-2 right-2 text-white text-2xl"
+          onClick={closeModal}
+        >
+          &times;
+        </button>
+        <img
+          src={`http://localhost:5000/uploads/${selectedImage}`}
+          alt="ขยายรูป"
+          className="w-full max-h-[90vh] object-contain rounded"
+        />
+      </div>
+    </div>
+  )}
+</div>
+
+          
         </div>
 
         
