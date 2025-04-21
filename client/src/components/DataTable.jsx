@@ -310,6 +310,7 @@ import axios from "axios";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import THSarabunNew from "./fonts/THSarabunNew-normal";
+import { logoImage } from "../image/logoBase64";
 
 const DataTable = ({ data, filteredData, handleDelete }) => {
   const [sortOrder, setSortOrder] = useState("asc");
@@ -425,8 +426,15 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
       doc.setFont("THSarabun");
       doc.setFontSize(18); // ขนาดใหญ่ขึ้น
       
+      
       // คำนวณความกว้างของหน้ากระดาษ
       const pageWidth = doc.internal.pageSize.getWidth();
+      // 👉 เพิ่มโลโก้
+      const imgWidth = 30; // กว้างภาพ
+      const imgHeight = 30; // สูงภาพ
+      const centerX = (pageWidth - imgWidth) / 2; // จัดกลาง
+
+      doc.addImage(logoImage, 'PNG', centerX, 5, imgWidth, imgHeight); // วางไว้บนสุด
       
       // ข้อความหัวข้อ
       const title1 = `ข้อมูลครุภัณฑ์ย่อยของ รหัสครุภัณฑ์ ${mainAssetId}`;
@@ -437,11 +445,11 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
       const title2X = (pageWidth - doc.getTextWidth(title2)) / 2;
       
       // แสดงหัวข้อบน PDF โดยเว้นระยะระหว่างบรรทัดเล็กน้อย
-      doc.text(title1, title1X, 20); // บรรทัดแรก
-      doc.text(title2, title2X, 28); // บรรทัดที่สอง ห่างจากบรรทัดแรก
+      doc.text(title1, title1X, 42); // บรรทัดแรก
+      doc.text(title2, title2X, 50); // บรรทัดที่สอง ห่างจากบรรทัดแรก
       // Configure autoTable with dynamic column widths and styling
       autoTable(doc, {
-        startY: 40,
+        startY: 60,
         head: [
           [
             "รายการพัสดุย่อย",
@@ -470,7 +478,7 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
         bodyStyles: {
           font: "THSarabun",
           fontStyle: "normal",
-          halign: 'center'
+          halign: 'left'
         },
         columnStyles: {
           0: { cellWidth: 'auto' },
@@ -496,8 +504,6 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
   
 
 
-  
-
 const exportPDFAllRow = () => {
   alert(`คุณต้องการส่งออกไฟล์ PDF สำหรับครุภัณฑ์หลัก`);
   const doc = new jsPDF({
@@ -505,14 +511,17 @@ const exportPDFAllRow = () => {
     unit: 'mm',
     format: 'a4',
   });
-  
 
   doc.addFileToVFS("THSarabun.ttf", THSarabunNew);
   doc.addFont("THSarabun.ttf", "THSarabun", "normal");
   doc.setFont("THSarabun");
   doc.setFontSize(12);
 
-  const tableData = departmentData.map((item) => [
+
+  
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+    const tableData = departmentData.map((item) => [
     item.main_asset_id,
     item.main_asset_name,
     item.department_name || "-",
@@ -523,73 +532,73 @@ const exportPDFAllRow = () => {
     item.fiscal_year || "-",
     item.status || "-",
   ]);
-
-
-  const pageWidth = doc.internal.pageSize.getWidth(); // ความกว้างหน้ากระดาษ
-  const departmentText = `ข้อมูลรายการครุภัณฑ์ทั้งหมดของภาควิชา ${departmentName}`;
-  const facultyText = `คณะครุศาสตร์อุตสาหกรรมเเละเทคโนโลยี สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง`;
   
-  // คำนวณตำแหน่งให้อยู่กึ่งกลาง
+  // 👉 เพิ่มโลโก้
+  const imgWidth = 30; // กว้างภาพ
+  const imgHeight = 30; // สูงภาพ
+  const centerX = (pageWidth - imgWidth) / 2; // จัดกลาง
+
+  doc.addImage(logoImage, 'PNG', centerX, 5, imgWidth, imgHeight); // วางไว้บนสุด
+
+  // 👉 ข้อความหัวกระดาษ
+  const departmentText = `ข้อมูลรายการครุภัณฑ์ทั้งหมด ${departmentName}`;
+  const facultyText = `คณะครุศาสตร์อุตสาหกรรมเเละเทคโนโลยี สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง`;
+
   const departmentX = (pageWidth - doc.getTextWidth(departmentText)) / 2;
   const facultyX = (pageWidth - doc.getTextWidth(facultyText)) / 2;
 
-  // ตั้งค่าฟอนต์เป็นตัวหนาและขนาดใหญ่
-  doc.setFont("THSarabun"); // กำหนดฟอนต์เป็น THSarabun และตัวหนา
-  doc.setFontSize(16); // ปรับขนาดตัวอักษรให้ใหญ่ขึ้น
+  doc.setFont("THSarabun");
+  doc.setFontSize(16);
+  doc.text(departmentText, departmentX, 42); // ขยับลงมา หลังรูป
+  doc.text(facultyText, facultyX, 50);
 
-  
-  // วางข้อความ
-  doc.text(departmentText, departmentX, 20); // บรรทัดแรก
-  doc.text(facultyText, facultyX, 28);       // บรรทัดที่สอง ห่างจากบรรทัดแรกเล็กน้อย
-
-  // ✅ เรียกผ่าน autoTable() โดยส่ง doc เข้าไป
+  // 👉 ตาราง
   autoTable(doc, {
-    startY: 40,
+    startY: 60, // ขยับตามความสูงของโลโก้ + ข้อความ
     head: [[
-      "รหัสทรัพย์สิน",
-      "ชื่อทรัพย์สิน",
-      "ภาควิชา",
-      "ประเภทสินทรัพย์",
-      "ผู้รับผิดชอบ",
-      "จำนวน",
-      "ประเภทเงิน",
-      "ปีงบประมาณ",
-      "สภาพการครุภัณฑ์",
-    ]],
-    body: tableData,
-    styles: {
-      font: "THSarabun",  // Use Thai font
-      fontSize: 11,
-    },
-    headStyles: {
-      font: "THSarabun",
-      fontStyle: "normal",
-      fillColor: [230, 230, 230],
-      textColor: [0, 0, 0],
-      halign: 'center'
-    },
-    bodyStyles: {
-      font: "THSarabun",
-      fontStyle: "normal",
-      halign: 'left'
-    },
-    columnStyles: {
-      0: { cellWidth: 'auto' },
-      1: { cellWidth: 'auto' },
-      2: { cellWidth: 'auto' },
-      3: { cellWidth: 'auto' },
-      4: { cellWidth: 'auto' },
-      5: { cellWidth: 'auto' },
-      6: { cellWidth: 'auto' },
-      7: { cellWidth: 'auto' },
-      8: { cellWidth: 'auto' },
-    },
-  });
+            "รหัสทรัพย์สิน",
+            "ชื่อทรัพย์สิน",
+            "ภาควิชา",
+            "ประเภทสินทรัพย์",
+            "ผู้รับผิดชอบ",
+            "จำนวน",
+            "ประเภทเงิน",
+            "ปีงบประมาณ",
+            "สภาพการครุภัณฑ์",
+          ]],
+          body: tableData,
+          styles: {
+            font: "THSarabun",  // Use Thai font
+            fontSize: 12,
+          },
+          headStyles: {
+            font: "THSarabun",
+            fontStyle: "normal",
+            fillColor: [230, 230, 230],
+            textColor: [0, 0, 0],
+            halign: 'left'
+          },
+          bodyStyles: {
+            font: "THSarabun",
+            fontStyle: "normal",
+            halign: 'left'
+          },
+          columnStyles: {
+            0: { cellWidth: 'auto' },
+            1: { cellWidth: 'auto' },
+            2: { cellWidth: 'auto' },
+            3: { cellWidth: 'auto' },
+            4: { cellWidth: 'auto' },
+            5: { cellWidth: 'auto' },
+            6: { cellWidth: 'auto' },
+            7: { cellWidth: 'auto' },
+            8: { cellWidth: 'auto' },
+          },
+        });
+      
+        doc.save(`mainasset_${departmentName}.pdf`);
+      };
 
-  doc.save(`mainasset_${departmentName}.pdf`);
-};
-
-  
   
   return (
     <div className="bg-white mt-4 p-4 rounded-md shadow-md overflow-x-auto">
