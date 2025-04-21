@@ -47,10 +47,21 @@ const SearchForm = ({ onFilter }) => {
   }, []);
 
 
-  const getYearOptions = () => {
-    const currentYear = new Date().getFullYear();
-    return Array.from({ length: 21 }, (_, i) => currentYear - 10 + i + 543);
-  };
+  // const getYearOptions = () => {
+  //   const currentYear = new Date().getFullYear();
+  //   return Array.from({ length: 21 }, (_, i) => currentYear - 10 + i + 543);
+  // };
+  const [fiscalYears, setFiscalYears] = useState([]);
+  useEffect(() => {
+    axios
+      .get('http://localhost:5000/api/fiscal-years') // ระบุ URL ให้ตรงกับ backend
+      .then((response) => {
+        setFiscalYears(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching fiscal years:', error);
+      });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -90,8 +101,10 @@ const SearchForm = ({ onFilter }) => {
                 className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">-- กรุณาเลือก --</option>
-                {getYearOptions().map((year) => (
-                  <option key={year} value={year}>{year}</option>
+                {fiscalYears.map((item) => (
+                  <option key={item.fiscal_year} value={item.fiscal_year}>
+                    {item.fiscal_year}
+                  </option>
                 ))}
               </select>
             </div>

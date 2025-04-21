@@ -126,26 +126,30 @@ const handleAverangeChange = (input) => {
 };
 
 
+const getYearOptions = () => {
+  const currentYear = new Date().getFullYear();
+  return Array.from({ length: 21 }, (_, i) => currentYear - 10 + i + 543);
+};
+
 
 
   return (
     <div className="acquisition-container">
       <h3 className="acquisition-title">วิธีการได้มา</h3>
       <div className="grid-2-cols">
-        <div>
-          <label className="acquisition-label">ปีงบประมาณ</label>
-          <select
-            className="acquisition-select"
-            value={value.fiscal_year || ""}
-            onChange={(e) => onChange("fiscal_year", e.target.value)}
-          >
-            <option value="">-- กรุณาเลือก --</option>
-            <option>2561</option>
-            <option>2562</option>
-            <option>2563</option>
-            <option>2564</option>
-          </select>
-        </div>
+      <div>
+        <label className="acquisition-label">ปีงบประมาณ</label>
+        <input
+          type="number"
+          className="acquisition-select" // ถ้าต้องการให้สไตล์เหมือนเดิม
+          value={value.fiscal_year || ""}
+          onChange={(e) => onChange("fiscal_year", e.target.value)}
+          placeholder="เช่น 2567"
+          min="2500"
+          max="2700" // หรือจะไม่ใส่ก็ได้ ถ้าปล่อยให้กรอกอิสระ
+        />
+      </div>
+
 
         {/* วันที่ตรวจรับ */}
         <div>

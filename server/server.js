@@ -261,6 +261,19 @@ app.get('/api/mainasset-assetlist', async (req, res) => {
 });
 
 
+// ดึง fiscal_year ที่ไม่ซ้ำ
+app.get('/api/fiscal-years', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT DISTINCT fiscal_year FROM mainasset ORDER BY fiscal_year DESC'
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching fiscal years:', err);
+    res.status(500).send('Server error');
+  }
+});
+
 
 
 const path = require('path');  // เพิ่มบรรทัดนี้
