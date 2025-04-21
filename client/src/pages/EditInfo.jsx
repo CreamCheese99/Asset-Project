@@ -86,28 +86,6 @@ const EditInfo = () => {
   }, []);
 
 
-
-
-    // // ดึงข้อมูลผู้รับผิดชอบจาก API
-    // useEffect(() => {
-    //   if (!departmentId) {
-    //     console.log("departmentId is null or undefined");
-    //     return;  // ป้องกันการเรียก API ถ้า departmentId เป็น null
-    //   }
-
-    //   // หาก departmentId มีค่าให้เรียก API
-    //   axios
-    //     .get(`http://localhost:5000/api/users/by-department/${departmentId}`)
-    //     .then(response => {
-    //       console.log('Users in department:', response.data);
-    //       setUsersInDepartment(response.data);
-    //     })
-    //     .catch(error => {
-    //       console.error('Error loading users:', error);
-    //     });
-    // }, [departmentId]);
-
-
 //****************************************************************************** */
  // ดึง departmentId จาก localStorage
  useEffect(() => {
@@ -222,39 +200,21 @@ const resetForm = () => {
   setNewTypeSubAsset("");
 };
 
-// Function to handle deleting a sub-asset
-const handleDelete = async (subId) => {
-  const confirmDelete = window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?");
-  if (!confirmDelete) return;
 
-  console.log(" ลบ subasset id:", subId);
 
-  try {
-    await axios.delete(`http://localhost:5000/api/subasset/${subId}`);
-    
-    // Update state after deletion
-    setData(prevData => ({
-      ...prevData,
-      subasset: prevData.subasset.filter(item => item.sub_asset_id !== subId),
-    }));
+// เพิ่มข้อมูล subasset ใหม่
+const handleSaveSubasset = async (e) => {
+  e.preventDefault();
 
-    console.log("✅ ลบข้อมูลสำเร็จ");
-  } catch (error) {
-    console.error("❌ เกิดข้อผิดพลาดในการลบข้อมูล:", error);
-    alert("เกิดข้อผิดพลาดในการลบข้อมูล!");
-  }
-};
-
-// Function to save sub-asset data (POST or PUT based on edit mode)
-const handleSaveSubasset = async () => {
-  if (!newSubasset || !newDetail || !newPrice || !newQuantity || !newUnit || !newStatus || !newNote || !newTypeSubAsset) {
+  if (
+    !newSubasset || !newDetail || !newPrice || !newQuantity ||!newUnit || !newStatus || !newNote || !newTypeSubAsset
+  ) {
     alert("กรุณากรอกข้อมูลให้ครบถ้วน");
     return;
   }
 
-  // Check if main_asset_id exists
   if (!data?.mainAsset?.main_asset_id) {
-    console.error(" main_asset_id ไม่พบข้อมูล!");
+    console.error("main_asset_id ไม่พบข้อมูล!");
     alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Main Asset ID");
     return;
   }
@@ -273,37 +233,74 @@ const handleSaveSubasset = async () => {
 
   try {
     const url = editMode
-      ? `http://localhost:5000/api/subasset/${editId}` // PUT request
-      : "http://localhost:5000/api/subasset"; // POST request
-    
-    const method = editMode ? "put" : "post"; // Determine the request method
-    
+      ? `http://localhost:5000/api/subasset/${editId}`
+      : "http://localhost:5000/api/subasset";
+    const method = editMode ? "put" : "post";
+
     const response = await axios[method](url, subAssetData);
     console.log("บันทึกข้อมูลสำเร็จ:", response.data);
 
-    // Update state with the new or edited sub-asset
-    if (editMode) {
-      setData(prevData => ({
-        ...prevData,
-        subasset: prevData.subasset.map(item =>
-          item.sub_asset_id === editId ? { ...item, ...subAssetData } : item
-        ),
-      }));
-    } else {
-      setData(prevData => ({
-        ...prevData,
-        subasset: [...prevData.subasset, { ...subAssetData, sub_asset_id: response.data.sub_asset_id }],
-      }));
-    }
 
-    // Close the popup and reset the form
+// อัปเดตหรือเพิ่ม subasset ใน state
+if (editMode) {
+  setData(prevData => ({
+    ...prevData,
+    subasset: (prevData.subasset || []).map(item =>
+      item.sub_asset_id === editId ? { ...item, ...subAssetData } : item
+    ),
+  }));
+} else {
+  const newSubAsset = {
+    ...subAssetData,
+    sub_asset_id: response.data?.sub_asset_id || Date.now() // fallback กันพัง
+  };
+  setData(prevData => ({
+    ...prevData,
+    subasset: [
+      ...(prevData.subasset || []),
+      newSubAsset,
+    ],
+  }));
+}
+
+
+   
+    alert("✅ บันทึกข้อมูลเรียบร้อยแล้ว!");
+
+    // ปิด popup และล้างฟอร์ม
     setIsPopupOpen(false);
     resetForm();
   } catch (error) {
     console.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล:", error);
-    alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล!");
+    alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล!");
   }
 };
+
+// ลบข้อมูล subasset
+const handleDelete = async (subId) => {
+  const confirmDelete = window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?");
+  if (!confirmDelete) return;
+
+  console.log(" ลบ subasset id:", subId);
+
+  try {
+    await axios.delete(`http://localhost:5000/api/subasset/${subId}`);
+    
+    // อัปเดตข้อมูลใน state หลังจากการลบ
+    setData(prevData => ({
+      ...prevData,
+      subasset: prevData.subasset.filter(item => item.sub_asset_id !== subId),
+    }
+  ));
+  alert("ลบข้อมูลสำเร็จ!");
+
+    console.log("✅ ลบข้อมูลสำเร็จ");
+  } catch (error) {
+    console.error("❌ เกิดข้อผิดพลาดในการลบข้อมูล:", error);
+    alert("เกิดข้อผิดพลาดในการลบข้อมูล!");
+  }
+};
+
 
 // Format currency
 const formatCurrency = (value) => {
@@ -820,12 +817,14 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
                       ยกเลิก
                     </button>
                     <button
+                      type="button" // <<< เพิ่มตรงนี้
                       className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-700"
                       onClick={handleSaveSubasset}
                       disabled={loading}
                     >
                       {loading ? "กำลังบันทึก..." : "บันทึก"}
                     </button>
+
                   </div>
                 </div>
               </div>

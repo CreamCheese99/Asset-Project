@@ -373,6 +373,8 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
 
 
   const exportPDF = async (mainAssetId) => {
+    alert(`กำลังสร้างไฟล์ PDF สำหรับรหัสครุภัณฑ์ ${mainAssetId}...`);
+
     const token = localStorage.getItem("token");
   
     try {
@@ -381,11 +383,17 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
       });
   
       const subAssets = response.data;
-  
       if (!Array.isArray(subAssets) || subAssets.length === 0) {
+        alert("ไม่พบข้อมูลครุภัณฑ์ย่อย ไม่สามารถสร้าง PDF ได้");
         console.error("ไม่พบข้อมูล sub-assets");
         return;
       }
+  
+  
+      // if (!Array.isArray(subAssets) || subAssets.length === 0) {
+      //   console.error("ไม่พบข้อมูล sub-assets");
+      //   return;
+      // }
   
       // Ensure that the data is well-structured before passing to autoTable
       const tableData = subAssets.map(item => [
