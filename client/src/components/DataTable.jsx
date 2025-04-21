@@ -373,7 +373,7 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
 
 
   const exportPDF = async (mainAssetId) => {
-    alert(`กำลังสร้างไฟล์ PDF สำหรับรหัสครุภัณฑ์ ${mainAssetId}...`);
+    alert(`คุณต้องการส่งออกไฟล์ PDF สำหรับครุภัณย่อยฑ์ ของครุภัณฑ์รหัส ${mainAssetId}...`);
 
     const token = localStorage.getItem("token");
   
@@ -422,13 +422,26 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
       doc.setFont("THSarabun"); // ✅ ต้องมาก่อน
       doc.setFontSize(12); // ต้องตั้งหลัง setFont
 
-  
-      // Title and Table
-      doc.text(`รายการครุภัณฑ์ย่อยของ รหัสครุภัณฑ์ ${mainAssetId}`, 14, 20);
-  
+      doc.setFont("THSarabun");
+      doc.setFontSize(18); // ขนาดใหญ่ขึ้น
+      
+      // คำนวณความกว้างของหน้ากระดาษ
+      const pageWidth = doc.internal.pageSize.getWidth();
+      
+      // ข้อความหัวข้อ
+      const title1 = `ข้อมูลครุภัณฑ์ย่อยของ รหัสครุภัณฑ์ ${mainAssetId}`;
+      const title2 = `คณะครุศาสตร์อุตสาหกรรมและเทคโนโลยี สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง`;
+      
+      // คำนวณตำแหน่ง X ให้อยู่กึ่งกลางหน้ากระดาษ
+      const title1X = (pageWidth - doc.getTextWidth(title1)) / 2;
+      const title2X = (pageWidth - doc.getTextWidth(title2)) / 2;
+      
+      // แสดงหัวข้อบน PDF โดยเว้นระยะระหว่างบรรทัดเล็กน้อย
+      doc.text(title1, title1X, 20); // บรรทัดแรก
+      doc.text(title2, title2X, 28); // บรรทัดที่สอง ห่างจากบรรทัดแรก
       // Configure autoTable with dynamic column widths and styling
       autoTable(doc, {
-        startY: 30,
+        startY: 40,
         head: [
           [
             "รายการพัสดุย่อย",
@@ -483,7 +496,10 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
   
 
 
+  
+
 const exportPDFAllRow = () => {
+  alert(`คุณต้องการส่งออกไฟล์ PDF สำหรับครุภัณฑ์หลัก`);
   const doc = new jsPDF({
     orientation: 'landscape',
     unit: 'mm',
@@ -505,15 +521,30 @@ const exportPDFAllRow = () => {
     item.subamount || 0,
     item.budget_type || "-",
     item.fiscal_year || "-",
-    item.usage || "-",
+    item.status || "-",
   ]);
 
 
+  const pageWidth = doc.internal.pageSize.getWidth(); // ความกว้างหน้ากระดาษ
+  const departmentText = `ข้อมูลรายการครุภัณฑ์ทั้งหมดของภาควิชา ${departmentName}`;
+  const facultyText = `คณะครุศาสตร์อุตสาหกรรมเเละเทคโนโลยี สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง`;
   
-  doc.text(`ข้อมูลรายการครุภัณฑ์ทั้งหมดของภาควิชา ${departmentName}`, 14, 20);
+  // คำนวณตำแหน่งให้อยู่กึ่งกลาง
+  const departmentX = (pageWidth - doc.getTextWidth(departmentText)) / 2;
+  const facultyX = (pageWidth - doc.getTextWidth(facultyText)) / 2;
+
+  // ตั้งค่าฟอนต์เป็นตัวหนาและขนาดใหญ่
+  doc.setFont("THSarabun"); // กำหนดฟอนต์เป็น THSarabun และตัวหนา
+  doc.setFontSize(16); // ปรับขนาดตัวอักษรให้ใหญ่ขึ้น
+
+  
+  // วางข้อความ
+  doc.text(departmentText, departmentX, 20); // บรรทัดแรก
+  doc.text(facultyText, facultyX, 28);       // บรรทัดที่สอง ห่างจากบรรทัดแรกเล็กน้อย
+
   // ✅ เรียกผ่าน autoTable() โดยส่ง doc เข้าไป
   autoTable(doc, {
-    startY: 30,
+    startY: 40,
     head: [[
       "รหัสทรัพย์สิน",
       "ชื่อทรัพย์สิน",
@@ -528,7 +559,7 @@ const exportPDFAllRow = () => {
     body: tableData,
     styles: {
       font: "THSarabun",  // Use Thai font
-      fontSize: 14,
+      fontSize: 11,
     },
     headStyles: {
       font: "THSarabun",
@@ -540,7 +571,7 @@ const exportPDFAllRow = () => {
     bodyStyles: {
       font: "THSarabun",
       fontStyle: "normal",
-      halign: 'center'
+      halign: 'left'
     },
     columnStyles: {
       0: { cellWidth: 'auto' },

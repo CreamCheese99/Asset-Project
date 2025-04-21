@@ -26,6 +26,7 @@ const storage = multer.diskStorage({
 // สร้าง instance ของ multer
 const upload = multer({ storage: storage });
 
+
 //เพิ่ม mainasset
 app.post('/mainasset', upload.fields([ 
   { name: 'image1', maxCount: 1 },

@@ -38,21 +38,56 @@ const ManageInfo = () => {
     }
   };
 
+  // const handleSave = async () => {
+  //   try {
+  //     if (editingId) {
+  //       await axios.put(`http://localhost:5000/department/${editingId}`, tempData);
+  //     } else {
+  //       await axios.post("http://localhost:5000/department", tempData);
+  //     }
+  //     fetchData(); // โหลดข้อมูลใหม่หลังการเพิ่ม/แก้ไข
+  //     setIsModalOpen(false);
+  //     setEditingId(null);
+  //   } catch (error) {
+  //     console.error("Error saving data:", error);
+  //   }
+  // };
   const handleSave = async () => {
+    const trimmedCurriculum = tempData.curriculum
+      .map((cur) => cur.trim())
+      .filter((cur) => cur !== ""); // ลบหลักสูตรที่ว่างออก
+  
+    if (!tempData.department_name.trim()) {
+      alert("กรุณากรอกชื่อภาควิชา");
+      return;
+    }
+  
+    if (trimmedCurriculum.length === 0) {
+      alert("กรุณากรอกอย่างน้อยหนึ่งหลักสูตร");
+      return;
+    }
+  
+    const cleanData = {
+      department_name: tempData.department_name.trim(),
+      curriculum: trimmedCurriculum,
+    };
+  
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/department/${editingId}`, tempData);
+        await axios.put(`http://localhost:5000/department/${editingId}`, cleanData);
       } else {
-        await axios.post("http://localhost:5000/department", tempData);
+        await axios.post("http://localhost:5000/department", cleanData);
       }
-      fetchData(); // โหลดข้อมูลใหม่หลังการเพิ่ม/แก้ไข
+      fetchData();
       setIsModalOpen(false);
       setEditingId(null);
+      setTempData({ department_name: "", curriculum: [""] });
     } catch (error) {
       console.error("Error saving data:", error);
     }
   };
-
+  
+  
   return (
     <div className="container mx-auto p-4 mt-4 bg-white rounded-lg shadow-lg max-w-7xl">
       <h2 className="text-2xl font-bold mb-4 text-gray-800 text-left">ข้อมูลภาควิชา</h2>
@@ -92,13 +127,13 @@ const ManageInfo = () => {
                       className="bg-yellow-500 text-white px-4 py-2 rounded-full hover:bg-yellow-600 shadow-md flex items-center"
                       onClick={() => handleEdit(item.department_id, item)}
                     >
-                      <FaEdit className="mr-1" /> แก้ไข
+                      <FaEdit className="mr-1" /> 
                     </button>
                     <button
                       className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 shadow-md flex items-center"
                       onClick={() => handleDelete(item.department_id)}
                     >
-                      <FaTrash className="mr-1" /> ลบ
+                      <FaTrash className="mr-1" /> 
                     </button>
                   </div>
                 </td>
@@ -166,13 +201,13 @@ const ManageInfo = () => {
             </button>
 
             <div className="flex justify-between mt-4">
-              <button onClick={() => setIsModalOpen(false)} className="bg-gray-400  rounded-lg text-white px-4 py-2 rounded-full hover:bg-red-500">
+              <button onClick={() => setIsModalOpen(false)} className="bg-gray-400  rounded-full text-white px-4 py-2 rounded-full hover:bg-red-500">
                 ยกเลิก
               </button>
 
               <button
                 onClick={handleSave}
-                className={`px-4 py-2 rounded-lg text-white transition-all ${
+                className={`px-4 py-2 rounded-full text-white transition-all ${
                   !tempData.department_name.trim() || tempData.curriculum.every((cur) => cur.trim() === "")
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-blue-500 hover:bg-blue-600"

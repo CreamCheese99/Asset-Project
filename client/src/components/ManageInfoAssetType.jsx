@@ -32,7 +32,15 @@ const ManageAssetTypes = () => {
       alert("กรุณากรอกประเภทสินทรัพย์");
       return;
     }
-
+  
+    const confirmMsg = editingId
+      ? "คุณต้องการแก้ไขข้อมูลประเภทสินทรัพย์นี้หรือไม่?"
+      : "คุณต้องการเพิ่มประเภทสินทรัพย์นี้หรือไม่?";
+  
+    if (!window.confirm(confirmMsg)) {
+      return;
+    }
+  
     try {
       if (editingId) {
         await axios.put(`http://localhost:5000/api/asset_type/${editingId}`, {
@@ -47,14 +55,14 @@ const ManageAssetTypes = () => {
     } catch (error) {
       console.error("Error saving asset type:", error);
     }
-
+  
     setEditingId(null);
     setIsModalOpen(false);
     setTempData({ assetType: "" });
   };
-
+  
   const handleDelete = async (id) => {
-    if (window.confirm("คุณต้องการลบประเภทสินทรัพย์นี้หรือไม่?")) {
+    if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบประเภทสินทรัพย์นี้? การลบจะไม่สามารถกู้คืนได้")) {
       try {
         await axios.delete(`http://localhost:5000/api/asset_type/${id}`);
         fetchAssetTypes();
@@ -63,6 +71,7 @@ const ManageAssetTypes = () => {
       }
     }
   };
+  
 
   return (
     <div className="container mx-auto p-4 mt-4 bg-white rounded-lg shadow-lg max-w-7xl"> 
@@ -94,13 +103,13 @@ const ManageAssetTypes = () => {
                   onClick={() => handleEdit(item.asset_type_id, item)}
                   className="bg-yellow-500 text-white px-4 py-2 rounded-full hover:bg-yellow-600 shadow-md flex items-center"
                 >
-                  <FaEdit className="mr-1" /> แก้ไข
+                  <FaEdit className="mr-1" /> 
                 </button>
                 <button
                   onClick={() => handleDelete(item.asset_type_id)}
                   className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 shadow-md flex items-center"
                 >
-                  <FaTrash className="mr-1" /> ลบ
+                  <FaTrash className="mr-1" /> 
                 </button>
               </td>
             </tr>
@@ -124,7 +133,7 @@ const ManageAssetTypes = () => {
             <div className="flex justify-between">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="bg-gray-400  rounded-lg text-white px-4 py-2 rounded-full hover:bg-red-500"
+                className="bg-gray-400  rounded-full text-white px-4 py-2 rounded-full hover:bg-red-500"
               >
                 ยกเลิก
               </button>
