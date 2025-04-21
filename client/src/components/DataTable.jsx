@@ -611,7 +611,7 @@ const exportPDFAllRow = () => {
             <tr className="bg-gray-200 text-gray-700">
               <th className="border px-4 py-2">รหัสทรัพย์สิน</th>
               <th className="border px-4 py-2 hidden lg:table-cell">ชื่อทรัพย์สิน</th>
-              <th className="border px-4 py-2">รหัสภาควิชา</th>
+             {/* <th className="border px-4 py-2">รหัสภาควิชา</th> */}
               <th className="border px-4 py-2">ภาควิชา</th>
               <th className="border px-4 py-2">ประเภทสินทรัพย์</th>
               <th className="border px-4 py-2">ผู้รับผิดชอบ</th>
@@ -641,7 +641,7 @@ const exportPDFAllRow = () => {
                 <tr key={item.main_asset_id} className="text-center">
                   <td className="border px-4 py-2">{item.main_asset_id}</td>
                   <td className="border px-4 py-2 hidden lg:table-cell">{item.main_asset_name}</td>
-                  <td className="border px-4 py-2">{item.department_id || "-"}</td>
+                  {/* <td className="border px-4 py-2">{item.department_id || "-"}</td> */}
                   <td className="border px-4 py-2">{item.department_name || "-"}</td>
                   <td className="border px-4 py-2">{item.asset_type || "-"}</td>
                   <td className="border px-4 py-2">{item.responsible_person || "-"}</td>
