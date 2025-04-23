@@ -6,7 +6,7 @@ import { useState } from 'react';
 const Header = () => {
   // ดึง roleId และ user_name จาก localStorage
   const roleId = localStorage.getItem('roleId');  // ตรวจสอบว่า key ชื่อถูกต้อง
-  const userName = localStorage.getItem('user_name'); // ดึงชื่อผู้ใช้
+  const userName = localStorage.getItem('userName'); // ดึงชื่อผู้ใช้
   const [isMenuOpen, setMenuOpen] = useState(false); // สถานะเพื่อเปิด/ปิดเมนู dropdown
   const navigate = useNavigate(); // ใช้ navigate hook เพื่อเปลี่ยนเส้นทางหลังออกจากระบบ
 

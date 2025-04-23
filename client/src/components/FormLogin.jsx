@@ -54,22 +54,22 @@ function FormLogin() {
   
       console.log('Received response:', response); // ตรวจสอบการตอบกลับจาก API
   
-      // const data = response.data;
-      // if (response.status === 200) {
-      //   // Store token and roleId in localStorage
-      //   localStorage.setItem('token', data.token);
-      //   localStorage.setItem('roleId', data.roleId);
-      //   localStorage.setItem('userName', data.user_name);
-      //   localStorage.setItem('departmentId', data.department_id);
-
-
-        const data = response.data;
+      const data = response.data;
       if (response.status === 200) {
         // Store token and roleId in localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('roleId', data.roleId);
-        localStorage.setItem("user_name", data.user_name); 
+        localStorage.setItem('userName', data.user_name);
         localStorage.setItem('departmentId', data.department_id);
+
+
+      //   const data = response.data;
+      // if (response.status === 200) {
+      //   // Store token and roleId in localStorage
+      //   localStorage.setItem('token', data.token);
+      //   localStorage.setItem('roleId', data.roleId);
+      //   localStorage.setItem("user_name", data.user_name); 
+      //   localStorage.setItem('departmentId', data.department_id);
   
         // Redirect based on roleId
         if (data.roleId === 1) {
