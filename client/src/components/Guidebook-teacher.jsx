@@ -4,11 +4,12 @@ import "../css/GuideBook.css";
 import loginImage from "../image/guidebookImage/login.png";
 import homeImage from "../image/guidebookImage/professor/home.png";
 import manageassetImage from "../image/guidebookImage/professor/manageasset.png";
-import manageasset2Image from "../image/guidebookImage/professor/manageasset 2.png";
+import teacher from "../image/guidebookImage/teacher/teacher.jpg";
 // import subassetImage from "../image/guidebookImage/professor/addsubasset.png";
-import subasset2Image from "../image/guidebookImage/professor/addsubasset.png";
+import teacher2 from "../image/guidebookImage/teacher/teacher2.jpg";
 import logoutImage from "../image/guidebookImage/professor/logout.png";
-import res from "../image/guidebookImage/professor/res.jpg";
+// import res from "../image/guidebookImage/professor/res.jpg";
+
 
 const sections = [
   {
@@ -34,14 +35,12 @@ const sections = [
     image: manageassetImage,
     steps: [
       { type: "text", content: "1. เลือกเมนู 'หน้าจัดการพัสดุ' จากแถบเมนูด้านบน" },
-      { type: "text", content: "2. ผู้ใช้สามารถฟิลเตอร์หรือใส่รหัสทรัพย์สินเพื่อดูรายการพัสดุได้และจะดูได้เฉพาะพัสดุในภาควิชาตนเอง" },
+      { type: "text", content: "2. ผู้ใช้สามารถฟิลเตอร์หรือใส่รหัสทรัพย์สินเพื่อดูรายการพัสดุได้และจะดูได้เฉพาะพัสดุที่ตนเองรับผิดชอบ" },
       { type: "text", content: "3. ผู้ใช้สามารถแก้ไขข้อมูลพัสดุย่อยได้โดยเลือกแก้ไขในพัสดุหลัก" },
-      { type: "image", src: manageasset2Image, alt: "จัดการพัสดุ" },
-      { type: "text", content: "4. กรอกผู้รับผิดชอบ" },
-      { type: "image", src: res, alt: "กรอกผู้รับผิดชอบ" },
-      { type: "text", content: "5. เพิ่มรายการพัสดุย่อยเมื่อกรอกข้อมูลเรียบร้อยให้ทำการกดปุ่มบันทึก" },
-      { type: "image", src: subasset2Image, alt: "เพิ่มพัสดุย่อย" },
-      { type: "text", content: "6. ปุ่มนำออกข้อมูลพัสดุเป็นไฟล์ pdf" },
+      { type: "image", src: teacher, alt: "จัดการพัสดุ" },
+      { type: "text", content: "4. เพิ่มรายการพัสดุย่อยเมื่อกรอกข้อมูลเรียบร้อยให้ทำการกดปุ่มบันทึก" },
+      { type: "image", src: teacher2, alt: "เพิ่มพัสดุย่อย" },
+      { type: "text", content: "5. ปุ่มนำออกข้อมูลพัสดุเป็นไฟล์ pdf" },
     ],
   },
 
@@ -55,7 +54,7 @@ const sections = [
   },
 ];
 
-function GuideBookProfessor() {
+function GuideBookTeacher() {
   return (
     <div className="guidebook-container">
       <h1 className="guidebook-title">📘 คู่มือการใช้งานระบบจัดการครุภัณฑ์</h1>
@@ -85,4 +84,4 @@ function GuideBookProfessor() {
   );
 }
 
-export default GuideBookProfessor;
+export default GuideBookTeacher;
