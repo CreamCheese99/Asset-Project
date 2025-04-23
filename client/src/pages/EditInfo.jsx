@@ -402,7 +402,7 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
               <input
                 type="text"
                 className="w-full border-2 border-blue-100 rounded-xl p-2 bg-yellow-100 focus:bg-white"
-                value={updatedData?.mainAsset?.department_id || ''}
+                value={updatedData?.mainAsset?.department_name || ''}
                 readOnly={!isEditing}
                 onChange={handleChangeMainasset}
                 name="department_id"

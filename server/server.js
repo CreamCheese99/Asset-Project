@@ -296,11 +296,17 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get("/mainasset/:id", async (req, res) => {
   try {
     const encodedId = req.params.id;
-    const id = decodeURIComponent(encodedId); // ถอดรหัสให้กลับมาเป็นภาษาไทยและอักขระพิเศษ
+    const id = decodeURIComponent(encodedId);
     console.log("Decoded ID:", id);
 
-    const mainAssetQuery = `SELECT * FROM public.mainasset WHERE main_asset_id = $1`;
+    const mainAssetQuery = `
+      SELECT mainasset.*, department.department_name
+      FROM public.mainasset
+      INNER JOIN department ON department.department_id = mainasset.department_id
+      WHERE mainasset.main_asset_id = $1
+    `;
     const mainAssetResult = await pool.query(mainAssetQuery, [id]);
+
     if (mainAssetResult.rows.length === 0) {
       return res.status(404).json({ message: "Main asset not found" });
     }
@@ -308,20 +314,14 @@ app.get("/mainasset/:id", async (req, res) => {
     const subAssetQuery = `SELECT * FROM public.subasset WHERE main_asset_id = $1`;
     const subAssetResult = await pool.query(subAssetQuery, [id]);
 
-    // res.json({
-    //   mainAsset: mainAssetResult.rows[0],
-    //   subAssets: subAssetResult.rows,
-    // });
-
     res.json({
       mainAsset: {
         ...mainAssetResult.rows[0],
-        image_url: mainAssetResult.rows[0].image1,  // ใช้ image1 จากฐานข้อมูล
+        image_url: mainAssetResult.rows[0].image1,
       },
       subAssets: subAssetResult.rows,
     });
 
-    
   } catch (error) {
     console.error("Error fetching data:", error);
     res.status(500).json({ message: "Internal server error" });

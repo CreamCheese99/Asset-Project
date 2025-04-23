@@ -356,7 +356,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.department_id || ''}
+                value={data.mainAsset?.department_name || ''}
                 readOnly
               />
             </div>
