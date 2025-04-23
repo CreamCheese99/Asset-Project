@@ -2,7 +2,6 @@
 // import axios from 'axios'; // Import axios
 // import "../css/AssetForm.css";  // หากไฟล์ AssetForm.css อยู่ใน src/css
 
-
 // const AssetForm = ({ value, onChange }) => {
 //   const [department, setDepartment] = useState([]);
 
@@ -10,7 +9,7 @@
 //     // Fetch department data from the API using axios
 //     const fetchDepartment = async () => {
 //       try {
-//         const response = await axios.get('http://localhost:5000/api/department');
+//         const response = await axios.get('http://localhost:5001/api/department');
 //         // Ensure that response.data is an array
 //         if (Array.isArray(response.data)) {
 //           setDepartment(response.data); // Set the department to state
@@ -22,12 +21,8 @@
 //       }
 //     };
 
-//     fetchDepartment();  
+//     fetchDepartment();
 //   }, []); // Empty dependency array ensures this runs once on mount
-
-
-
-  
 
 //   return (
 //     <div className="asset-form-container">
@@ -39,17 +34,17 @@
 //             type="text"
 //             className="asset-form-input"
 //             placeholder="สมอ.xxx-xxx-xxxx/61"
-//             value={value.main_asset_id || ''} 
+//             value={value.main_asset_id || ''}
 //             onChange={(e) => onChange('main_asset_id', e.target.value)}
 //           />
 //         </div>
-// {/* 
+// {/*
 //         <div>
 //           <label className="asset-form-label">ภาควิชา</label>
 //           <select
 //             className="asset-form-select"
-//             value={value.department_id} 
-//             onChange={(e) => onChange('department_id', e.target.value)} 
+//             value={value.department_id}
+//             onChange={(e) => onChange('department_id', e.target.value)}
 //           >
 //             <option value="">-- กรุณาเลือก --</option>
 //             {Array.isArray(department) && department.map((dept) => (
@@ -59,7 +54,6 @@
 //             ))}
 //           </select>
 //         </div> */}
-
 
 //     <div>
 //       <label className="asset-form-label">ภาควิชา</label>
@@ -95,15 +89,14 @@
 //       )}
 //     </div>
 
-
 //         <div>
 //           <label className="asset-form-label">สภาพการครุภัณฑ์</label>
 //           <select
 //             className="asset-form-select"
-//             value={value.status || ''} 
+//             value={value.status || ''}
 //             onChange={(e) => onChange('status', e.target.value)}
 //           >
-//             <option value="">-- กรุณาเลือก --</option> 
+//             <option value="">-- กรุณาเลือก --</option>
 //             <option>ใช้งาน</option>
 //             <option>ส่งซ่อม</option>
 //             <option>ชำรุด</option>
@@ -118,9 +111,9 @@
 // };
 
 // export default AssetForm;
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import "../css/AssetForm.css";  
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "../css/AssetForm.css";
 
 const AssetForm = ({ value = { curriculum: [] }, onChange }) => {
   const [department, setDepartment] = useState([]);
@@ -131,14 +124,16 @@ const AssetForm = ({ value = { curriculum: [] }, onChange }) => {
   useEffect(() => {
     const fetchDepartment = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/department');
+        const response = await axios.get(
+          "http://localhost:5001/api/department"
+        );
         if (Array.isArray(response.data)) {
           setDepartment(response.data); // Set the department to state
         } else {
           console.error("The response data is not an array:", response.data);
         }
       } catch (err) {
-        console.error('Error fetching department:', err);
+        console.error("Error fetching department:", err);
       }
     };
 
@@ -147,18 +142,20 @@ const AssetForm = ({ value = { curriculum: [] }, onChange }) => {
 
   // ฟังก์ชันจัดการการเลือกภาควิชา
   const handleDepartmentChange = async (departmentId) => {
-    onChange('department_id', departmentId); // อัปเดตค่า department_id
+    onChange("department_id", departmentId); // อัปเดตค่า department_id
     if (departmentId) {
       setLoadingCurriculum(true); // เริ่มโหลด
       try {
-        const response = await axios.get(`http://localhost:5000/api/curriculum/${departmentId}`);
+        const response = await axios.get(
+          `http://localhost:5001/api/curriculum/${departmentId}`
+        );
         if (Array.isArray(response.data)) {
           setCurriculum(response.data); // ดึงข้อมูลหลักสูตรของภาควิชานั้น
         } else {
           console.error("curriculum data is not an array:", response.data);
         }
       } catch (err) {
-        console.error('Error fetching curriculum:', err);
+        console.error("Error fetching curriculum:", err);
       } finally {
         setLoadingCurriculum(false); // การโหลดเสร็จสมบูรณ์
       }
@@ -170,12 +167,14 @@ const AssetForm = ({ value = { curriculum: [] }, onChange }) => {
   // ฟังก์ชันจัดการการเลือกหลักสูตร
   const handleCurriculumChange = (curriculumId) => {
     // ตรวจสอบว่า value.curriculum เป็นอาเรย์หรือไม่ก่อน
-    const updatedCurriculum = Array.isArray(value.curriculum) ? value.curriculum : [];
+    const updatedCurriculum = Array.isArray(value.curriculum)
+      ? value.curriculum
+      : [];
     const updatedList = updatedCurriculum.includes(curriculumId)
-      ? updatedCurriculum.filter((id) => id !== curriculumId)  // เอาออกถ้าติ๊กซ้ำ
+      ? updatedCurriculum.filter((id) => id !== curriculumId) // เอาออกถ้าติ๊กซ้ำ
       : [...updatedCurriculum, curriculumId]; // เพิ่มใหม่
 
-    onChange('curriculum', updatedList);
+    onChange("curriculum", updatedList);
   };
 
   return (
@@ -188,8 +187,8 @@ const AssetForm = ({ value = { curriculum: [] }, onChange }) => {
             type="text"
             className="asset-form-input"
             placeholder="สมอ.xxx-xxx-xxxx/61"
-            value={value.main_asset_id || ''}
-            onChange={(e) => onChange('main_asset_id', e.target.value)}
+            value={value.main_asset_id || ""}
+            onChange={(e) => onChange("main_asset_id", e.target.value)}
           />
         </div>
 
@@ -220,8 +219,13 @@ const AssetForm = ({ value = { curriculum: [] }, onChange }) => {
                     <input
                       type="checkbox"
                       value={curriculum.curriculum_id}
-                      checked={Array.isArray(value.curriculum) && value.curriculum.includes(curriculum.curriculum_id)}
-                      onChange={() => handleCurriculumChange(curriculum.curriculum_id)}
+                      checked={
+                        Array.isArray(value.curriculum) &&
+                        value.curriculum.includes(curriculum.curriculum_id)
+                      }
+                      onChange={() =>
+                        handleCurriculumChange(curriculum.curriculum_id)
+                      }
                     />
                     {curriculum.curriculum_name}
                   </div>
@@ -235,8 +239,8 @@ const AssetForm = ({ value = { curriculum: [] }, onChange }) => {
           <label className="asset-form-label">สภาพการครุภัณฑ์</label>
           <select
             className="asset-form-select"
-            value={value.status || ''}
-            onChange={(e) => onChange('status', e.target.value)}
+            value={value.status || ""}
+            onChange={(e) => onChange("status", e.target.value)}
           >
             <option value="">-- กรุณาเลือก --</option>
             <option>ใช้งาน</option>

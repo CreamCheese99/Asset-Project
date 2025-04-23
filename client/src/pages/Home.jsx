@@ -3,11 +3,11 @@ import axios from "axios";
 import Filters from "../components/Filters";
 import BarChart from "../components/BarChart";
 import PieChart from "../components/PieChart";
-import { 
-  summaryDepartmentDetails, 
+import {
+  summaryDepartmentDetails,
   summaryDepartmentAssets,
   summaryFilterDepartmentAssets,
-  summaryFilterDepartmentDetails
+  summaryFilterDepartmentDetails,
 } from "../components/dataUtils";
 
 const Home = () => {
@@ -26,15 +26,38 @@ const Home = () => {
     setErrorMessage("");
 
     try {
-      const response = await axios.get("http://localhost:5000/api/getData");
+      const response = await axios.get("http://localhost:5001/api/getData");
       const data = response.data;
       console.log("Data received from API:", data);
 
-      if (selectedDepartment || selectedAssetStatus || selectedFund || selectedYear) {
-        console.log("Filter parameters:", { selectedDepartment, selectedFund, selectedYear });
+      if (
+        selectedDepartment ||
+        selectedAssetStatus ||
+        selectedFund ||
+        selectedYear
+      ) {
+        console.log("Filter parameters:", {
+          selectedDepartment,
+          selectedFund,
+          selectedYear,
+        });
 
-        setBarData(summaryFilterDepartmentDetails(data, selectedDepartment, selectedFund, selectedYear));
-        setPieData(summaryFilterDepartmentAssets(data, selectedDepartment, selectedAssetStatus, selectedYear));
+        setBarData(
+          summaryFilterDepartmentDetails(
+            data,
+            selectedDepartment,
+            selectedFund,
+            selectedYear
+          )
+        );
+        setPieData(
+          summaryFilterDepartmentAssets(
+            data,
+            selectedDepartment,
+            selectedAssetStatus,
+            selectedYear
+          )
+        );
       } else {
         setBarData(summaryDepartmentDetails(data));
         setPieData(summaryDepartmentAssets(data));
@@ -66,15 +89,29 @@ const Home = () => {
         errorMessage={errorMessage}
       />
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 0.5fr", gap: "20px" }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 0.5fr",
+          gap: "20px",
+        }}
+      >
         {loading ? (
           <p>กำลังโหลดข้อมูล...</p>
         ) : errorMessage ? (
           <p>{errorMessage}</p>
         ) : (
           <>
-            {barData?.datasets?.length > 0 ? <BarChart data={barData} /> : <p>ไม่มีข้อมูลกราฟแท่งที่ตรงกับตัวกรอง</p>}
-            {pieData?.datasets?.length > 0 ? <PieChart data={pieData} /> : <p>ไม่มีข้อมูลกราฟวงกลมที่ตรงกับตัวกรอง</p>}
+            {barData?.datasets?.length > 0 ? (
+              <BarChart data={barData} />
+            ) : (
+              <p>ไม่มีข้อมูลกราฟแท่งที่ตรงกับตัวกรอง</p>
+            )}
+            {pieData?.datasets?.length > 0 ? (
+              <PieChart data={pieData} />
+            ) : (
+              <p>ไม่มีข้อมูลกราฟวงกลมที่ตรงกับตัวกรอง</p>
+            )}
           </>
         )}
       </div>

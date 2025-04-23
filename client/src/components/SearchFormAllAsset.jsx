@@ -19,7 +19,7 @@
 //   useEffect(() => {
 //     const fetchAssetType = async () => {
 //       try {
-//         const response = await axios.get('http://localhost:5000/api/asset_type');
+//         const response = await axios.get('http://localhost:5001/api/asset_type');
 //         if (Array.isArray(response.data)) {
 //           setAssetType(response.data); // Set the asset types
 //         } else {
@@ -37,7 +37,7 @@
 //   useEffect(() => {
 //     const fetchDepartment = async () => {
 //       try {
-//         const response = await axios.get('http://localhost:5000/api/department');
+//         const response = await axios.get('http://localhost:5001/api/department');
 //         if (Array.isArray(response.data)) {
 //           setDepartments(response.data); // Set the departments
 //         } else {
@@ -142,7 +142,7 @@
 //               ))}
 //             </select>
 //         </div>
-        
+
 //         <div className="flex-1">
 //           <label className="block text-sm font-medium text-gray-600 mb-2">
 //             สภาพการครุภัณฑ์
@@ -176,10 +176,9 @@ import axios from "axios";
 const SearchFormAllAsset = ({ onFilter }) => {
   const [filters, setFilters] = useState({
     main_asset_id: "",
-    department_id: "",  // ใช้ department_id แทน department_name
+    department_id: "", // ใช้ department_id แทน department_name
     usage: "",
-    asset_type: ""
-    
+    asset_type: "",
   });
 
   const [assetType, setAssetType] = useState([]);
@@ -188,7 +187,9 @@ const SearchFormAllAsset = ({ onFilter }) => {
   useEffect(() => {
     const fetchAssetType = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/asset_type");
+        const response = await axios.get(
+          "http://localhost:5001/api/asset_type"
+        );
         if (Array.isArray(response.data)) {
           setAssetType(response.data);
         }
@@ -202,7 +203,9 @@ const SearchFormAllAsset = ({ onFilter }) => {
   useEffect(() => {
     const fetchDepartment = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/department");
+        const response = await axios.get(
+          "http://localhost:5001/api/department"
+        );
         if (Array.isArray(response.data)) {
           setDepartment(response.data);
         }
@@ -225,22 +228,23 @@ const SearchFormAllAsset = ({ onFilter }) => {
 
   const handleSearch = () => {
     const formattedFilters = {
-      main_asset_id: filters.main_asset_id.trim() || null,  // ถ้าไม่มีค่าใช้ null
-      department_id: filters.department_id || null,  // ถ้าไม่มีค่าใช้ null
-      usage: filters.usage || null,  // ถ้าไม่มีค่าใช้ null
-      asset_type: filters.asset_type || null  // ถ้าไม่มีค่าใช้ null 
+      main_asset_id: filters.main_asset_id.trim() || null, // ถ้าไม่มีค่าใช้ null
+      department_id: filters.department_id || null, // ถ้าไม่มีค่าใช้ null
+      usage: filters.usage || null, // ถ้าไม่มีค่าใช้ null
+      asset_type: filters.asset_type || null, // ถ้าไม่มีค่าใช้ null
     };
 
     console.log("Filters ส่งออก:", formattedFilters);
-    onFilter(formattedFilters);  // ส่งค่าที่ถูกต้องไปยัง ManageAssets
+    onFilter(formattedFilters); // ส่งค่าที่ถูกต้องไปยัง ManageAssets
   };
 
   return (
     <div className="bg-white mt-4 p-4 rounded-xl shadow-md">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-600 mb-2">รหัสทรัพย์สิน</label>
+          <label className="block text-sm font-medium text-gray-600 mb-2">
+            รหัสทรัพย์สิน
+          </label>
           <input
             type="text"
             name="main_asset_id"
@@ -261,13 +265,17 @@ const SearchFormAllAsset = ({ onFilter }) => {
           >
             <option value="">-- กรุณาเลือก --</option>
             {department.map((dept) => (
-              <option key={dept.department_id} value={dept.department_id}>{dept.department_name}</option>
+              <option key={dept.department_id} value={dept.department_id}>
+                {dept.department_name}
+              </option>
             ))}
           </select>
         </div>
 
         <div>
-          <label className="block text-gray-700 text-sm mb-2">ประเภทสินทรัพย์</label>
+          <label className="block text-gray-700 text-sm mb-2">
+            ประเภทสินทรัพย์
+          </label>
           <select
             name="asset_type"
             value={filters.asset_type}
@@ -276,13 +284,17 @@ const SearchFormAllAsset = ({ onFilter }) => {
           >
             <option value="">-- กรุณาเลือก --</option>
             {assetType.map((asset) => (
-              <option key={asset.asset_type_id} value={asset.asset_type_id}>{asset.asset_type_name}</option>
+              <option key={asset.asset_type_id} value={asset.asset_type_id}>
+                {asset.asset_type_name}
+              </option>
             ))}
           </select>
         </div>
 
         <div>
-          <label className="block text-gray-700 text-sm mb-2">สภาพการครุภัณฑ์</label>
+          <label className="block text-gray-700 text-sm mb-2">
+            สภาพการครุภัณฑ์
+          </label>
           <select
             name="usage"
             value={filters.usage}
@@ -298,7 +310,6 @@ const SearchFormAllAsset = ({ onFilter }) => {
             <option value="จำหน่าย">จำหน่าย</option>
           </select>
         </div>
-
 
         <div className="col-span-1 sm:col-span-2 md:col-span-4 flex justify-end">
           <button

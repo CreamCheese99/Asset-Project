@@ -14,7 +14,7 @@ const ManageAssetTypes = () => {
 
   const fetchAssetTypes = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/asset_type");
+      const response = await axios.get("http://localhost:5001/api/asset_type");
       setData(response.data);
     } catch (error) {
       console.error("Error fetching asset types:", error);
@@ -35,11 +35,11 @@ const ManageAssetTypes = () => {
 
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/api/asset_type/${editingId}`, {
+        await axios.put(`http://localhost:5001/api/asset_type/${editingId}`, {
           asset_type_name: tempData.assetType,
         });
       } else {
-        await axios.post("http://localhost:5000/api/asset_type", {
+        await axios.post("http://localhost:5001/api/asset_type", {
           asset_type_name: tempData.assetType,
         });
       }
@@ -56,7 +56,7 @@ const ManageAssetTypes = () => {
   const handleDelete = async (id) => {
     if (window.confirm("คุณต้องการลบประเภทสินทรัพย์นี้หรือไม่?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/asset_type/${id}`);
+        await axios.delete(`http://localhost:5001/api/asset_type/${id}`);
         fetchAssetTypes();
       } catch (error) {
         console.error("Error deleting asset type:", error);
@@ -65,8 +65,10 @@ const ManageAssetTypes = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 mt-4 bg-white rounded-lg shadow-lg max-w-7xl"> 
-      <h2 className="text-2xl font-bold mb-4 text-gray-800 text-left">ประเภทสินทรัพย์</h2>
+    <div className="container mx-auto p-4 mt-4 bg-white rounded-lg shadow-lg max-w-7xl">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800 text-left">
+        ประเภทสินทรัพย์
+      </h2>
       <button
         className="flex items-center bg-blue-500 text-white px-5 py-2 rounded-full hover:bg-blue-600 shadow-md"
         onClick={() => {
@@ -77,7 +79,7 @@ const ManageAssetTypes = () => {
       >
         <FaPlus className="mr-2" /> เพิ่ม
       </button>
-      
+
       <table className="w-full mt-4 bg-white shadow-md rounded-lg overflow-hidden">
         <thead className="bg-gray-200 text-gray-700">
           <tr>
@@ -107,7 +109,7 @@ const ManageAssetTypes = () => {
           ))}
         </tbody>
       </table>
-      
+
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-xl w-96">
@@ -119,7 +121,9 @@ const ManageAssetTypes = () => {
               placeholder="ประเภทสินทรัพย์"
               className="w-full border p-3 rounded-full mb-4"
               value={tempData.assetType}
-              onChange={(e) => setTempData({ ...tempData, assetType: e.target.value })}
+              onChange={(e) =>
+                setTempData({ ...tempData, assetType: e.target.value })
+              }
             />
             <div className="flex justify-between">
               <button
@@ -131,7 +135,9 @@ const ManageAssetTypes = () => {
               <button
                 onClick={handleSave}
                 className={`px-4 py-2 rounded-full text-white ${
-                  tempData.assetType.trim() ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-not-allowed"
+                  tempData.assetType.trim()
+                    ? "bg-blue-500 hover:bg-blue-600"
+                    : "bg-gray-400 cursor-not-allowed"
                 }`}
                 disabled={!tempData.assetType.trim()}
               >

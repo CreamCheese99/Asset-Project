@@ -6,7 +6,10 @@ const ManageInfo = () => {
   const [data, setData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [tempData, setTempData] = useState({ department_name: "", curriculum: [""] });
+  const [tempData, setTempData] = useState({
+    department_name: "",
+    curriculum: [""],
+  });
 
   useEffect(() => {
     fetchData();
@@ -14,7 +17,7 @@ const ManageInfo = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/department");
+      const response = await axios.get("http://localhost:5001/department");
       setData(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -30,7 +33,7 @@ const ManageInfo = () => {
   const handleDelete = async (id) => {
     if (window.confirm("คุณต้องการลบภาควิชาและหลักสูตรนี้หรือไม่?")) {
       try {
-        await axios.delete(`http://localhost:5000/department/${id}`);
+        await axios.delete(`http://localhost:5001/department/${id}`);
         setData(data.filter((item) => item.department_id !== id));
       } catch (error) {
         console.error("Error deleting department:", error);
@@ -41,9 +44,12 @@ const ManageInfo = () => {
   const handleSave = async () => {
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/department/${editingId}`, tempData);
+        await axios.put(
+          `http://localhost:5001/department/${editingId}`,
+          tempData
+        );
       } else {
-        await axios.post("http://localhost:5000/department", tempData);
+        await axios.post("http://localhost:5001/department", tempData);
       }
       fetchData(); // โหลดข้อมูลใหม่หลังการเพิ่ม/แก้ไข
       setIsModalOpen(false);
@@ -55,7 +61,9 @@ const ManageInfo = () => {
 
   return (
     <div className="container mx-auto p-4 mt-4 bg-white rounded-lg shadow-lg max-w-7xl">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800 text-left">ข้อมูลภาควิชา</h2>
+      <h2 className="text-2xl font-bold mb-4 text-gray-800 text-left">
+        ข้อมูลภาควิชา
+      </h2>
 
       <button
         className="flex items-center bg-blue-500 text-white px-5 py-2 rounded-full hover:bg-blue-600 shadow-md"
@@ -83,7 +91,12 @@ const ManageInfo = () => {
                 <td className="py-2 px-4">{item.department_name}</td>
                 <td className="py-2 px-4 flex flex-wrap gap-2">
                   {item.curriculum.map((cur, index) => (
-                    <span key={index} className="bg-gray-200 p-1 rounded-lg text-sm">{cur}</span>
+                    <span
+                      key={index}
+                      className="bg-gray-200 p-1 rounded-lg text-sm"
+                    >
+                      {cur}
+                    </span>
                   ))}
                 </td>
                 <td className="py-2 px-4 text-center">
@@ -120,7 +133,9 @@ const ManageInfo = () => {
               placeholder="ภาควิชา"
               className="w-full border p-2 rounded-lg mb-2"
               value={tempData.department_name}
-              onChange={(e) => setTempData({ ...tempData, department_name: e.target.value })}
+              onChange={(e) =>
+                setTempData({ ...tempData, department_name: e.target.value })
+              }
             />
 
             {tempData.curriculum.map((cur, index) => (
@@ -142,7 +157,9 @@ const ManageInfo = () => {
                     onClick={() =>
                       setTempData({
                         ...tempData,
-                        curriculum: tempData.curriculum.filter((_, i) => i !== index),
+                        curriculum: tempData.curriculum.filter(
+                          (_, i) => i !== index
+                        ),
                       })
                     }
                   >
@@ -166,22 +183,28 @@ const ManageInfo = () => {
             </button>
 
             <div className="flex justify-between mt-4">
-              <button onClick={() => setIsModalOpen(false)} className="bg-gray-400  rounded-lg text-white px-4 py-2 rounded-full hover:bg-red-500">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-gray-400  rounded-lg text-white px-4 py-2 rounded-full hover:bg-red-500"
+              >
                 ยกเลิก
               </button>
 
               <button
                 onClick={handleSave}
                 className={`px-4 py-2 rounded-lg text-white transition-all ${
-                  !tempData.department_name.trim() || tempData.curriculum.every((cur) => cur.trim() === "")
+                  !tempData.department_name.trim() ||
+                  tempData.curriculum.every((cur) => cur.trim() === "")
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-blue-500 hover:bg-blue-600"
                 }`}
-                disabled={!tempData.department_name.trim() || tempData.curriculum.every((cur) => cur.trim() === "")}
+                disabled={
+                  !tempData.department_name.trim() ||
+                  tempData.curriculum.every((cur) => cur.trim() === "")
+                }
               >
-              บันทึก
-            </button>
-
+                บันทึก
+              </button>
             </div>
           </div>
         </div>

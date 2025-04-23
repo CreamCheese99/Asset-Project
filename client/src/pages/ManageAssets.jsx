@@ -15,7 +15,7 @@
 // //     </div>
 // //     )
 // //   }
-  
+
 // //   export default ManageAssets
 
 // import React, { useState, useEffect } from "react";
@@ -31,20 +31,19 @@
 //   const [data, setData] = useState([]);
 //   const [filteredData, setFilteredData] = useState([]);
 
-
 //   const [roleId, setRoleId] = useState(localStorage.getItem("roleId"));
 
 //   const handleFilterChange = (newFilters) => {
 //     console.log("Updated Filters:", newFilters);
 //     setFilters(newFilters);
-  
+
 //     const hasActiveFilter = Object.values(newFilters).some((value) => value !== "");
-  
+
 //     if (!hasActiveFilter) {
 //       setFilteredData(data);
 //       return;
 //     }
-  
+
 //     const filtered = data.filter((item) => {
 //       return Object.entries(newFilters).every(([key, value]) => {
 //         if (!value) return true;
@@ -53,60 +52,56 @@
 //         return dataValue.includes(filterValue);
 //       });
 //     });
-  
+
 //     setFilteredData(filtered);
 //   };
-  
-  
+
 //   useEffect(() => {
 //     const fetchData = async () => {
 //       try {
-//         const response = await axios.get("http://localhost:5000/mainasset");
+//         const response = await axios.get("http://localhost:5001/mainasset");
 //         setData(response.data);
 //         setFilteredData(response.data); // ใช้ข้อมูลทั้งหมดเป็นค่าเริ่มต้น
 //       } catch (error) {
 //         console.error("Error fetching assets:", error);
 //       }
 //     };
-  
+
 //     fetchData();
 //   }, []);
-  
 
 //   useEffect(() => {
 //     console.log("Filters:", filters);
 //     console.log("Data:", data);
-  
+
 //     const hasActiveFilter = Object.values(filters).some((value) => value !== "");
 //     if (!hasActiveFilter) {
 //       setFilteredData(data);
 //       return;
 //     }
-  
+
 //     const filtered = data.filter((item) => {
 //       return Object.entries(filters).every(([key, value]) => {
 //         if (!value) return true; // ✅ ถ้าค่าว่างให้ข้าม
-  
+
 //         let dataValue = item[key]?.toString().toLowerCase() || "";
 //         let filterValue = value.toString().toLowerCase();
-  
-//         console.log(`Comparing ${key}: ${dataValue} === ${filterValue}`); 
-  
+
+//         console.log(`Comparing ${key}: ${dataValue} === ${filterValue}`);
+
 //         return dataValue.includes(filterValue); // ✅ ใช้ includes() รองรับการค้นหาบางส่วน
 //       });
 //     });
-  
+
 //     setFilteredData(filtered);
 //   }, [filters, data]);
-  
-  
 
 //   // ฟังก์ชันลบข้อมูล
 //   const handleDelete = (id) => {
 //     const encodedId = encodeURIComponent(id); // เข้ารหัส ID ก่อนส่ง
 //     if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?")) {
 //       axios
-//         .delete(`http://localhost:5000/api/mainasset/${encodedId}`)
+//         .delete(`http://localhost:5001/api/mainasset/${encodedId}`)
 //         .then(() => {
 //           // ลบข้อมูลจาก data และ filteredData
 //           setData((prevData) => prevData.filter((item) => item.main_asset_id !== id));
@@ -137,9 +132,6 @@
 
 // export default ManageAssets;
 
-
-
-
 import React, { useState, useEffect } from "react";
 import Breadcrumb2 from "../components/Breadcrumb2";
 import SearchForm from "../components/SearchForm";
@@ -158,15 +150,17 @@ const ManageAssets = () => {
   const handleFilterChange = (newFilters) => {
     console.log("Updated Filters:", newFilters);
     setFilters(newFilters); // อัปเดต filters
-    
-    const hasActiveFilter = Object.values(newFilters).some((value) => value !== "");
-  
+
+    const hasActiveFilter = Object.values(newFilters).some(
+      (value) => value !== ""
+    );
+
     // ถ้าไม่มีฟิลเตอร์แอคทีฟให้แสดงข้อมูลทั้งหมด
     if (!hasActiveFilter) {
       setFilteredData(data);
       return;
     }
-  
+
     const filtered = data.filter((item) => {
       return Object.entries(newFilters).every(([key, value]) => {
         if (!value) return true; // ถ้าค่าว่างข้ามการกรองนั้น
@@ -175,7 +169,7 @@ const ManageAssets = () => {
         return dataValue.includes(filterValue); // ค้นหาบางส่วน
       });
     });
-  
+
     setFilteredData(filtered); // อัปเดตข้อมูลที่กรองแล้ว
   };
 
@@ -183,14 +177,14 @@ const ManageAssets = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/mainasset");
+        const response = await axios.get("http://localhost:5001/mainasset");
         setData(response.data); // เก็บข้อมูลทั้งหมด
         setFilteredData(response.data); // ตั้งค่าเริ่มต้นให้ข้อมูลที่กรองแล้วเป็นข้อมูลทั้งหมด
       } catch (error) {
         console.error("Error fetching assets:", error);
       }
     };
-  
+
     fetchData();
   }, []);
 
@@ -199,10 +193,12 @@ const ManageAssets = () => {
     const encodedId = encodeURIComponent(id); // เข้ารหัส ID ก่อนส่ง
     if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?")) {
       axios
-        .delete(`http://localhost:5000/api/mainasset/${encodedId}`)
+        .delete(`http://localhost:5001/api/mainasset/${encodedId}`)
         .then(() => {
           // ลบข้อมูลจาก data และ filteredData
-          setData((prevData) => prevData.filter((item) => item.main_asset_id !== id));
+          setData((prevData) =>
+            prevData.filter((item) => item.main_asset_id !== id)
+          );
           setFilteredData((prevData) =>
             prevData.filter((item) => item.main_asset_id !== id)
           );
@@ -216,12 +212,17 @@ const ManageAssets = () => {
   };
 
   return (
-    <div style={{ backgroundColor: "#f1f8e9" }} className="min-h-screen font-sans">
+    <div
+      style={{ backgroundColor: "#f1f8e9" }}
+      className="min-h-screen font-sans"
+    >
       <Breadcrumb2 />
       <div className="container mx-auto p-4">
-        <SearchForm onFilter={handleFilterChange} /> {/* ส่งฟังก์ชันกรองไปยัง SearchForm */}
+        <SearchForm onFilter={handleFilterChange} />{" "}
+        {/* ส่งฟังก์ชันกรองไปยัง SearchForm */}
         <ActionButtons data={data} roleId={roleId} />
-        <DataTable data={filteredData} handleDelete={handleDelete} /> {/* ใช้ข้อมูลที่กรองแล้ว */}
+        <DataTable data={filteredData} handleDelete={handleDelete} />{" "}
+        {/* ใช้ข้อมูลที่กรองแล้ว */}
         <ActionButtons4 />
       </div>
     </div>

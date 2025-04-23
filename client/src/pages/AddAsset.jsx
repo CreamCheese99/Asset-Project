@@ -11,35 +11,35 @@ import ActionButtons5 from "../components/ActionButtons5";
 const AddAsset = () => {
   // State to hold asset data
   const [assetData, setAssetData] = useState({
-    main_asset_id: '',
-    main_asset_name: '',
-    status: '',
-    fiscal_year: '',
-    date_received: '',
-    budget_limit: '',
-    averange_price: '',
-    budget_type: '',
-    location_use: '',
-    location_deliver: '',
-    usage: '',
-    responsible_person: '',
-    sub_asset_name: '',
-    asset_type: '',
-    details: '',
-    quantity: '',
-    unit_price: '',
-    counting_unit: '',
-    department_id: '',
-    note:'',
-    type_sub_asset:'',
-    image: null  // เพิ่มฟิลด์เก็บรูปภาพ
+    main_asset_id: "",
+    main_asset_name: "",
+    status: "",
+    fiscal_year: "",
+    date_received: "",
+    budget_limit: "",
+    averange_price: "",
+    budget_type: "",
+    location_use: "",
+    location_deliver: "",
+    usage: "",
+    responsible_person: "",
+    sub_asset_name: "",
+    asset_type: "",
+    details: "",
+    quantity: "",
+    unit_price: "",
+    counting_unit: "",
+    department_id: "",
+    note: "",
+    type_sub_asset: "",
+    image: null, // เพิ่มฟิลด์เก็บรูปภาพ
   });
 
   // อัปเดตข้อมูลจากอินพุตทั่วไป
   const handleAssetChange = (field, value) => {
     setAssetData((prevData) => ({
       ...prevData,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -50,7 +50,6 @@ const AddAsset = () => {
       image: files, // เก็บหลายไฟล์
     }));
   };
-  
 
   // ฟังก์ชันแจ้งเตือน
   const handleAlert = (message, type = "error") => {
@@ -59,7 +58,7 @@ const AddAsset = () => {
 
   const handleSubmit = async () => {
     const formData = new FormData();
-  
+
     // เพิ่มข้อมูล assetData ลงใน formData
     for (const key in assetData) {
       if (key.startsWith("image") && assetData[key] instanceof File) {
@@ -68,79 +67,90 @@ const AddAsset = () => {
         formData.append(key, assetData[key]);
       }
     }
-  
+
     try {
-      const response = await axios.post('http://localhost:5000/mainasset', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-  
-      console.log('บันทึกข้อมูลสำเร็จ:', response.data);
-      alert('บันทึกข้อมูลสำเร็จ!');
+      const response = await axios.post(
+        "http://localhost:5001/mainasset",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("บันทึกข้อมูลสำเร็จ:", response.data);
+      alert("บันทึกข้อมูลสำเร็จ!");
     } catch (error) {
       if (error.response) {
-        console.error('ข้อผิดพลาดจากการตอบกลับ:', error.response.data);
-        alert(error.response.data.error || 'เกิดข้อผิดพลาดที่เซิร์ฟเวอร์!');
+        console.error("ข้อผิดพลาดจากการตอบกลับ:", error.response.data);
+        alert(error.response.data.error || "เกิดข้อผิดพลาดที่เซิร์ฟเวอร์!");
       } else if (error.request) {
-        console.error('ข้อผิดพลาดจากการส่งคำขอ:', error.request);
-        alert('ไม่ได้รับการตอบกลับจากเซิร์ฟเวอร์!');
+        console.error("ข้อผิดพลาดจากการส่งคำขอ:", error.request);
+        alert("ไม่ได้รับการตอบกลับจากเซิร์ฟเวอร์!");
       } else {
-        console.error('ข้อความข้อผิดพลาด:', error.message);
-        alert('ข้อผิดพลาดที่ไม่คาดคิด!');
+        console.error("ข้อความข้อผิดพลาด:", error.message);
+        alert("ข้อผิดพลาดที่ไม่คาดคิด!");
       }
     }
   };
-  
-  
+
   // รีเซ็ตข้อมูล
   const handleCancel = () => {
     setAssetData({
-      main_asset_id: '',
-      main_asset_name: '',
-      status: '',
-      fiscal_year: '',
-      date_received: '',
-      budget_limit: '',
-      averange_price: '',
-      budget_type: '',
-      location_use: '',
-      location_deliver: '',
-      usage: '',
-      responsible_person: '',
-      sub_asset_name: '',
-      asset_type: '',
-      details: '',
-      quantity: '',
-      unit_price: '',
-      counting_unit: '',
-      department_id: '',
-      note:'',
-      type_sub_asset:'',
-      image: null  // เปลี่ยนเป็น null เพื่อให้ไม่มีค่าเริ่มต้น
+      main_asset_id: "",
+      main_asset_name: "",
+      status: "",
+      fiscal_year: "",
+      date_received: "",
+      budget_limit: "",
+      averange_price: "",
+      budget_type: "",
+      location_use: "",
+      location_deliver: "",
+      usage: "",
+      responsible_person: "",
+      sub_asset_name: "",
+      asset_type: "",
+      details: "",
+      quantity: "",
+      unit_price: "",
+      counting_unit: "",
+      department_id: "",
+      note: "",
+      type_sub_asset: "",
+      image: null, // เปลี่ยนเป็น null เพื่อให้ไม่มีค่าเริ่มต้น
     });
   };
-  
 
   return (
-    <div style={{ backgroundColor: '#f1f8e9' }} className="min-h-screen font-sans">
+    <div
+      style={{ backgroundColor: "#f1f8e9" }}
+      className="min-h-screen font-sans"
+    >
       <Breadcrumb />
       <div className="container mx-auto p-4">
         {/* ส่งฟังก์ชันและค่าไปยัง child components */}
         <AssetForm value={assetData} onChange={handleAssetChange} />
         <AcquisitionInfo value={assetData} onChange={handleAssetChange} />
-        <AssetDetails value={assetData} onChange={handleAssetChange} onImageChange={handleImageChange} />
-        <ActionButtons2 
-          assetData={assetData}  
-          onSave={handleSubmit } 
-          onCancel={handleCancel} 
+        <AssetDetails
+          value={assetData}
+          onChange={handleAssetChange}
+          onImageChange={handleImageChange}
         />
-        <div className="mt-14"> {/* เว้นระยะห่างระหว่าง component */}
-            <AssetInfoSection 
-              value={assetData} 
-              onChange={handleAssetChange} 
-              mainAssetId={assetData.main_asset_id}  
-            />
+        <ActionButtons2
+          assetData={assetData}
+          onSave={handleSubmit}
+          onCancel={handleCancel}
+        />
+        <div className="mt-14">
+          {" "}
+          {/* เว้นระยะห่างระหว่าง component */}
+          <AssetInfoSection
+            value={assetData}
+            onChange={handleAssetChange}
+            mainAssetId={assetData.main_asset_id}
+          />
         </div>
         <ActionButtons5 />
       </div>

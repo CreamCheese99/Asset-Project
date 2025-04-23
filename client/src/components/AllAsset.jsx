@@ -1,37 +1,38 @@
-
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const AllAsset = ({ filters }) => {
-  const [searchTerm, setSearchTerm] = useState("");  // State for search input
-  const [assets, setAssets] = useState([]);  // State for assets data
-  const [loading, setLoading] = useState(true);  // State for loading status
-  const [error, setError] = useState(null);  // State for error handling
-  const [isModalOpen, setIsModalOpen] = useState(false);  // State for modal
-  const [selectedImage, setSelectedImage] = useState("");  // State to store the selected image for modal
+  const [searchTerm, setSearchTerm] = useState(""); // State for search input
+  const [assets, setAssets] = useState([]); // State for assets data
+  const [loading, setLoading] = useState(true); // State for loading status
+  const [error, setError] = useState(null); // State for error handling
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
+  const [selectedImage, setSelectedImage] = useState(""); // State to store the selected image for modal
 
   // Fetch assets data from the API
   useEffect(() => {
     const fetchAssets = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/mainasset-assetlist');
-        
+        const response = await fetch(
+          "http://localhost:5001/api/mainasset-assetlist"
+        );
+
         if (!response.ok) {
-          throw new Error('เกิดข้อผิดพลาดในการดึงข้อมูลจากเซิร์ฟเวอร์');
+          throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูลจากเซิร์ฟเวอร์");
         }
 
         const data = await response.json();
-        
+
         if (Array.isArray(data)) {
-          setAssets(data);  // Set fetched data to state
+          setAssets(data); // Set fetched data to state
         } else {
-          throw new Error('ข้อมูลที่ได้รับไม่ถูกต้อง');
+          throw new Error("ข้อมูลที่ได้รับไม่ถูกต้อง");
         }
       } catch (error) {
         console.error("Error fetching assets:", error);
-        setError(error.message);  // Set error message
+        setError(error.message); // Set error message
       } finally {
-        setLoading(false);  // Set loading to false once data is fetched
+        setLoading(false); // Set loading to false once data is fetched
       }
     };
 
@@ -39,10 +40,14 @@ const AllAsset = ({ filters }) => {
   }, []);
 
   // Filter assets based on search term and filters props
-  const filteredAssets = assets.filter(asset => {
-    const matchesFilters = 
-      (filters.main_asset_id ? asset.main_asset_id.includes(filters.main_asset_id) : true) &&
-      (filters.department_id ? asset.department_id === filters.department_id : true) &&
+  const filteredAssets = assets.filter((asset) => {
+    const matchesFilters =
+      (filters.main_asset_id
+        ? asset.main_asset_id.includes(filters.main_asset_id)
+        : true) &&
+      (filters.department_id
+        ? asset.department_id === filters.department_id
+        : true) &&
       (filters.usage ? asset.usage === filters.usage : true) &&
       (filters.asset_type ? asset.asset_type === filters.asset_type : true) &&
       (filters.budget_type ? asset.budget_type === filters.budget_type : true);
@@ -51,7 +56,7 @@ const AllAsset = ({ filters }) => {
       asset.main_asset_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset.sub_asset_name.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return matchesFilters && matchesSearchTerm;  // Only include assets that match both filters and search term
+    return matchesFilters && matchesSearchTerm; // Only include assets that match both filters and search term
   });
 
   // Handle opening the modal with the selected image
@@ -93,13 +98,16 @@ const AllAsset = ({ filters }) => {
             <p className="text-center text-gray-500">กำลังโหลดข้อมูล...</p>
           ) : filteredAssets.length > 0 ? (
             filteredAssets.map((item) => (
-              <div key={item.main_asset_id} className="bg-white rounded-lg shadow-md hover:shadow-lg border border-gray-200 overflow-hidden">
+              <div
+                key={item.main_asset_id}
+                className="bg-white rounded-lg shadow-md hover:shadow-lg border border-gray-200 overflow-hidden"
+              >
                 {/* Image */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4 p-4">
                   {/* รูปภาพ */}
                   {item.image1 && (
                     <img
-                      src={`http://localhost:5000/uploads/${item.image1}`}  // URL รูปภาพจากฐานข้อมูล
+                      src={`http://localhost:5001/uploads/${item.image1}`} // URL รูปภาพจากฐานข้อมูล
                       alt={item.main_asset_name}
                       className="w-full h-48 object-cover rounded-md cursor-pointer transform hover:scale-105 transition-transform duration-300"
                       onClick={() => openModal(item.image1)} // เปิดโมดัลเมื่อคลิก
@@ -107,7 +115,7 @@ const AllAsset = ({ filters }) => {
                   )}
                   {item.image2 && (
                     <img
-                      src={`http://localhost:5000/uploads/${item.image2}`}  // URL รูปภาพจากฐานข้อมูล
+                      src={`http://localhost:5001/uploads/${item.image2}`} // URL รูปภาพจากฐานข้อมูล
                       alt={item.main_asset_name}
                       className="w-full h-48 object-cover rounded-md cursor-pointer transform hover:scale-105 transition-transform duration-300"
                       onClick={() => openModal(item.image2)} // เปิดโมดัลเมื่อคลิก
@@ -115,7 +123,7 @@ const AllAsset = ({ filters }) => {
                   )}
                   {item.image3 && (
                     <img
-                      src={`http://localhost:5000/uploads/${item.image3}`}  // URL รูปภาพจากฐานข้อมูล
+                      src={`http://localhost:5001/uploads/${item.image3}`} // URL รูปภาพจากฐานข้อมูล
                       alt={item.main_asset_name}
                       className="w-full h-48 object-cover rounded-md cursor-pointer transform hover:scale-105 transition-transform duration-300"
                       onClick={() => openModal(item.image3)} // เปิดโมดัลเมื่อคลิก
@@ -123,7 +131,7 @@ const AllAsset = ({ filters }) => {
                   )}
                   {item.image4 && (
                     <img
-                      src={`http://localhost:5000/uploads/${item.image4}`}  // URL รูปภาพจากฐานข้อมูล
+                      src={`http://localhost:5001/uploads/${item.image4}`} // URL รูปภาพจากฐานข้อมูล
                       alt={item.main_asset_name}
                       className="w-full h-48 object-cover rounded-md cursor-pointer transform hover:scale-105 transition-transform duration-300"
                       onClick={() => openModal(item.image4)} // เปิดโมดัลเมื่อคลิก
@@ -131,7 +139,7 @@ const AllAsset = ({ filters }) => {
                   )}
                   {item.image5 && (
                     <img
-                      src={`http://localhost:5000/uploads/${item.image5}`}  // URL รูปภาพจากฐานข้อมูล
+                      src={`http://localhost:5001/uploads/${item.image5}`} // URL รูปภาพจากฐานข้อมูล
                       alt={item.main_asset_name}
                       className="w-full h-48 object-cover rounded-md cursor-pointer transform hover:scale-105 transition-transform duration-300"
                       onClick={() => openModal(item.image5)} // เปิดโมดัลเมื่อคลิก
@@ -143,14 +151,18 @@ const AllAsset = ({ filters }) => {
                   <h2 className="text-lg font-semibold text-gray-700">
                     {item.main_asset_name}
                   </h2>
-                  <p className="text-sm text-gray-500 mb-2">{item.main_asset_id}</p>
+                  <p className="text-sm text-gray-500 mb-2">
+                    {item.main_asset_id}
+                  </p>
                   <div className="text-sm text-gray-600">
                     <p>สภาพการครุภัณฑ์: {item.status}</p>
                     <p>ชื่อทรัพย์: {item.main_asset_name}</p>
                   </div>
                   <div className="mt-4">
                     <Link
-                      to={`/show-info/${encodeURIComponent(item.main_asset_id)}`} 
+                      to={`/show-info/${encodeURIComponent(
+                        item.main_asset_id
+                      )}`}
                       className="block w-full text-center px-4 py-2 bg-teal-500 text-white text-sm font-medium rounded-md hover:bg-teal-600"
                     >
                       ดูรายละเอียด
@@ -176,7 +188,7 @@ const AllAsset = ({ filters }) => {
               X
             </button>
             <img
-              src={`http://localhost:5000/uploads/${selectedImage}`} // รูปที่ถูกเลือกจากฐานข้อมูล
+              src={`http://localhost:5001/uploads/${selectedImage}`} // รูปที่ถูกเลือกจากฐานข้อมูล
               alt="Selected asset"
               className="w-full h-full object-contain"
             />

@@ -20,63 +20,66 @@
 // }
 
 // export default FormLogin;
-import React, { useState } from 'react';
-import axios from 'axios';  // Import axios
-import FormInputField from './FormInputField';  
-import LogoSection from './LogoSection';
+import React, { useState } from "react";
+import axios from "axios"; // Import axios
+import FormInputField from "./FormInputField";
+import LogoSection from "./LogoSection";
 
 function FormLogin() {
-  const [user_email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [user_email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent page reload
-  
-    console.log('Form submit triggered'); // ตรวจสอบว่าฟังก์ชันถูกเรียก
-  
+
+    console.log("Form submit triggered"); // ตรวจสอบว่าฟังก์ชันถูกเรียก
+
     // Check if both email and password are provided
     if (!user_email || !password) {
-      setError('Please enter both email and password');
+      setError("Please enter both email and password");
       return;
     }
-  
+
     try {
       const requestData = {
         user_email: user_email,
         password: password,
       };
-  
-      console.log('Sending request data:', requestData); // Log request data
-  
+
+      console.log("Sending request data:", requestData); // Log request data
+
       // Send the request to the login API
-      const response = await axios.post('http://localhost:5000/login', requestData);
-  
-      console.log('Received response:', response); // ตรวจสอบการตอบกลับจาก API
-  
+      const response = await axios.post(
+        "http://localhost:5001/login",
+        requestData
+      );
+
+      console.log("Received response:", response); // ตรวจสอบการตอบกลับจาก API
+
       const data = response.data;
       if (response.status === 200) {
         // Store token and roleId in localStorage
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('roleId', data.roleId);
-        localStorage.setItem('userName', data.user_name);
-  
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("roleId", data.roleId);
+        localStorage.setItem("userName", data.user_name);
+
         // Redirect based on roleId
         if (data.roleId === 1) {
-          window.location.href = '/home';
+          window.location.href = "/home";
         } else if (data.roleId === 2) {
-          window.location.href = '/home';
+          window.location.href = "/home";
         } else if (data.roleId === 3) {
-          window.location.href = '/home';
+          window.location.href = "/home";
         } else if (data.roleId === 4) {
-          window.location.href = '/home';
+          window.location.href = "/home";
         }
       } else {
         setError(data.message); // Display API error message
       }
     } catch (error) {
-      console.error('Login error:', error);
-      setError('เกิดข้อผิดพลาดขณะเข้าสู่ระบบ');  // แก้ไขข้อความผิดพลาดให้เป็นภาษาไทย
+      console.error("Login error:", error);
+      setError("เกิดข้อผิดพลาดขณะเข้าสู่ระบบ"); // แก้ไขข้อความผิดพลาดให้เป็นภาษาไทย
     }
   };
 
@@ -85,7 +88,7 @@ function FormLogin() {
       <LogoSection />
       <h1>Log in</h1>
       <div className="w-96 space-y-8 text-left">
-        <FormInputField 
+        <FormInputField
           label="Email"
           id="email"
           type="text"
@@ -104,8 +107,8 @@ function FormLogin() {
         {error && <p className="text-red-500">{error}</p>}
         <form onSubmit={handleLogin}>
           <button
-            type="submit" 
-            style={{ background: '#8bc34a' }}
+            type="submit"
+            style={{ background: "#8bc34a" }}
             className="w-full py-2 text-white text-base font-medium rounded-lg hover:bg-gray-300 transition duration-200"
           >
             Login

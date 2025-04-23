@@ -1,5 +1,5 @@
 import React from 'react'
-import GuideBookPage from '../components/GuidebookPage'
+import GuideBookPage from '../components/Guidebook-professor.jsx'
 
 function GuideBook() {
   return (

@@ -4,7 +4,13 @@ import "../css/AssetDetails.css"; // นำเข้าไฟล์ CSS
 
 const AssetDetails = ({ value, onChange }) => {
   const [images, setImages] = useState([null, null, null, null, null]);
-  const [previewImages, setPreviewImages] = useState([null, null, null, null, null]);
+  const [previewImages, setPreviewImages] = useState([
+    null,
+    null,
+    null,
+    null,
+    null,
+  ]);
   const [assetType, setAssetType] = useState([]);
 
   const handleImageChange = (e, index) => {
@@ -38,7 +44,9 @@ const AssetDetails = ({ value, onChange }) => {
   useEffect(() => {
     const fetchAssetType = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/asset_type");
+        const response = await axios.get(
+          "http://localhost:5001/api/asset_type"
+        );
         if (Array.isArray(response.data)) {
           setAssetType(response.data);
         } else {
@@ -141,13 +149,17 @@ const AssetDetails = ({ value, onChange }) => {
             <input
               type="file"
               accept="image/*"
-              name={`image${index + 1}`}  
+              name={`image${index + 1}`}
               onChange={(e) => handleImageChange(e, index)}
               className="input-file"
             />
             {previewImages[index] && (
               <div className="mt-4">
-                <img src={previewImages[index]} alt={`Asset ${index + 1}`} className="preview-img" />
+                <img
+                  src={previewImages[index]}
+                  alt={`Asset ${index + 1}`}
+                  className="preview-img"
+                />
               </div>
             )}
           </div>

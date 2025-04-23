@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Breadcrumb5 from "../components/Breadcrumb5";
-import '../css/ShowInfo.css'; // Import the CSS file
-import ActionButtons3 from '../components/ActionButtons3';
+import "../css/ShowInfo.css"; // Import the CSS file
+import ActionButtons3 from "../components/ActionButtons3";
 
 const ShowInfo = () => {
   const { id } = useParams();
@@ -12,14 +12,14 @@ const ShowInfo = () => {
   const [error, setError] = useState(null);
   const encodedId = encodeURIComponent(id);
 
-
   useEffect(() => {
     console.log("Fetching asset data for ID:", id); // Debug log
 
-   
     const fetchAssetData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/mainasset/${encodedId}`);
+        const response = await axios.get(
+          `http://localhost:5001/mainasset/${encodedId}`
+        );
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -33,7 +33,10 @@ const ShowInfo = () => {
   }, [id]);
 
   const formatCurrency = (value) => {
-    return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" }).format(value);
+    return new Intl.NumberFormat("th-TH", {
+      style: "currency",
+      currency: "THB",
+    }).format(value);
   };
 
   if (loading) {
@@ -57,7 +60,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.main_asset_id || ''}
+                value={data.mainAsset?.main_asset_id || ""}
                 readOnly
               />
             </div>
@@ -66,7 +69,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.department_id || ''}
+                value={data.mainAsset?.department_id || ""}
                 readOnly
               />
             </div>
@@ -75,7 +78,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.status || ''}
+                value={data.mainAsset?.status || ""}
                 readOnly
               />
             </div>
@@ -91,7 +94,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.fiscal_year || ''}
+                value={data.mainAsset?.fiscal_year || ""}
                 readOnly
               />
             </div>
@@ -100,7 +103,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.date_received || ''}
+                value={data.mainAsset?.date_received || ""}
                 readOnly
               />
             </div>
@@ -109,7 +112,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.budget_type || ''}
+                value={data.mainAsset?.budget_type || ""}
                 readOnly
               />
             </div>
@@ -118,7 +121,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.budget_limit || ''}
+                value={data.mainAsset?.budget_limit || ""}
                 readOnly
               />
             </div>
@@ -127,7 +130,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.averange_price || ''}
+                value={data.mainAsset?.averange_price || ""}
                 readOnly
               />
             </div>
@@ -143,7 +146,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.main_asset_name || ''}
+                value={data.mainAsset?.main_asset_name || ""}
                 readOnly
               />
             </div>
@@ -153,7 +156,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.asset_type || ''}
+                value={data.mainAsset?.asset_type || ""}
                 readOnly
               />
             </div>
@@ -163,7 +166,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.location_use || ''}
+                value={data.mainAsset?.location_use || ""}
                 readOnly
               />
             </div>
@@ -173,7 +176,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.usage || ''}
+                value={data.mainAsset?.usage || ""}
                 readOnly
               />
             </div>
@@ -183,7 +186,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.location_deliver || ''}
+                value={data.mainAsset?.location_deliver || ""}
                 readOnly
               />
             </div>
@@ -193,7 +196,7 @@ const ShowInfo = () => {
               <input
                 type="text"
                 className="input-field-show"
-                value={data.mainAsset?.responsible_person || ''}
+                value={data.mainAsset?.responsible_person || ""}
                 readOnly
               />
             </div>
@@ -220,19 +223,23 @@ const ShowInfo = () => {
               {data.subAssets?.length > 0 ? (
                 data.subAssets.map((item) => (
                   <tr key={item.sub_asset_id} className="text-center">
-                     <td className="border px-4 py-2">{item.sub_asset_name}</td>
-                      <td className="border px-4 py-2">{item.type_sub_asset}</td>
-                      <td className="border px-4 py-2">{item.details}</td>
-                      <td className="border px-4 py-2">{formatCurrency(item.unit_price)}</td>
-                      <td className="border px-4 py-2">{item.quantity}</td>
-                      <td className="border px-4 py-2">{item.counting_unit}</td>
-                      <td className="border px-4 py-2">{item.status}</td>
-                      <td className="border px-4 py-2">{item.note}</td>
+                    <td className="border px-4 py-2">{item.sub_asset_name}</td>
+                    <td className="border px-4 py-2">{item.type_sub_asset}</td>
+                    <td className="border px-4 py-2">{item.details}</td>
+                    <td className="border px-4 py-2">
+                      {formatCurrency(item.unit_price)}
+                    </td>
+                    <td className="border px-4 py-2">{item.quantity}</td>
+                    <td className="border px-4 py-2">{item.counting_unit}</td>
+                    <td className="border px-4 py-2">{item.status}</td>
+                    <td className="border px-4 py-2">{item.note}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className="text-center text-gray-500 py-4">ไม่มีข้อมูล</td>
+                  <td colSpan="7" className="text-center text-gray-500 py-4">
+                    ไม่มีข้อมูล
+                  </td>
                 </tr>
               )}
             </tbody>
