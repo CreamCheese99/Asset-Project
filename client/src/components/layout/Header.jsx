@@ -55,7 +55,7 @@ const Header = () => {
       {/* เมนูนำทาง */}
       <nav style={{ backgroundColor: '#aed581' }} className="rounded-b-md shadow-lg py-4">
         <div className="container mx-auto flex justify-center space-x-8">
-          {(roleId === '1'  || roleId === '3' || roleId === '4'|| roleId === '5') && (
+          {(roleId === '1'  || roleId === '2'|| roleId === '3' || roleId === '4'|| roleId === '5') && (
             <Link to="/home" className="hover:text-gray-200 transition duration-300">หน้าหลัก</Link>
           )}
 
@@ -67,10 +67,17 @@ const Header = () => {
             </>
           )}
 
-          {(roleId === '2' || roleId === '3') && ( // สำหรับ Admin
+          {( roleId === '3') && ( // สำหรับ Admin
             <>
               <Link to="/manage-permissions" className="hover:text-gray-200 transition duration-300">จัดการสิทธิ์</Link>
               <Link to="/manage-personal-info" className="hover:text-gray-200 transition duration-300">ข้อมูลทั่วไป</Link>
+            </>
+          )}
+          
+          {( roleId === '2') && ( // สำหรับ Admin
+            <>
+              <Link to="/manage-permissions" className="hover:text-gray-200 transition duration-300">จัดการสิทธิ์</Link>
+              
             </>
           )}
 
