@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
-<<<<<<< HEAD
-import API from '../API';
-import FormInputField from './FormInputField';  
-=======
 import axios from 'axios';
 import FormInputField from './FormInputField';
->>>>>>> test
 import LogoSection from './LogoSection';
 
 function FormLogin() {
@@ -29,23 +24,12 @@ function FormLogin() {
         username: user_email.trim(),
         password: password.trim(),
       };
-<<<<<<< HEAD
-  
-      console.log('Sending request data:', requestData); // Log request data
-  
-      // Send the request to the login API
-      const response = await API.post('http://localhost:5000/login', requestData);
-  
-      console.log('Received response:', response); // ตรวจสอบการตอบกลับจาก API
-  
-=======
 
       console.log('ส่งข้อมูลเข้าสู่ระบบ:', requestData);
 
       const response = await axios.post('http://localhost:5000/api/login', requestData);
       console.log('การตอบกลับจากเซิร์ฟเวอร์:', response);
 
->>>>>>> test
       const data = response.data;
 
       if (response.status >= 200 && response.status < 300) {
