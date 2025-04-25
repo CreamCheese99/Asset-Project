@@ -531,7 +531,7 @@ export const createAssetStatusPieCharts = (data, selectedDepartment = "", select
 // ดึงข้อมูลจาก API
 export const fetchDataFromAPI = async () => {
   try {
-    const response = await fetch("http://localhost:5001/api/getData"); 
+    const response = await fetch("http://localhost:5000/api/getData"); 
     if (!response.ok) {
       throw new Error("Cannot fetch data from API");
     }

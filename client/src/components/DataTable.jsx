@@ -53,7 +53,7 @@
 
 //     if (userDeptId && userRoleId !== "3") {
 //       axios
-//         .get(`http://localhost:5001/api/department`, {
+//         .get(`http://localhost:5000/api/department`, {
 //           headers: { Authorization: `Bearer ${token}` },
 //         })
 //         .then((response) => {
@@ -142,7 +142,7 @@
 //   const token = localStorage.getItem("token");
 
 //   try {
-//     const response = await axios.get(`http://localhost:5001/api/subasset/${mainAssetId}`, {
+//     const response = await axios.get(`http://localhost:5000/api/subasset/${mainAssetId}`, {
 //       headers: { Authorization: `Bearer ${token}` }
 //     });
 
@@ -329,7 +329,7 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
 
     if (userDeptId && userRoleId !== "3") {
       axios
-        .get(`http://localhost:5001/api/department`, {
+        .get(`http://localhost:5000/api/department`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
@@ -379,7 +379,7 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
     const token = localStorage.getItem("token");
   
     try {
-      const response = await axios.get(`http://localhost:5001/api/subasset/${encodeURIComponent(mainAssetId)}`, {
+      const response = await axios.get(`http://localhost:5000/api/subasset/${encodeURIComponent(mainAssetId)}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
   

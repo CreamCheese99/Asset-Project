@@ -50,7 +50,7 @@ const EditInfo = () => {
 
     const fetchAssetData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5001/mainasset/${encodeURIComponent(id)}`);
+        const response = await axios.get(`http://localhost:5000/mainasset/${encodeURIComponent(id)}`);
         setData(response.data);
 
         if (response.data?.mainAsset) {
@@ -74,7 +74,7 @@ const EditInfo = () => {
       const userId = localStorage.getItem("userId");
       if (userId) {
         try {
-          const response = await axios.get(`http://localhost:5001/api/users/${userId}`);
+          const response = await axios.get(`http://localhost:5000/api/users/${userId}`);
           setCurrentUser(response.data);
         } catch (error) {
           console.error("Error fetching current user:", error);
@@ -99,7 +99,7 @@ const EditInfo = () => {
 useEffect(() => {
   if (departmentId) {
     axios
-      .get(`http://localhost:5001/api/users/by-department/${departmentId}`)
+      .get(`http://localhost:5000/api/users/by-department/${departmentId}`)
       .then(response => {
         setUsersInDepartment(response.data);
       })
@@ -126,7 +126,7 @@ const handleSaveMainasset = async () => {
   // const handleSaveMainasset = async () => {
   try {
     // ส่งข้อมูลที่แก้ไขไปยัง API ด้วย axios
-    const response = await axios.put('http://localhost:5001/mainasset/:id', updatedData.mainAsset);
+    const response = await axios.put('http://localhost:5000/mainasset/:id', updatedData.mainAsset);
 
     if (response.status === 200) {
       // ข้อมูลบันทึกสำเร็จ
@@ -233,8 +233,8 @@ const handleSaveSubasset = async (e) => {
 
   try {
     const url = editMode
-      ? `http://localhost:5001/api/subasset/${editId}`
-      : "http://localhost:5001/api/subasset";
+      ? `http://localhost:5000/api/subasset/${editId}`
+      : "http://localhost:5000/api/subasset";
     const method = editMode ? "put" : "post";
 
     const response = await axios[method](url, subAssetData);
@@ -284,7 +284,7 @@ const handleDelete = async (subId) => {
   console.log(" ลบ subasset id:", subId);
 
   try {
-    await axios.delete(`http://localhost:5001/api/subasset/${subId}`);
+    await axios.delete(`http://localhost:5000/api/subasset/${subId}`);
     
     // อัปเดตข้อมูลใน state หลังจากการลบ
     setData(prevData => ({
@@ -345,7 +345,7 @@ const handleImageChange = (e, index) => {
     formData.append("asset_id", updatedData.mainAsset.main_asset_id);
 
     axios
-      .post("http://localhost:5001/api/update-image", formData, {
+      .post("http://localhost:5000/api/update-image", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       .then((res) => {
@@ -556,7 +556,7 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
                 <div key={index} className="border rounded p-2 shadow-sm bg-white">
                   {img ? (
                     <img
-                      src={`http://localhost:5001/uploads/${img}`}
+                      src={`http://localhost:5000/uploads/${img}`}
                       alt={`รูปภาพ ${index + 1}`}
                       className="w-full h-40 object-cover rounded cursor-pointer"
                       onClick={() => openModal(img)}
@@ -592,7 +592,7 @@ if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
           &times;
         </button>
         <img
-          src={`http://localhost:5001/uploads/${selectedImage}`}
+          src={`http://localhost:5000/uploads/${selectedImage}`}
           alt="ขยายรูป"
           className="w-full max-h-[90vh] object-contain rounded"
         />
