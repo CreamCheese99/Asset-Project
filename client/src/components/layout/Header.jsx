@@ -13,7 +13,7 @@ const Header = () => {
   const handleLogout = () => {
     // ลบข้อมูลใน localStorage และเปลี่ยนเส้นทางไปที่หน้า login
     localStorage.removeItem('roleId');
-    localStorage.removeItem('user_name');
+    localStorage.removeItem('userName'); 
     localStorage.removeItem('token');
     navigate('/'); // เปลี่ยนเส้นทางไปยังหน้า login
   };
