@@ -75,7 +75,7 @@ const AddAsset = () => {
     }
   
     try {
-      const response = await API.post('http://localhost:5000/api/mainasset', formData, {
+      const response = await API.post('http://localhost:5000/api/mainasset-add', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
