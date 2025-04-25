@@ -26,7 +26,7 @@ const storage = multer.diskStorage({
 // สร้าง instance ของ multer
 const upload = multer({ storage: storage });
 //เพิ่ม mainasset
-app.post('/mainasset', upload.fields([ 
+app.post('/api/mainasset', upload.fields([ 
   { name: 'image1', maxCount: 1 },
   { name: 'image2', maxCount: 1 },
   { name: 'image3', maxCount: 1 },
@@ -162,7 +162,7 @@ if (!Array.isArray(curriculumArray) || curriculumArray.length === 0) {
 });
 
 
-app.get("/mainasset", async (req, res) => {
+app.get("/api/mainasset", async (req, res) => {
   try {
     const {
       main_asset_id,
@@ -223,34 +223,34 @@ app.get("/mainasset", async (req, res) => {
 
 
 
-//API หน้า AllAsset
-app.get('/api/mainasset', async (req, res) => {
-  try {
-    // ตรวจสอบการเชื่อมต่อกับฐานข้อมูล
-    console.log("กำลังเชื่อมต่อกับฐานข้อมูล...");
+// //API หน้า AllAsset
+// app.get('/api/mainasset', async (req, res) => {
+//   try {
+//     // ตรวจสอบการเชื่อมต่อกับฐานข้อมูล
+//     console.log("กำลังเชื่อมต่อกับฐานข้อมูล...");
     
-    // คำสั่ง SQL สำหรับดึงข้อมูล
-    const query = `
-      SELECT ma.main_asset_id, ma.main_asset_name, ma.status, sa.sub_asset_id, sa.sub_asset_name, sa.status AS sub_asset_status
-      FROM mainasset ma
-      JOIN subasset sa ON ma.main_asset_id = sa.main_asset_id
-    `;
+//     // คำสั่ง SQL สำหรับดึงข้อมูล
+//     const query = `
+//       SELECT ma.main_asset_id, ma.main_asset_name, ma.status, sa.sub_asset_id, sa.sub_asset_name, sa.status AS sub_asset_status
+//       FROM mainasset ma
+//       JOIN subasset sa ON ma.main_asset_id = sa.main_asset_id
+//     `;
     
-    const result = await pool.query(query);  // ส่งคำสั่ง SQL เพื่อดึงข้อมูล
+//     const result = await pool.query(query);  // ส่งคำสั่ง SQL เพื่อดึงข้อมูล
     
-    // ตรวจสอบว่ามีข้อมูลที่ดึงมา
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "ไม่พบข้อมูล" });
-    }
+//     // ตรวจสอบว่ามีข้อมูลที่ดึงมา
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ error: "ไม่พบข้อมูล" });
+//     }
 
-    // ส่งข้อมูลกลับไปยังคลไคลเอนต์
-    res.json(result.rows);
-  } catch (err) {
-    // เพิ่มการแสดงข้อความข้อผิดพลาด
-    console.error("ข้อผิดพลาดในการดึงข้อมูล:", err);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลจากฐานข้อมูล", message: err.message });
-  }
-});
+//     // ส่งข้อมูลกลับไปยังคลไคลเอนต์
+//     res.json(result.rows);
+//   } catch (err) {
+//     // เพิ่มการแสดงข้อความข้อผิดพลาด
+//     console.error("ข้อผิดพลาดในการดึงข้อมูล:", err);
+//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลจากฐานข้อมูล", message: err.message });
+//   }
+// });
 
 app.get('/api/mainasset-assetlist', async (req, res) => {
   try {
@@ -293,7 +293,7 @@ app.get('/api/fiscal-years', async (req, res) => {
 
 const path = require('path');  // เพิ่มบรรทัดนี้
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.get("/mainasset/:id", async (req, res) => {
+app.get("/api/mainasset/:id", async (req, res) => {
   try {
     const encodedId = req.params.id;
     const id = decodeURIComponent(encodedId);
@@ -366,127 +366,127 @@ app.delete('/api/mainasset/:id', async (req, res) => {
 
 
 
-// API สำหรับการอัปเดตข้อมูล mainasset
-app.put("/mainasset/:id", async (req, res) => {
-  const { id } = req.params;
-  const {
-    main_asset_id,
-    main_asset_name,
-    status,
-    fiscal_year,
-    date_received,
-    budget_limit,
-    averange_price,
-    budget_type,
-    asset_type,
-    location_use,
-    location_deliver,
-    usage,
-    responsible_person,
-    department_id,
-  } = req.body;
+// // API สำหรับการอัปเดตข้อมูล mainasset
+// app.put("/api/mainasset/:id", async (req, res) => {
+//   const { id } = req.params;
+//   const {
+//     main_asset_id,
+//     main_asset_name,
+//     status,
+//     fiscal_year,
+//     date_received,
+//     budget_limit,
+//     averange_price,
+//     budget_type,
+//     asset_type,
+//     location_use,
+//     location_deliver,
+//     usage,
+//     responsible_person,
+//     department_id,
+//   } = req.body;
 
-  try {
-    // อัปเดตข้อมูล mainasset
-    const mainAssetUpdateQuery = `
-      UPDATE public.mainasset
-      SET
-        main_asset_name = $1,
-        status = $2,
-        fiscal_year = $3,
-        date_received = $4,
-        budget_limit = $5,
-        averange_price = $6,
-        budget_type = $7,
-        asset_type = $8,
-        location_use = $9,
-        location_deliver = $10,
-        usage = $11,
-        responsible_person = $12,
-        department_id = $13
-      WHERE main_asset_id = $14
-      RETURNING *;
-    `;
+//   try {
+//     // อัปเดตข้อมูล mainasset
+//     const mainAssetUpdateQuery = `
+//       UPDATE public.mainasset
+//       SET
+//         main_asset_name = $1,
+//         status = $2,
+//         fiscal_year = $3,
+//         date_received = $4,
+//         budget_limit = $5,
+//         averange_price = $6,
+//         budget_type = $7,
+//         asset_type = $8,
+//         location_use = $9,
+//         location_deliver = $10,
+//         usage = $11,
+//         responsible_person = $12,
+//         department_id = $13
+//       WHERE main_asset_id = $14
+//       RETURNING *;
+//     `;
 
-    const updatedMainAssetResult = await pool.query(mainAssetUpdateQuery, [
-      main_asset_name,
-      status,
-      fiscal_year,
-      date_received,
-      budget_limit,
-      averange_price,
-      budget_type,
-      asset_type,
-      location_use,
-      location_deliver,
-      usage,
-      responsible_person,
-      department_id,
-      main_asset_id || id, // ใช้ main_asset_id ที่รับจาก body หรือ id จาก params
-    ]);
+//     const updatedMainAssetResult = await pool.query(mainAssetUpdateQuery, [
+//       main_asset_name,
+//       status,
+//       fiscal_year,
+//       date_received,
+//       budget_limit,
+//       averange_price,
+//       budget_type,
+//       asset_type,
+//       location_use,
+//       location_deliver,
+//       usage,
+//       responsible_person,
+//       department_id,
+//       main_asset_id || id, // ใช้ main_asset_id ที่รับจาก body หรือ id จาก params
+//     ]);
 
-    if (updatedMainAssetResult.rows.length === 0) {
-      return res.status(404).json({ message: "Main asset not found" });
-    }
+//     if (updatedMainAssetResult.rows.length === 0) {
+//       return res.status(404).json({ message: "Main asset not found" });
+//     }
 
-    // อัปเดตข้อมูล subasset (ถ้ามีการส่งข้อมูล subasset มาด้วย)
-    const subAssets = req.body.subAssets || [];
-    for (const subAsset of subAssets) {
-      const {
-        sub_asset_id,
-        sub_asset_name,
-        details,
-        unit_price,
-        quantity,
-        counting_unit,
-        note,
-        type_sub_asset,
-        status: subAssetStatus,
-      } = subAsset;
+//     // อัปเดตข้อมูล subasset (ถ้ามีการส่งข้อมูล subasset มาด้วย)
+//     const subAssets = req.body.subAssets || [];
+//     for (const subAsset of subAssets) {
+//       const {
+//         sub_asset_id,
+//         sub_asset_name,
+//         details,
+//         unit_price,
+//         quantity,
+//         counting_unit,
+//         note,
+//         type_sub_asset,
+//         status: subAssetStatus,
+//       } = subAsset;
 
-      const subAssetUpdateQuery = `
-        UPDATE public.subasset
-        SET
-          sub_asset_name = $1,
-          details = $2,
-          unit_price = $3,
-          quantity = $4,
-          counting_unit = $5,
-          note = $6,
-          type_sub_asset = $7,
-          status = $8
-        WHERE sub_asset_id = $9 AND main_asset_id = $10
-        RETURNING *;
-      `;
+//       const subAssetUpdateQuery = `
+//         UPDATE public.subasset
+//         SET
+//           sub_asset_name = $1,
+//           details = $2,
+//           unit_price = $3,
+//           quantity = $4,
+//           counting_unit = $5,
+//           note = $6,
+//           type_sub_asset = $7,
+//           status = $8
+//         WHERE sub_asset_id = $9 AND main_asset_id = $10
+//         RETURNING *;
+//       `;
 
-      const updatedSubAssetResult = await pool.query(subAssetUpdateQuery, [
-        sub_asset_name,
-        details,
-        unit_price,
-        quantity,
-        counting_unit,
-        subAssetStatus,
-        note,
-        type_sub_asset,
-        sub_asset_id,
-        main_asset_id || id // ใช้ main_asset_id ที่รับจาก body หรือ id จาก params
-      ]);
+//       const updatedSubAssetResult = await pool.query(subAssetUpdateQuery, [
+//         sub_asset_name,
+//         details,
+//         unit_price,
+//         quantity,
+//         counting_unit,
+//         subAssetStatus,
+//         note,
+//         type_sub_asset,
+//         sub_asset_id,
+//         main_asset_id || id // ใช้ main_asset_id ที่รับจาก body หรือ id จาก params
+//       ]);
 
-      if (updatedSubAssetResult.rows.length === 0) {
-        return res.status(404).json({ message: `Sub-asset ${sub_asset_id} not found` });
-      }
-    }
+//       if (updatedSubAssetResult.rows.length === 0) {
+//         return res.status(404).json({ message: `Sub-asset ${sub_asset_id} not found` });
+//       }
+//     }
 
-    res.json({
-      message: "Asset and sub-assets updated successfully",
-      mainAsset: updatedMainAssetResult.rows[0],
-      subAssets: subAssets,
-    });
-  } catch (error) {
-    console.error("Error updating data:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
+//     res.json({
+//       message: "Asset and sub-assets updated successfully",
+//       mainAsset: updatedMainAssetResult.rows[0],
+//       subAssets: subAssets,
+//     });
+//   } catch (error) {
+//     console.error("Error updating data:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });
 
 
 
@@ -495,7 +495,7 @@ app.put("/mainasset/:id", async (req, res) => {
 
 
 // สร้าง API endpoint สำหรับอัปเดตข้อมูลครุภัณฑ์
-app.put('/mainasset/:id', async (req, res) => {
+app.put('/api/mainasset/:id', async (req, res) => {
   const {
     main_asset_id,
     main_asset_name,
@@ -790,7 +790,7 @@ app.put('/api/subasset-edit/:id', async (req, res) => {
 
 
 
-app.get("/department", async (req, res) => {
+app.get("/api/department-curriculum", async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT d.department_id, d.department_name, 
@@ -805,6 +805,7 @@ app.get("/department", async (req, res) => {
     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลภาควิชา" });
   }
 });
+
 app.get('/api/department', async (req, res) => {
   try {
     // ดึงข้อมูลจากฐานข้อมูล โดยจัดเรียงตาม department_id
@@ -847,7 +848,7 @@ app.get('/api/curriculum/:departmentId', async (req, res) => {
   }
 });
 
-app.post("/department", async (req, res) => {
+app.post("/api/department", async (req, res) => {
   const { department_name, curriculum } = req.body;
 
   if (!department_name) {
@@ -895,7 +896,7 @@ app.post("/department", async (req, res) => {
 
 
 // แก้ไขภาควิชา พร้อมหลักสูตร
-app.put("/department/:id", async (req, res) => {
+app.put("/api/department/:id", async (req, res) => {
   const { id } = req.params;
   const { department_name, curriculum } = req.body;
 
@@ -942,7 +943,7 @@ app.put("/department/:id", async (req, res) => {
   }
 });
 
-app.delete("/department/:id", async (req, res) => {
+app.delete("/api/department/:id", async (req, res) => {
   const { id } = req.params;
 
   const client = await pool.connect();
@@ -985,18 +986,18 @@ app.get("/api/asset_type", async (req, res) => {
   }
 });
 
-app.get("/api/asset_type/:id", async (req, res) => {
-  const { id } = req.params; // ดึงค่าของ id จาก URL params
-  try {
-    const result = await pool.query("SELECT * FROM asset_type WHERE asset_type_id = $1", [id]); // ใช้ parameterized query เพื่อป้องกัน SQL Injection
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "ประเภทสินทรัพย์ไม่พบ" });
-    }
-    res.json(result.rows[0]); // ส่งข้อมูลของประเภทสินทรัพย์ที่ตรงกับ id
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// app.get("/api/asset_type/:id", async (req, res) => {
+//   const { id } = req.params; // ดึงค่าของ id จาก URL params
+//   try {
+//     const result = await pool.query("SELECT * FROM asset_type WHERE asset_type_id = $1", [id]); // ใช้ parameterized query เพื่อป้องกัน SQL Injection
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ error: "ประเภทสินทรัพย์ไม่พบ" });
+//     }
+//     res.json(result.rows[0]); // ส่งข้อมูลของประเภทสินทรัพย์ที่ตรงกับ id
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 // 📌 2. เพิ่มข้อมูล
 app.post("/api/asset_type", async (req, res) => {
@@ -1218,14 +1219,6 @@ app.put('/api/users/:id/role', async (req, res) => {
 });
 
 
-
-
-
-
-
-
-
-
 // API สำหรับดึงข้อมูลบทบาททั้งหมด
 app.get('/api/role', async (req, res) => {
   try {
@@ -1240,7 +1233,7 @@ app.get('/api/role', async (req, res) => {
 
 //***********************Login************************* */
 
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { user_email, password } = req.body;
   const jwt = require('jsonwebtoken');
 
@@ -1288,319 +1281,110 @@ app.post('/login', async (req, res) => {
 
 //****************************
 
-app.get("/api/department-assets", async (req, res) => {
-  try {
-    const result = await pool.query(
-      `SELECT 
-          d.department_id, 
-          ma.fiscal_year, 
-          ma.budget_type, 
-          SUM(ma.budget_limit) as budget_limit
-        FROM mainasset ma
-        JOIN department d ON ma.department_id = d.department_id  -- สมมติว่าใช้ department_id
-        GROUP BY d.department_id, ma.fiscal_year, ma.budget_type
-        ORDER BY ma.fiscal_year;`
-            );
+// app.get("/api/department-assets", async (req, res) => {
+//   try {
+//     const result = await pool.query(
+//       `SELECT 
+//           d.department_id, 
+//           ma.fiscal_year, 
+//           ma.budget_type, 
+//           SUM(ma.budget_limit) as budget_limit
+//         FROM mainasset ma
+//         JOIN department d ON ma.department_id = d.department_id  -- สมมติว่าใช้ department_id
+//         GROUP BY d.department_id, ma.fiscal_year, ma.budget_type
+//         ORDER BY ma.fiscal_year;`
+//             );
 
-    res.json(result.rows);
-  } catch (error) {
-    console.error("Database error:", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
-  }
-});
-
-
-app.get("/api/status-summary", async (req, res) => {
-  try {
-    const result = await pool.query(
-      `SELECT status, fiscal_year, COUNT(*) as count 
-      FROM mainasset 
-      GROUP BY status, fiscal_year 
-      ORDER BY fiscal_year;`
-    );
-
-    // จัดกลุ่มข้อมูลโดยแบ่งตามปีงบประมาณ (fiscal_year)
-    const groupedData = {};
-    result.rows.forEach(row => {
-      const { fiscal_year, status, count } = row;
-      if (!groupedData[fiscal_year]) {
-        groupedData[fiscal_year] = {
-          labels: [],
-          data: [],
-        };
-      }
-      groupedData[fiscal_year].labels.push(status);
-      groupedData[fiscal_year].data.push(parseInt(count));
-    });
-
-    // สร้างโครงสร้างข้อมูลสำหรับส่งไปยัง Frontend
-    const responseData = Object.keys(groupedData).map(year => ({
-      fiscal_year: year,
-      labels: groupedData[year].labels,
-      datasets: [{
-        data: groupedData[year].data,
-        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
-      }]
-    }));
-
-    res.json(responseData);
-  } catch (error) {
-    console.error("Database error:", error);
-    res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
-  }
-});
+//     res.json(result.rows);
+//   } catch (error) {
+//     console.error("Database error:", error);
+//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+//   }
+// });
 
 
+// app.get("/api/status-summary", async (req, res) => {
+//   try {
+//     const result = await pool.query(
+//       `SELECT status, fiscal_year, COUNT(*) as count 
+//       FROM mainasset 
+//       GROUP BY status, fiscal_year 
+//       ORDER BY fiscal_year;`
+//     );
+
+//     // จัดกลุ่มข้อมูลโดยแบ่งตามปีงบประมาณ (fiscal_year)
+//     const groupedData = {};
+//     result.rows.forEach(row => {
+//       const { fiscal_year, status, count } = row;
+//       if (!groupedData[fiscal_year]) {
+//         groupedData[fiscal_year] = {
+//           labels: [],
+//           data: [],
+//         };
+//       }
+//       groupedData[fiscal_year].labels.push(status);
+//       groupedData[fiscal_year].data.push(parseInt(count));
+//     });
+
+//     // สร้างโครงสร้างข้อมูลสำหรับส่งไปยัง Frontend
+//     const responseData = Object.keys(groupedData).map(year => ({
+//       fiscal_year: year,
+//       labels: groupedData[year].labels,
+//       datasets: [{
+//         data: groupedData[year].data,
+//         backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
+//       }]
+//     }));
+
+//     res.json(responseData);
+//   } catch (error) {
+//     console.error("Database error:", error);
+//     res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+//   }
+// });
 
 
-app.get("/api/mainasset-dash", async (req, res) => {
-  try {
-    const { department, budgetType, year } = req.query;
 
-    let query = `
-      SELECT d.department_name AS department, m.budget_type, m.fiscal_year, SUM(m.budget_limit) AS total_budget
-      FROM mainasset m
-      JOIN department d ON m.department_id = d.department_id
-      WHERE 1=1
-    `;
 
-    let params = [];
+// app.get("/api/mainasset-dash", async (req, res) => {
+//   try {
+//     const { department, budgetType, year } = req.query;
 
-    if (department) {
-      query += ` AND d.department_name = $${params.length + 1}`;
-      params.push(department);
-    }
-    if (budgetType) {
-      query += ` AND m.budget_type = $${params.length + 1}`;
-      params.push(budgetType);
-    }
-    if (year) {
-      query += ` AND m.fiscal_year = $${params.length + 1}`;
-      params.push(year);
-    }
+//     let query = `
+//       SELECT d.department_name AS department, m.budget_type, m.fiscal_year, SUM(m.budget_limit) AS total_budget
+//       FROM mainasset m
+//       JOIN department d ON m.department_id = d.department_id
+//       WHERE 1=1
+//     `;
 
-    query += " GROUP BY d.department_name, m.budget_type, m.fiscal_year ORDER BY m.fiscal_year";
+//     let params = [];
 
-    const result = await pool.query(query, params);
+//     if (department) {
+//       query += ` AND d.department_name = $${params.length + 1}`;
+//       params.push(department);
+//     }
+//     if (budgetType) {
+//       query += ` AND m.budget_type = $${params.length + 1}`;
+//       params.push(budgetType);
+//     }
+//     if (year) {
+//       query += ` AND m.fiscal_year = $${params.length + 1}`;
+//       params.push(year);
+//     }
 
-    // 🔹 ห่อข้อมูลที่ส่งกลับด้วย `departmentDetails`
-    res.json({ departmentDetails: result.rows });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+//     query += " GROUP BY d.department_name, m.budget_type, m.fiscal_year ORDER BY m.fiscal_year";
+
+//     const result = await pool.query(query, params);
+
+//     // 🔹 ห่อข้อมูลที่ส่งกลับด้วย `departmentDetails`
+//     res.json({ departmentDetails: result.rows });
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 
 //************************************************Home***************************************************************** */
-
-// ข้อมูล JSON ที่เราจำลองจากฐานข้อมูล (ข้อมูลสำหรับกราฟ)
-
-// const data = {
-//   departments: [
-//     "ครุศาสตร์วิศวกรรม", 
-//     "ครุศาสตร์เกษตร", 
-//     "ครุศาสตร์สถาปัตยกรรม", 
-//     "ครุศาสตร์การออกแบบ", 
-//     "ครุศาสตร์การออกแบบสภาพแวดล้อมภายใน"
-//   ],
-//   fundTypes: [
-//     "เงินงบประมาณ", 
-//     "เงินรายได้", 
-//     "เงินสะสม", 
-//     "เงินกันเหลื่อมปี"
-//   ],
-//   years: ["2565", "2566", "2567", "2568"],
-
-//   departmentDetails: {
-//     "ครุศาสตร์วิศวกรรม": {
-//       "เงินงบประมาณ": {
-//         "2565": [300, 250, 100],
-//         "2566": [400, 200, 150],
-//         "2567": [500, 300, 180],
-//         "2568": [600, 400, 200]
-//       },
-//       "เงินรายได้": {
-//         "2565": [120, 150, 180],
-//         "2566": [130, 160, 190],
-//         "2567": [140, 170, 200],
-//         "2568": [150, 180, 210]
-//       },
-//       "เงินสะสม": {
-//         "2565": [50, 40, 30],
-//         "2566": [60, 50, 40],
-//         "2567": [70, 60, 50],
-//         "2568": [80, 70, 60]
-//       },
-//       "เงินกันเหลื่อมปี": {
-//         "2565": [20, 15, 10],
-//         "2566": [30, 20, 15],
-//         "2567": [40, 25, 20],
-//         "2568": [50, 35, 25]
-//       }
-//     },
-//     "ครุศาสตร์เกษตร": {
-//       "เงินงบประมาณ": {
-//         "2565": [250, 200, 130],
-//         "2566": [350, 220, 160],
-//         "2567": [450, 270, 210],
-//         "2568": [500, 350, 230]
-//       },
-//       "เงินรายได้": {
-//         "2565": [110, 140, 170],
-//         "2566": [120, 150, 180],
-//         "2567": [130, 160, 190],
-//         "2568": [140, 170, 200]
-//       },
-//       "เงินสะสม": {
-//         "2565": [40, 35, 25],
-//         "2566": [50, 45, 35],
-//         "2567": [60, 55, 45],
-//         "2568": [70, 60, 50]
-//       },
-//       "เงินกันเหลื่อมปี": {
-//         "2565": [15, 10, 5],
-//         "2566": [25, 15, 10],
-//         "2567": [35, 20, 15],
-//         "2568": [45, 30, 20]
-//       }
-//     },
-//     "ครุศาสตร์สถาปัตยกรรม": {
-//       "เงินงบประมาณ": {
-//         "2565": [350, 220, 180],
-//         "2566": [400, 250, 200],
-//         "2567": [450, 280, 230],
-//         "2568": [500, 320, 250]
-//       },
-//       "เงินรายได้": {
-//         "2565": [150, 180, 200],
-//         "2566": [160, 190, 210],
-//         "2567": [170, 200, 220],
-//         "2568": [180, 210, 240]
-//       },
-//       "เงินสะสม": {
-//         "2565": [60, 50, 40],
-//         "2566": [70, 60, 50],
-//         "2567": [80, 70, 60],
-//         "2568": [90, 80, 70]
-//       },
-//       "เงินกันเหลื่อมปี": {
-//         "2565": [25, 20, 15],
-//         "2566": [35, 30, 20],
-//         "2567": [45, 35, 30],
-//         "2568": [55, 45, 35]
-//       }
-//     },
-//     "ครุศาสตร์การออกแบบ": {
-//       "เงินงบประมาณ": {
-//         "2565": [200, 150, 120],
-//         "2566": [250, 170, 140],
-//         "2567": [300, 200, 160],
-//         "2568": [350, 220, 180]
-//       },
-//       "เงินรายได้": {
-//         "2565": [100, 130, 160],
-//         "2566": [110, 140, 170],
-//         "2567": [120, 150, 180],
-//         "2568": [130, 160, 190]
-//       },
-//       "เงินสะสม": {
-//         "2565": [30, 25, 20],
-//         "2566": [40, 35, 30],
-//         "2567": [50, 45, 40],
-//         "2568": [60, 55, 50]
-//       },
-//       "เงินกันเหลื่อมปี": {
-//         "2565": [10, 8, 5],
-//         "2566": [15, 12, 8],
-//         "2567": [20, 18, 10],
-//         "2568": [25, 22, 15]
-//       }
-//     },
-//     "ครุศาสตร์การออกแบบสภาพแวดล้อมภายใน": {
-//       "เงินงบประมาณ": {
-//         "2565": [220, 180, 140],
-//         "2566": [280, 200, 160],
-//         "2567": [350, 230, 190],
-//         "2568": [400, 260, 210]
-//       },
-//       "เงินรายได้": {
-//         "2565": [130, 160, 190],
-//         "2566": [140, 170, 200],
-//         "2567": [150, 180, 210],
-//         "2568": [160, 190, 220]
-//       },
-//       "เงินสะสม": {
-//         "2565": [45, 35, 30],
-//         "2566": [55, 45, 35],
-//         "2567": [65, 55, 45],
-//         "2568": [75, 65, 55]
-//       },
-//       "เงินกันเหลื่อมปี": {
-//         "2565": [12, 10, 6],
-//         "2566": [18, 15, 10],
-//         "2567": [24, 20, 15],
-//         "2568": [30, 25, 20]
-//       }
-//     }
-//   },
-
-//   assetStatuses: [
-//     "ใช้งาน", 
-//     "ส่งซ่อม", 
-//     "ชำรุด", 
-//     "บริจาค/โอน", 
-//     "รับโอน", 
-//     "จำหน่าย"
-//   ],
-//   statusSummaryByDepartment: {
-//     "ใช้งาน": {
-//       "ครุศาสตร์วิศวกรรม": 7,
-//       "ครุศาสตร์เกษตร": 8,
-//       "ครุศาสตร์สถาปัตยกรรม": 10,
-//       "ครุศาสตร์การออกแบบ": 6,
-//       "ครุศาสตร์การออกแบบสภาพแวดล้อมภายใน": 5
-//     },
-//     "ส่งซ่อม": {
-//       "ครุศาสตร์วิศวกรรม": 2,
-//       "ครุศาสตร์เกษตร": 3,
-//       "ครุศาสตร์สถาปัตยกรรม": 4,
-//       "ครุศาสตร์การออกแบบ": 3,
-//       "ครุศาสตร์การออกแบบสภาพแวดล้อมภายใน": 4
-//     },
-//     "ชำรุด": {
-//       "ครุศาสตร์วิศวกรรม": 3,
-//       "ครุศาสตร์เกษตร": 3,
-//       "ครุศาสตร์สถาปัตยกรรม": 3,
-//       "ครุศาสตร์การออกแบบ": 3,
-//       "ครุศาสตร์การออกแบบสภาพแวดล้อมภายใน": 3
-//     },
-//     "บริจาค/โอน": {
-//       "ครุศาสตร์วิศวกรรม": 3,
-//       "ครุศาสตร์เกษตร": 3,
-//       "ครุศาสตร์สถาปัตยกรรม": 3,
-//       "ครุศาสตร์การออกแบบ": 3,
-//       "ครุศาสตร์การออกแบบสภาพแวดล้อมภายใน": 3
-//     },
-//     "รับโอน": {
-//       "ครุศาสตร์วิศวกรรม": 3,
-//       "ครุศาสตร์เกษตร": 3,
-//       "ครุศาสตร์สถาปัตยกรรม": 3,
-//       "ครุศาสตร์การออกแบบ": 3,
-//       "ครุศาสตร์การออกแบบสภาพแวดล้อมภายใน": 3
-//     },
-//     "จำหน่าย": {
-//       "ครุศาสตร์วิศวกรรม": 3,
-//       "ครุศาสตร์เกษตร": 3,
-//       "ครุศาสตร์สถาปัตยกรรม": 3,
-//       "ครุศาสตร์การออกแบบ": 3,
-//       "ครุศาสตร์การออกแบบสภาพแวดล้อมภายใน": 3
-//     }
-//   }
-// };
-// //  API ที่ส่งข้อมูล mock
-// app.get('/api/getData', (req, res) => {
-// res.json(data);
-// });
 
 app.get('/api/getData', async (req, res) => {
   try {

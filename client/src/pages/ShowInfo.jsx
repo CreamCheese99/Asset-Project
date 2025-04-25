@@ -19,7 +19,7 @@ const ShowInfo = () => {
   useEffect(() => {
     const fetchAssetData = async () => {
       try {
-        const response = await API.get(`http://localhost:5000/mainasset/${encodedId}`);
+        const response = await API.get(`http://localhost:5000/api/mainasset/${encodedId}`);
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);

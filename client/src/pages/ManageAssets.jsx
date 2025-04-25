@@ -51,7 +51,7 @@ const ManageAssets = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await API.get("http://localhost:5000/mainasset");
+        const response = await API.get("http://localhost:5000/api/mainasset");
         setData(response.data); // เก็บข้อมูลทั้งหมด
         setFilteredData(response.data); // ตั้งค่าเริ่มต้นให้ข้อมูลที่กรองแล้วเป็นข้อมูลทั้งหมด
       } catch (error) {

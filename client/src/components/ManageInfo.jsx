@@ -14,7 +14,7 @@ const ManageInfo = () => {
 
   const fetchData = async () => {
     try {
-      const response = await API.get("http://localhost:5000/department");
+      const response = await API.get("http://localhost:5000/api/department-curriculum");
       setData(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -30,7 +30,7 @@ const ManageInfo = () => {
   const handleDelete = async (id) => {
     if (window.confirm("คุณต้องการลบภาควิชาและหลักสูตรนี้หรือไม่?")) {
       try {
-        await API.delete(`http://localhost:5000/department/${id}`);
+        await API.delete(`http://localhost:5000/api/department/${id}`);
         setData(data.filter((item) => item.department_id !== id));
       } catch (error) {
         console.error("Error deleting department:", error);
@@ -74,9 +74,9 @@ const ManageInfo = () => {
   
     try {
       if (editingId) {
-        await API.put(`http://localhost:5000/department/${editingId}`, cleanData);
+        await API.put(`http://localhost:5000/api/department/${editingId}`, cleanData);
       } else {
-        await API.post("http://localhost:5000/department", cleanData);
+        await API.post("http://localhost:5000/api/department", cleanData);
       }
       fetchData();
       setIsModalOpen(false);

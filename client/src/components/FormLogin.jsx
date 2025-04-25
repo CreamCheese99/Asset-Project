@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import API from '../API';
 import FormInputField from './FormInputField';
 import LogoSection from './LogoSection';
 
@@ -27,7 +27,7 @@ function FormLogin() {
 
       console.log('ส่งข้อมูลเข้าสู่ระบบ:', requestData);
 
-      const response = await axios.post('http://localhost:5000/api/login', requestData);
+      const response = await API.post('http://localhost:5000/api/login', requestData);
       console.log('การตอบกลับจากเซิร์ฟเวอร์:', response);
 
       const data = response.data;
