@@ -4,6 +4,8 @@ const bodyParser = require("body-parser");
 const multer = require("multer");  // นำเข้า multer
 const pool = require("./db");
 const app = express();
+const LdapAuth = require('./LdapAuth');
+const saveUserToDatabase = require('./saveUserToDatabase'); 
 const PORT = 5000;
 
 // ใช้ cors สำหรับการอนุญาตให้เข้าถึง API
@@ -1240,43 +1242,102 @@ app.get('/api/role', async (req, res) => {
 
 //***********************Login************************* */
 
-app.post('/login', async (req, res) => {
-  const { user_email, password } = req.body;
-  const jwt = require('jsonwebtoken');
+// app.post('/api/login', async (req, res) => {
+//   const { username, password } = req.body;
 
-  console.log('Received email:', user_email);  // ตรวจสอบ email ที่รับมา
-  console.log('Received password:', password); // ตรวจสอบ password ที่รับมา
+//   if (!username || !password) {
+//     return res.status(400).json({ message: 'Username and password are required' });
+//   }
+
+//   try {
+//     const isAuthenticated = await ldapAuth.authenticate(username, password);
+
+//     if (isAuthenticated) {
+//       const userInfo = await ldapAuth.getUserInfo(username);
+//       console.log('User Info:', userInfo);
+
+//       await saveUserToDatabase(userInfo);
+
+//       const result = await pool.query(
+//         'SELECT user_id, user_name, department_id, role_id FROM users WHERE user_email = $1',
+//         [userInfo.mail]
+//       );
+
+//       const dbUser = result.rows[0];
+
+//       const token = 'fake-token-for-dev'; // <-- ใช้ JWT จริงได้ในภายหลัง
+
+//       res.json({
+//         token: token,
+//         roleId: dbUser.role_id,
+//         user_name: dbUser.user_name,
+//         department_id: dbUser.department_id
+//       });
+//     } else {
+//       res.status(401).json({
+//         success: false,
+//         message: 'Invalid credentials'
+//       });
+//     }
+//   } catch (error) {
+//     console.error('Error:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: error.message
+//     });
+//   }
+// });
+
+
+const ldapAuth = new LdapAuth('10.252.92.100', 389, 'dc=kmitl,dc=ac,dc=th'); 
+app.post('/api/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Username and password are required' });
+  }
 
   try {
-    const result = await pool.query('SELECT * FROM users WHERE user_email = $1', [user_email]);
-    const user = result.rows[0];
+    const isAuthenticated = await ldapAuth.authenticate(username, password);
 
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+    if (isAuthenticated) {
+      const userInfo = await ldapAuth.getUserInfo(username);
+      console.log('User Info:', userInfo);
+
+      // ตรวจสอบสิทธิ์ในฐานข้อมูล โดยใช้ email จาก LDAP
+      const result = await pool.query(
+        'SELECT user_id, user_name, department_id, role_id FROM users WHERE user_email = $1',
+        [userInfo.mail]
+      );
+
+      if (result.rowCount === 0) {
+        return res.status(403).json({ message: 'ไม่มีสิทธิ์ในการเข้าสู่ระบบ' });
+      }
+
+      const dbUser = result.rows[0];
+
+      const token = 'fake-token-for-dev'; // เปลี่ยนเป็น JWT ภายหลัง
+
+      res.json({
+        token: token,
+        roleId: dbUser.role_id,
+        user_name: dbUser.user_name,
+        department_id: dbUser.department_id
+      });
+    } else {
+      res.status(401).json({
+        message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง'
+      });
     }
-
-    if (password !== user.password) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    // สร้าง JWT token พร้อม roleId และ department_id
-    const token = jwt.sign(
-      { userId: user.user_id, roleId: user.role_id, departmentId: user.department_id },
-      'your_jwt_secret',
-      { expiresIn: '1h' }
-    );
-
-    res.json({
-      token,
-      roleId: user.role_id,
-      user_name: user.user_name,
-      department_id: user.department_id // ✅ ใช้ชื่อนี้ให้ตรงกับ frontend
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({
+      message: error.message || 'เกิดข้อผิดพลาดในระบบ'
     });
-  } catch (err) {
-    console.error('Error:', err);
-    res.status(500).json({ message: 'Server error' });
   }
 });
+
+
 
 
 
@@ -1682,4 +1743,10 @@ app.get('/api/getData', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+});
+
+// ปิด LDAP Connection เมื่อเซิร์ฟเวอร์หยุดทำงาน
+process.on('SIGTERM', () => {
+  ldapAuth.close();
+  process.exit(0);
 });
