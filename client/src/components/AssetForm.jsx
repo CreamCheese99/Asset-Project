@@ -10,7 +10,7 @@
 //     // Fetch department data from the API using axios
 //     const fetchDepartment = async () => {
 //       try {
-//         const response = await axios.get('http://localhost:5000/api/department');
+//         const response = await axios.get('http://localhost:5001/api/department');
 //         // Ensure that response.data is an array
 //         if (Array.isArray(response.data)) {
 //           setDepartment(response.data); // Set the department to state
@@ -131,7 +131,7 @@ const AssetForm = ({ value = { curriculum: [] }, onChange }) => {
   useEffect(() => {
     const fetchDepartment = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/department');
+        const response = await axios.get('http://localhost:5001/api/department');
         if (Array.isArray(response.data)) {
           setDepartment(response.data); // Set the department to state
         } else {
@@ -151,7 +151,7 @@ const AssetForm = ({ value = { curriculum: [] }, onChange }) => {
     if (departmentId) {
       setLoadingCurriculum(true); // เริ่มโหลด
       try {
-        const response = await axios.get(`http://localhost:5000/api/curriculum/${departmentId}`);
+        const response = await axios.get(`http://localhost:5001/api/curriculum/${departmentId}`);
         if (Array.isArray(response.data)) {
           setCurriculum(response.data); // ดึงข้อมูลหลักสูตรของภาควิชานั้น
         } else {

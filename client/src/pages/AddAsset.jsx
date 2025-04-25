@@ -75,7 +75,7 @@ const AddAsset = () => {
     }
   
     try {
-      const response = await axios.post('http://localhost:5000/mainasset', formData, {
+      const response = await axios.post('http://localhost:5001/mainasset', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -203,7 +203,7 @@ export default AddAsset;
   
 //     const fetchAssetData = async () => {
 //       try {
-//         const response = await axios.get(`http://localhost:5000/mainasset/${assetData.main_asset_id}`);
+//         const response = await axios.get(`http://localhost:5001/mainasset/${assetData.main_asset_id}`);
 //         setAssetData(response.data); // อัปเดตข้อมูล assetData จากเซิร์ฟเวอร์
 //       } catch (error) {
 //         console.error('ไม่สามารถดึงข้อมูลได้:', error);
@@ -230,14 +230,14 @@ export default AddAsset;
 //       let response;
 //       if (assetData.main_asset_id) {
 //         // ใช้ PUT เมื่อแก้ไข
-//         response = await axios.put(`http://localhost:5000/mainasset/${assetData.main_asset_id}`, formData, {
+//         response = await axios.put(`http://localhost:5001/mainasset/${assetData.main_asset_id}`, formData, {
 //           headers: {
 //             'Content-Type': 'multipart/form-data',
 //           },
 //         });
 //       } else {
 //         // ใช้ POST เมื่อเพิ่มข้อมูลใหม่
-//         response = await axios.post('http://localhost:5000/mainasset', formData, {
+//         response = await axios.post('http://localhost:5001/mainasset', formData, {
 //           headers: {
 //             'Content-Type': 'multipart/form-data',
 //           },

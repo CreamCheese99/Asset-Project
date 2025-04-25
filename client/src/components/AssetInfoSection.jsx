@@ -86,11 +86,11 @@
 //     let response;
 
 //     if (editMode) {
-//       response = await axios.put(`http://localhost:5000/api/subasset/${editId}`, subAssetData);
+//       response = await axios.put(`http://localhost:5001/api/subasset/${editId}`, subAssetData);
 //       setData(data.map(item => (item.id === editId ? { ...item, ...subAssetData } : item)));
 //       setStatusMessage("แก้ไขข้อมูลพัสดุย่อยสำเร็จ!");  // เพิ่มการแสดงข้อความ
 //     } else {
-//       response = await axios.post('http://localhost:5000/api/subasset', subAssetData);
+//       response = await axios.post('http://localhost:5001/api/subasset', subAssetData);
 //       setData([...data, { ...subAssetData, id: data.length + 1 }]);
 //       setStatusMessage("บันทึกข้อมูลพัสดุย่อยสำเร็จ!");  // เพิ่มการแสดงข้อความ
 //     }
@@ -406,11 +406,11 @@ const AssetInfoSection = ({ value, onChange }) => {
     try {
       let response;
       if (editMode) {
-        response = await axios.put(`http://localhost:5000/api/subasset/${editId}`, subAssetData);
+        response = await axios.put(`http://localhost:5001/api/subasset/${editId}`, subAssetData);
         setData(data.map(item => (item.id === editId ? { ...item, ...subAssetData } : item)));
         setStatusMessage("แก้ไขข้อมูลพัสดุย่อยสำเร็จ!");
       } else {
-        response = await axios.post('http://localhost:5000/api/subasset', subAssetData);
+        response = await axios.post('http://localhost:5001/api/subasset', subAssetData);
         setData([...data, { ...subAssetData, id: data.length + 1 }]);
         setStatusMessage("บันทึกข้อมูลพัสดุย่อยสำเร็จ!");
       }

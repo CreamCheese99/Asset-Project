@@ -55,7 +55,7 @@ const ManageAssets = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/mainasset");
+        const response = await axios.get("http://localhost:5001/mainasset");
         setData(response.data); // เก็บข้อมูลทั้งหมด
         setFilteredData(response.data); // ตั้งค่าเริ่มต้นให้ข้อมูลที่กรองแล้วเป็นข้อมูลทั้งหมด
       } catch (error) {
@@ -71,7 +71,7 @@ const ManageAssets = () => {
     const encodedId = encodeURIComponent(id); // เข้ารหัส ID ก่อนส่ง
     if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?")) {
       axios
-        .delete(`http://localhost:5000/api/mainasset/${encodedId}`)
+        .delete(`http://localhost:5001/api/mainasset/${encodedId}`)
         .then(() => {
           // ลบข้อมูลจาก data และ filteredData
           setData((prevData) => prevData.filter((item) => item.main_asset_id !== id));
@@ -172,7 +172,7 @@ export default ManageAssets;
 //   useEffect(() => {
 //     const fetchData = async () => {
 //       try {
-//         const response = await axios.get("http://localhost:5000/mainasset");
+//         const response = await axios.get("http://localhost:5001/mainasset");
 //         setData(response.data); // เก็บข้อมูลทั้งหมด
 //         // ฟิลเตอร์ข้อมูลตาม roleId และ departmentId
 //         const filtered = response.data.filter((item) => {
@@ -195,7 +195,7 @@ export default ManageAssets;
 //     const encodedId = encodeURIComponent(id); // เข้ารหัส ID ก่อนส่ง
 //     if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?")) {
 //       axios
-//         .delete(`http://localhost:5000/api/mainasset/${encodedId}`)
+//         .delete(`http://localhost:5001/api/mainasset/${encodedId}`)
 //         .then(() => {
 //           // ลบข้อมูลจาก data และ filteredData
 //           setData((prevData) => prevData.filter((item) => item.main_asset_id !== id));
@@ -324,7 +324,7 @@ export default ManageAssets;
 //   useEffect(() => {
 //     const fetchData = async () => {
 //       try {
-//         const response = await axios.get("http://localhost:5000/mainasset");
+//         const response = await axios.get("http://localhost:5001/mainasset");
 //         console.log("Fetched data:", response.data);  // ตรวจสอบข้อมูลที่ได้จาก API
 //         setData(response.data); // เก็บข้อมูลทั้งหมด
 //         // ฟิลเตอร์ข้อมูลตาม roleId และ departmentId
@@ -350,7 +350,7 @@ export default ManageAssets;
 //     const encodedId = encodeURIComponent(id); // เข้ารหัส ID ก่อนส่ง
 //     if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?")) {
 //       axios
-//         .delete(`http://localhost:5000/api/mainasset/${encodedId}`)
+//         .delete(`http://localhost:5001/api/mainasset/${encodedId}`)
 //         .then(() => {
 //           // ลบข้อมูลจาก data และ filteredData
 //           setData((prevData) => prevData.filter((item) => item.main_asset_id !== id));

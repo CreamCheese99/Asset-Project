@@ -19,7 +19,7 @@
    
 //     const fetchAssetData = async () => {
 //       try {
-//         const response = await axios.get(`http://localhost:5000/mainasset/${encodedId}`);
+//         const response = await axios.get(`http://localhost:5001/mainasset/${encodedId}`);
 //         setData(response.data);
 //       } catch (error) {
 //         console.error("Error fetching data:", error);
@@ -196,7 +196,7 @@
 //                     <div key={index} className="border rounded p-2 shadow-sm bg-white">
 //                       {img ? (
 //                         <img
-//                           src={`http://localhost:5000/uploads/${img}`}
+//                           src={`http://localhost:5001/uploads/${img}`}
 //                           alt={`รูปภาพ ${index + 1}`}
 //                           className="w-full h-40 object-cover rounded"
 //                         />
@@ -289,7 +289,7 @@ const ShowInfo = () => {
   useEffect(() => {
     const fetchAssetData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/mainasset/${encodedId}`);
+        const response = await axios.get(`http://localhost:5001/mainasset/${encodedId}`);
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -486,7 +486,7 @@ const ShowInfo = () => {
                     <div key={index} className="border rounded p-2 shadow-sm bg-white">
                       {img ? (
                         <img
-                          src={`http://localhost:5000/uploads/${img}`}
+                          src={`http://localhost:5001/uploads/${img}`}
                           alt={`รูปภาพ ${index + 1}`}
                           className="w-full h-40 object-cover rounded"
                         />
@@ -504,7 +504,7 @@ const ShowInfo = () => {
                   <div key={index} className="border rounded p-2 shadow-sm bg-white">
                     {img ? (
                       <img
-                        src={`http://localhost:5000/uploads/${img}`}
+                        src={`http://localhost:5001/uploads/${img}`}
                         alt={`รูปภาพ ${index + 1}`}
                         className="w-full h-40 object-cover rounded cursor-pointer"
                         onClick={() => openModal(img)}
@@ -529,7 +529,7 @@ const ShowInfo = () => {
                       &times;
                     </button>
                     <img
-                      src={`http://localhost:5000/uploads/${selectedImage}`}
+                      src={`http://localhost:5001/uploads/${selectedImage}`}
                       alt="ขยายรูป"
                       className="w-full max-h-[90vh] object-contain rounded"
                     />

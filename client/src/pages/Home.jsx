@@ -175,7 +175,7 @@ const Home = () => {
     try {
       console.log("เริ่มการดึงข้อมูล...");
       
-      const res = await fetch("http://localhost:5000/api/getData");
+      const res = await fetch("http://localhost:5001/api/getData");
       
       if (!res.ok) {
         throw new Error(`ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์: ${res.status} ${res.statusText}`);
