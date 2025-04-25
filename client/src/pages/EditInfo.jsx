@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import API from '../API';
 import { useParams, useNavigate } from 'react-router-dom';
 import Breadcrumb7 from '../components/Breadcrumb7';
 import ActionButtons3 from '../components/ActionButtons3';
@@ -50,7 +50,7 @@ const EditInfo = () => {
 
     const fetchAssetData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/mainasset/${encodeURIComponent(id)}`);
+        const response = await API.get(`http://localhost:5000/mainasset/${encodeURIComponent(id)}`);
         setData(response.data);
 
         if (response.data?.mainAsset) {
@@ -74,7 +74,7 @@ const EditInfo = () => {
       const userId = localStorage.getItem("userId");
       if (userId) {
         try {
-          const response = await axios.get(`http://localhost:5000/api/users/${userId}`);
+          const response = await API.get(`http://localhost:5000/api/users/${userId}`);
           setCurrentUser(response.data);
         } catch (error) {
           console.error("Error fetching current user:", error);
@@ -98,7 +98,7 @@ const EditInfo = () => {
 // ดึงข้อมูลผู้ใช้จาก API เมื่อ departmentId มีค่า
 useEffect(() => {
   if (departmentId) {
-    axios
+    API
       .get(`http://localhost:5000/api/users/by-department/${departmentId}`)
       .then(response => {
         setUsersInDepartment(response.data);
@@ -125,8 +125,8 @@ const handleSaveMainasset = async () => {
    
   // const handleSaveMainasset = async () => {
   try {
-    // ส่งข้อมูลที่แก้ไขไปยัง API ด้วย axios
-    const response = await axios.put('http://localhost:5000/mainasset/:id', updatedData.mainAsset);
+    // ส่งข้อมูลที่แก้ไขไปยัง API ด้วย API
+    const response = await API.put('http://localhost:5000/mainasset/:id', updatedData.mainAsset);
 
     if (response.status === 200) {
       // ข้อมูลบันทึกสำเร็จ
@@ -237,7 +237,7 @@ const handleSaveSubasset = async (e) => {
       : "http://localhost:5000/api/subasset";
     const method = editMode ? "put" : "post";
 
-    const response = await axios[method](url, subAssetData);
+    const response = await API[method](url, subAssetData);
     console.log("บันทึกข้อมูลสำเร็จ:", response.data);
 
 
@@ -284,7 +284,7 @@ const handleDelete = async (subId) => {
   console.log(" ลบ subasset id:", subId);
 
   try {
-    await axios.delete(`http://localhost:5000/api/subasset/${subId}`);
+    await API.delete(`http://localhost:5000/api/subasset/${subId}`);
     
     // อัปเดตข้อมูลใน state หลังจากการลบ
     setData(prevData => ({
@@ -344,7 +344,7 @@ const handleImageChange = (e, index) => {
     formData.append("index", index);
     formData.append("asset_id", updatedData.mainAsset.main_asset_id);
 
-    axios
+    API
       .post("http://localhost:5000/api/update-image", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })

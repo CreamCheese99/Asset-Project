@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import API from "../API";
 
 const ActionButtons2 = ({ assetData, onCancel }) => {
   
@@ -37,7 +37,7 @@ const ActionButtons2 = ({ assetData, onCancel }) => {
     }
     
     try {
-      const response = await axios.post('http://localhost:5000/mainasset', formData, {
+      const response = await API.post('http://localhost:5000/mainasset', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

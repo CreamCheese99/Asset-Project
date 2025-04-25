@@ -1,6 +1,6 @@
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../API";
 
 const ManageInfo = () => {
   const [data, setData] = useState([]);
@@ -14,7 +14,7 @@ const ManageInfo = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/department");
+      const response = await API.get("http://localhost:5000/department");
       setData(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -30,7 +30,7 @@ const ManageInfo = () => {
   const handleDelete = async (id) => {
     if (window.confirm("คุณต้องการลบภาควิชาและหลักสูตรนี้หรือไม่?")) {
       try {
-        await axios.delete(`http://localhost:5000/department/${id}`);
+        await API.delete(`http://localhost:5000/department/${id}`);
         setData(data.filter((item) => item.department_id !== id));
       } catch (error) {
         console.error("Error deleting department:", error);
@@ -41,9 +41,9 @@ const ManageInfo = () => {
   // const handleSave = async () => {
   //   try {
   //     if (editingId) {
-  //       await axios.put(`http://localhost:5000/department/${editingId}`, tempData);
+  //       await API.put(`http://localhost:5000/department/${editingId}`, tempData);
   //     } else {
-  //       await axios.post("http://localhost:5000/department", tempData);
+  //       await API.post("http://localhost:5000/department", tempData);
   //     }
   //     fetchData(); // โหลดข้อมูลใหม่หลังการเพิ่ม/แก้ไข
   //     setIsModalOpen(false);
@@ -74,9 +74,9 @@ const ManageInfo = () => {
   
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/department/${editingId}`, cleanData);
+        await API.put(`http://localhost:5000/department/${editingId}`, cleanData);
       } else {
-        await axios.post("http://localhost:5000/department", cleanData);
+        await API.post("http://localhost:5000/department", cleanData);
       }
       fetchData();
       setIsModalOpen(false);

@@ -3,7 +3,7 @@ import Layout from './components/layout/Layout'
 import Home from './pages/Home'
 import ManageAssets from './pages/ManageAssets'
 import ManagePermissions from './pages/ManagePermissions'
-import AssetList from './pages/AssetList'
+// import AssetList from './pages/AssetList'
 import AddAsset from './pages/AddAsset' 
 import ManagePerInfo from './pages/ManagePerInfo'
 import Login from './pages/Login'
@@ -26,7 +26,7 @@ function App() {
           <Route index element={<Login />} />
           <Route path="manage-assets" element={<ManageAssets />} />
           <Route path="manage-permissions" element={<ManagePermissions />} />
-          <Route path="asset-list" element={<AssetList />} />
+          {/* <Route path="asset-list" element={<AssetList />} /> */}
           {/* <Route path="add-asset" element={<AddAsset />} />  */}
 
           {/* เส้นทางที่ป้องกันการเข้าถึงสำหรับ AddAsset */}

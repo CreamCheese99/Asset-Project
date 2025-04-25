@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../API";
 import "../css/AssetDetails.css"; // นำเข้าไฟล์ CSS
 
 const AssetDetails = ({ value, onChange }) => {
@@ -38,7 +38,7 @@ const AssetDetails = ({ value, onChange }) => {
   useEffect(() => {
     const fetchAssetType = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/asset_type");
+        const response = await API.get("http://localhost:5000/api/asset_type");
         if (Array.isArray(response.data)) {
           setAssetType(response.data);
         } else {

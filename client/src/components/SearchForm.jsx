@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaTable } from "react-icons/fa";
-import axios from "axios";
+import API from "../API";
 
 const SearchForm = ({ onFilter }) => {
   const [filters, setFilters] = useState({
@@ -21,7 +21,7 @@ const SearchForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchAssetType = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/asset_type");
+        const response = await API.get("http://localhost:5000/api/asset_type");
         if (Array.isArray(response.data)) {
           setAssetType(response.data);
         }
@@ -35,7 +35,7 @@ const SearchForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchDepartment = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/department");
+        const response = await API.get("http://localhost:5000/api/department");
         if (Array.isArray(response.data)) {
           setDepartment(response.data);
         }
@@ -53,7 +53,7 @@ const SearchForm = ({ onFilter }) => {
   // };
   const [fiscalYears, setFiscalYears] = useState([]);
   useEffect(() => {
-    axios
+    API
       .get('http://localhost:5000/api/fiscal-years') // ระบุ URL ให้ตรงกับ backend
       .then((response) => {
         setFiscalYears(response.data);

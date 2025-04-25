@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Filters from "../components/Filters";
 import BarChart from "../components/BarChart";
 import PieChart from "../components/PieChart";
+import API from "../API";
 import {
   summaryDepartmentDetails,
   summaryFilterDepartmentDetails,
@@ -168,36 +169,67 @@ const Home = () => {
     }
   };
 
+  // const fetchData = async () => {
+  //   setLoading(true);
+  //   setErrorMessage("");
+
+  //   try {
+  //     console.log("เริ่มการดึงข้อมูล...");
+      
+  //     const res = await fetch("http://localhost:5000/api/getData");
+      
+  //     if (!res.ok) {
+  //       throw new Error(`ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์: ${res.status} ${res.statusText}`);
+  //     }
+
+  //     const data = await res.json();
+  //     console.log("ดึงข้อมูลสำเร็จ:", Object.keys(data));
+
+  //     if (!data) {
+  //       setErrorMessage("ไม่พบข้อมูล");
+  //       return;
+  //     }
+
+  //     // นำข้อมูล filters มาใช้กรองข้อมูล
+  //     const filteredData = { ...data };
+      
+  //     // กรองข้อมูลตาม filter ที่เลือก (อิมพลีเมนต์การกรองตามความเหมาะสม)
+      
+  //     processBarGraphData(filteredData);
+  //     processPieChartData(filteredData);
+  //     processTotalAssets(filteredData);
+
+  //   } catch (err) {
+  //     console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
+  //     setErrorMessage(`ไม่สามารถดึงข้อมูลได้จากเซิร์ฟเวอร์: ${err.message}`);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const fetchData = async () => {
     setLoading(true);
     setErrorMessage("");
-
+  
     try {
       console.log("เริ่มการดึงข้อมูล...");
-      
-      const res = await fetch("http://localhost:5000/api/getData");
-      
-      if (!res.ok) {
-        throw new Error(`ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์: ${res.status} ${res.statusText}`);
-      }
-
-      const data = await res.json();
+  
+      const res = await API.get("http://localhost:5000/api/getData");
+  
+      const data = res.data;
       console.log("ดึงข้อมูลสำเร็จ:", Object.keys(data));
-
+  
       if (!data) {
         setErrorMessage("ไม่พบข้อมูล");
         return;
       }
-
-      // นำข้อมูล filters มาใช้กรองข้อมูล
+  
       const filteredData = { ...data };
-      
-      // กรองข้อมูลตาม filter ที่เลือก (อิมพลีเมนต์การกรองตามความเหมาะสม)
       
       processBarGraphData(filteredData);
       processPieChartData(filteredData);
       processTotalAssets(filteredData);
-
+  
     } catch (err) {
       console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
       setErrorMessage(`ไม่สามารถดึงข้อมูลได้จากเซิร์ฟเวอร์: ${err.message}`);
@@ -205,7 +237,7 @@ const Home = () => {
       setLoading(false);
     }
   };
-
+  
   useEffect(() => {
     fetchData();
   }, [filters]);

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import API from "../API";
 
 const DropdownPopup = ({ label, items, selectedItems, onSelectAll, onItemChange, selectAllChecked }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -142,16 +143,39 @@ const Filters = ({
     handleYearChange(""); // ส่งค่าว่างไปยัง parent component
   };
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await fetch("http://localhost:5000/api/getData");
+  //       if (!response.ok) throw new Error("ไม่สามารถดึงข้อมูลได้");
+
+  //       const data = await response.json();
+  //       setDepartments(data.departments || []);
+  //       setFundTypes(data.fundTypes || []);
+  //       setAssetStatus(data.assetStatuses || []);
+  //       setLoading(false);
+  //     } catch (error) {
+  //       console.error("Error fetching filter data:", error);
+  //       setApiError("เกิดข้อผิดพลาดในการดึงข้อมูล");
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/getData");
-        if (!response.ok) throw new Error("ไม่สามารถดึงข้อมูลได้");
+        // ใช้ axios แทน fetch
+        const response = await API.get("http://localhost:5000/api/getData");
+       
 
-        const data = await response.json();
-        setDepartments(data.departments || []);
-        setFundTypes(data.fundTypes || []);
-        setAssetStatus(data.assetStatuses || []);
+        // การจัดการข้อมูลเหมือนเดิม
+        setDepartments(response.data.departments || []);
+        setFundTypes(response.data.fundTypes || []);
+        setAssetStatus(response.data.assetStatuses || []);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching filter data:", error);
@@ -162,6 +186,7 @@ const Filters = ({
 
     fetchData();
   }, []);
+
 
   useEffect(() => {
     if (selectedFund) {
