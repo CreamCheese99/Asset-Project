@@ -4,7 +4,7 @@ import "../css/GuideBook.css";
 import loginImage from "../image/guidebookImage/login.png";
 import homeImage from "../image/guidebookImage/professor/home.png";
 import manageassetImage from "../image/guidebookImage/professor/manageasset.png";
-import manageasset2Image from "../image/guidebookImage/professor/manageasset 2.png";
+import manageasset2Image from "../image/guidebookImage/professor/manageasset2.png";
 // import subassetImage from "../image/guidebookImage/professor/addsubasset.png";
 import subasset2Image from "../image/guidebookImage/professor/addsubasset.png";
 import logoutImage from "../image/guidebookImage/professor/logout.png";

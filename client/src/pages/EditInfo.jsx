@@ -50,7 +50,7 @@ const EditInfo = () => {
 
     const fetchAssetData = async () => {
       try {
-        const response = await API.get(`http://localhost:5000/api/mainasset/${encodeURIComponent(id)}`);
+        const response = await API.get(`/mainasset/${encodeURIComponent(id)}`);
         setData(response.data);
 
         if (response.data?.mainAsset) {
@@ -74,7 +74,7 @@ const EditInfo = () => {
       const userId = localStorage.getItem("userId");
       if (userId) {
         try {
-          const response = await API.get(`http://localhost:5000/api/users/${userId}`);
+          const response = await API.get(`/users/${userId}`);
           setCurrentUser(response.data);
         } catch (error) {
           console.error("Error fetching current user:", error);
@@ -126,7 +126,7 @@ const handleSaveMainasset = async () => {
   // const handleSaveMainasset = async () => {
   try {
     // ส่งข้อมูลที่แก้ไขไปยัง API ด้วย API
-    const response = await API.put('http://localhost:5000/api/mainasset/:id', updatedData.mainAsset);
+    const response = await API.put('/mainasset/:id', updatedData.mainAsset);
 
     if (response.status === 200) {
       // ข้อมูลบันทึกสำเร็จ
@@ -284,7 +284,7 @@ const handleDelete = async (subId) => {
   console.log(" ลบ subasset id:", subId);
 
   try {
-    await API.delete(`http://localhost:5000/api/subasset/${subId}`);
+    await API.delete(`/subasset/${subId}`);
     
     // อัปเดตข้อมูลใน state หลังจากการลบ
     setData(prevData => ({

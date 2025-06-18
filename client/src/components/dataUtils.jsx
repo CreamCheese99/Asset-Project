@@ -1,4 +1,5 @@
 // ฟังก์ชันสำหรับแยกช่วงปีที่เลือก
+import API from "../API";
 const parseYearRange = (yearInput) => {
   if (!yearInput) return { start: null, end: null };
   
@@ -531,7 +532,7 @@ export const createAssetStatusPieCharts = (data, selectedDepartment = "", select
 // ดึงข้อมูลจาก API
 export const fetchDataFromAPI = async () => {
   try {
-    const response = await fetch("http://localhost:5000/api/getData"); 
+    const response = await API.get("/getData"); 
     if (!response.ok) {
       throw new Error("Cannot fetch data from API");
     }

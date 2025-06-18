@@ -24,7 +24,7 @@ const Permissions = () => {
     const fetchUsers = async () => {
       setIsLoading(true);
       try {
-        const response = await API.get('http://localhost:5000/api/users');
+        const response = await API.get('/users');
         setUsers(response.data);
       } catch (err) {
         console.error('เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้:', err);
@@ -39,7 +39,7 @@ const Permissions = () => {
     const fetchDepartment = async () => {
       setIsLoading(true);
       try {
-        const response = await API.get('http://localhost:5000/api/department');
+        const response = await API.get('/department');
         if (Array.isArray(response.data)) {
           setDepartment(response.data);
         } else {
@@ -57,7 +57,7 @@ const Permissions = () => {
   useEffect(() => {
     const fetchRole = async () => {
       try {
-        const response = await API.get("http://localhost:5000/api/role");
+        const response = await API.get("/role");
         if (response.data && Array.isArray(response.data)) {
           setRoles(response.data);
         } else {
@@ -87,7 +87,7 @@ const Permissions = () => {
       }
   
       // ใช้ id ที่รับมาแทน userId ที่ไม่มีใน scope
-      await API.put(`http://localhost:5000/api/users/${id}/role`, {
+      await API.put(`/users/${id}/role`, {
         role_id: selectedRoleId,
       });
   
@@ -127,7 +127,7 @@ const Permissions = () => {
   
     if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?")) {
       API
-        .delete(`http://localhost:5000/api/users/${id}`)  // ส่ง id เป็น parameter
+        .delete(`/users/${id}`)  // ส่ง id เป็น parameter
         .then((response) => {
           // เช็คว่า response มีข้อความตอบกลับที่ถูกต้องหรือไม่
           if (response.status === 200) {
@@ -162,7 +162,7 @@ const Permissions = () => {
       };
   
       try {
-        const response = await API.post("http://localhost:5000/api/users", newUserData);
+        const response = await API.post("/users", newUserData);
         setUsers(prevUsers => [...prevUsers, { 
           user_id: response.data.userId,
           ...newUserData,

@@ -74,11 +74,11 @@ const AssetInfoSection = ({ value, onChange }) => {
     try {
       let response;
       if (editMode) {
-        response = await API.put(`http://localhost:5000/api/subasset/${editId}`, subAssetData);
+        response = await API.put(`/subasset/${editId}`, subAssetData);
         setData(data.map(item => (item.id === editId ? { ...item, ...subAssetData } : item)));
         setStatusMessage("แก้ไขข้อมูลพัสดุย่อยสำเร็จ!");
       } else {
-        response = await API.post('http://localhost:5000/api/subasset', subAssetData);
+        response = await API.post('/subasset', subAssetData);
         setData([...data, { ...subAssetData, id: data.length + 1 }]);
         setStatusMessage("บันทึกข้อมูลพัสดุย่อยสำเร็จ!");
       }

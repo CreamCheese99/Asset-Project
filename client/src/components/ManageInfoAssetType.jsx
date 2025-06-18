@@ -14,7 +14,7 @@ const ManageAssetTypes = () => {
 
   const fetchAssetTypes = async () => {
     try {
-      const response = await API.get("http://localhost:5000/api/asset_type");
+      const response = await API.get("/asset_type");
       setData(response.data);
     } catch (error) {
       console.error("Error fetching asset types:", error);
@@ -43,11 +43,11 @@ const ManageAssetTypes = () => {
   
     try {
       if (editingId) {
-        await API.put(`http://localhost:5000/api/asset_type/${editingId}`, {
+        await API.put(`/asset_type/${editingId}`, {
           asset_type_name: tempData.assetType,
         });
       } else {
-        await API.post("http://localhost:5000/api/asset_type", {
+        await API.post("/asset_type", {
           asset_type_name: tempData.assetType,
         });
       }
@@ -64,7 +64,7 @@ const ManageAssetTypes = () => {
   const handleDelete = async (id) => {
     if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบประเภทสินทรัพย์นี้? การลบจะไม่สามารถกู้คืนได้")) {
       try {
-        await API.delete(`http://localhost:5000/api/asset_type/${id}`);
+        await API.delete(`/asset_type/${id}`);
         fetchAssetTypes();
       } catch (error) {
         console.error("Error deleting asset type:", error);

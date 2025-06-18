@@ -37,7 +37,7 @@ const ActionButtons2 = ({ assetData, onCancel }) => {
     }
     
     try {
-      const response = await API.post('http://localhost:5000/api/mainasset-add', formData, {
+      const response = await API.post('/mainasset-add', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

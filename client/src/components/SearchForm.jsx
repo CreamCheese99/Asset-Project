@@ -21,7 +21,7 @@ const SearchForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchAssetType = async () => {
       try {
-        const response = await API.get("http://localhost:5000/api/asset_type");
+        const response = await API.get("/asset_type");
         if (Array.isArray(response.data)) {
           setAssetType(response.data);
         }
@@ -35,7 +35,7 @@ const SearchForm = ({ onFilter }) => {
   useEffect(() => {
     const fetchDepartment = async () => {
       try {
-        const response = await API.get("http://localhost:5000/api/department");
+        const response = await API.get("/department");
         if (Array.isArray(response.data)) {
           setDepartment(response.data);
         }
@@ -54,7 +54,7 @@ const SearchForm = ({ onFilter }) => {
   const [fiscalYears, setFiscalYears] = useState([]);
   useEffect(() => {
     API
-      .get('http://localhost:5000/api/fiscal-years') // ระบุ URL ให้ตรงกับ backend
+      .get('/fiscal-years') // ระบุ URL ให้ตรงกับ backend
       .then((response) => {
         setFiscalYears(response.data);
       })

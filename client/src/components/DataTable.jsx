@@ -24,7 +24,7 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
 
     if (userDeptId && userRoleId !== "3") {
       API
-        .get(`http://localhost:5000/api/department`, {
+        .get(`/department`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
@@ -74,7 +74,7 @@ const DataTable = ({ data, filteredData, handleDelete }) => {
     const token = localStorage.getItem("token");
   
     try {
-      const response = await API.get(`http://localhost:5000/api/subasset/${encodeURIComponent(mainAssetId)}`, {
+      const response = await API.get(`/subasset/${encodeURIComponent(mainAssetId)}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
   

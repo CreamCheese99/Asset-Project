@@ -214,7 +214,7 @@ const Home = () => {
     try {
       console.log("เริ่มการดึงข้อมูล...");
   
-      const res = await API.get("http://localhost:5000/api/getData");
+      const res = await API.get("/getData");
   
       const data = res.data;
       console.log("ดึงข้อมูลสำเร็จ:", Object.keys(data));

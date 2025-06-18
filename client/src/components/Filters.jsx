@@ -169,7 +169,7 @@ const Filters = ({
     const fetchData = async () => {
       try {
         // ใช้ axios แทน fetch
-        const response = await API.get("http://localhost:5000/api/getData");
+        const response = await API.get("/getData");
        
 
         // การจัดการข้อมูลเหมือนเดิม
