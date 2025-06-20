@@ -1235,8 +1235,9 @@ app.get('/api/role', async (req, res) => {
 
 //***********************Login************************* */
 
-const ldapAuth = new LdapAuth('10.252.92.100', 389, 'dc=kmitl,dc=ac,dc=th'); 
+//const ldapAuth = new LdapAuth('10.252.92.100', 389, 'dc=kmitl,dc=ac,dc=th'); 
 app.post('/api/login', async (req, res) => {
+  const ldapAuth = new LdapAuth('10.252.92.100', 389, 'dc=kmitl,dc=ac,dc=th'); 
   const { username, password } = req.body;
 
   if (!username || !password) {
@@ -1280,6 +1281,12 @@ app.post('/api/login', async (req, res) => {
     res.status(500).json({
       message: error.message || 'เกิดข้อผิดพลาดในระบบ'
     });
+  }
+  finally
+  {
+    if (ldapAuth && typeof ldapAuth.close === 'function') {
+      await ldapAuth.close(); // เรียกใช้เมธอด close() เพื่อปิด Connection
+    }
   }
 });
 

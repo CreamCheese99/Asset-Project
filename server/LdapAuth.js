@@ -149,7 +149,7 @@ class LdapAuth {
     }
   }
 
-  close() {
+  async close() {
     if (this.ldapClient) {
       this.ldapClient.unbind();
       this.ldapClient.destroy();
