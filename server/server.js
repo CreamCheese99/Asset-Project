@@ -9,7 +9,13 @@ const saveUserToDatabase = require('./saveUserToDatabase');
 const PORT = 5000;
 
 // ใช้ cors สำหรับการอนุญาตให้เข้าถึง API
-app.use(cors());
+const corsOptions = {
+  origin: 'http://miso.siet.kmitl.ac.th', // เปลี่ยนเป็น Domain หรือ Public IP ของ Front-end ของคุณ
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // อนุญาต HTTP Methods ที่ใช้
+  credentials: true, // อนุญาตให้ส่ง Cookie/Authorization headers ข้าม Origin
+  optionsSuccessStatus: 204 // สำหรับ Preflight requests (OPTIONS method)
+};
+app.use(cors(corsOptions));
 
 // ตั้งค่าขีดจำกัดสำหรับ body-parser โดยกำหนดให้รองรับข้อมูลขนาดใหญ่
 app.use(bodyParser.json({ limit: "50mb" })); // ตั้งขีดจำกัดเป็น 50MB
