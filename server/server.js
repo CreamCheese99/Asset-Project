@@ -6,7 +6,7 @@ const pool = require("./db");
 const app = express();
 const LdapAuth = require('./LdapAuth');
 const saveUserToDatabase = require('./saveUserToDatabase'); 
-const PORT = 5000;
+const PORT = 443;
 
 // ใช้ cors สำหรับการอนุญาตให้เข้าถึง API
 const corsOptions = {
