@@ -6,7 +6,7 @@ const pool = require("./db");
 const app = express();
 const LdapAuth = require('./LdapAuth');
 const saveUserToDatabase = require('./saveUserToDatabase'); 
-const PORT = 443;
+const PORT = 3000;
 
 // ใช้ cors สำหรับการอนุญาตให้เข้าถึง API
 const corsOptions = {
@@ -1511,7 +1511,7 @@ app.get('/api/getData', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on port :${PORT}`);
 });
 
 // ปิด LDAP Connection เมื่อเซิร์ฟเวอร์หยุดทำงาน

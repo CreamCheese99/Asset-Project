@@ -56,7 +56,13 @@ function FormLogin() {
       if (error.response && error.response.data && error.response.data.message) {
         setError(error.response.data.message);
       } else {
-        setError('เกิดข้อผิดพลาดขณะเข้าสู่ระบบ');
+        let errorMessage = 'เกิดข้อผิดพลาดขณะเข้าสู่ระบบ';
+        
+        // ตรวจสอบและเพิ่มรายละเอียด error.message (เช่น Network Error, Timeout)
+        if (error.message) {
+            errorMessage += ` (รายละเอียด: ${error.message})`;
+        }
+        setError(errorMessage);
       }
     } finally {
       setLoading(false);
