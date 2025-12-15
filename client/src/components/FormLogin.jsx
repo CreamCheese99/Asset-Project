@@ -72,10 +72,10 @@ function FormLogin() {
   return (
     <div className="w-full space-y-4 max-w-lg px-[60px] py-[54px] bg-white rounded-3xl shadow-inner flex flex-col items-center">
       <LogoSection />
-      <h1>Log in</h1>
+     
       <form onSubmit={handleLogin} className="w-96 space-y-8 text-left">
         <FormInputField
-          label="Email"
+          label="Email(มี @kmitl.ac.th ด้วย)"
           id="email"
           type="text"
           placeholder="Enter your email"
