@@ -126,7 +126,8 @@ const handleSaveMainasset = async () => {
   // const handleSaveMainasset = async () => {
   try {
     // ส่งข้อมูลที่แก้ไขไปยัง API ด้วย API
-    const response = await API.put('/mainasset/:id', updatedData.mainAsset);
+    // const response = await API.put('/mainasset/:id', updatedData.mainAsset);
+    const response = await API.put('/api/mainasset/:id', updatedData.mainAsset);
 
     if (response.status === 200) {
       // ข้อมูลบันทึกสำเร็จ
