@@ -68,7 +68,7 @@ app.post('/api/mainasset-add', upload.fields([
 let curriculumArray = [];
 
 try {
-  if (typeof curriculum === 'string') {
+  if (typeof curriculum === 'string' && curriculum.trim() !== '') {
     curriculumArray = JSON.parse(curriculum);
   } else if (Array.isArray(curriculum)) {
     curriculumArray = curriculum;
@@ -81,10 +81,10 @@ try {
  }
 
 // ตรวจสอบว่ามีข้อมูลหลักสูตรหรือไม่
-if (!Array.isArray(curriculumArray) || curriculumArray.length === 0) {
-  await client.query('ROLLBACK');
-  return res.status(400).json({ error: 'Missing or invalid curriculum data' });
-}
+// if (!Array.isArray(curriculumArray) || curriculumArray.length === 0) {
+//   await client.query('ROLLBACK');
+//   return res.status(400).json({ error: 'Missing or invalid curriculum data' });
+// }
 
     // ตรวจสอบว่า curriculum ถูกส่งมาหรือไม่
     // if (!curriculumArray || curriculumArray.length === 0) {
@@ -100,7 +100,7 @@ if (!Array.isArray(curriculumArray) || curriculumArray.length === 0) {
     }
 
  // ตรวจสอบฟิลด์ที่จำเป็น (main_asset_id ถูกตัดออกจากการตรวจสอบแล้ว)
-    if (!main_asset_name) {
+    if (!main_asset_id || !main_asset_name || !department_id) {
       // Rollback ก่อน return
       await client.query('ROLLBACK');
       return res.status(400).json({ error: 'Missing required fields: main_asset_name' });
@@ -110,6 +110,7 @@ if (!Array.isArray(curriculumArray) || curriculumArray.length === 0) {
     // INSERT mainasset
     const newAsset = await client.query(
       `INSERT INTO mainasset (
+        main_asset_id, 
         main_asset_name, 
         status, 
         fiscal_year, 
@@ -128,8 +129,9 @@ if (!Array.isArray(curriculumArray) || curriculumArray.length === 0) {
         image3,
         image4,
         image5
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING *`,
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18,$19) RETURNING *`,
       [
+        main_asset_id,
         main_asset_name, // $1
         status,          // $2
         fiscal_year,     // $3
@@ -152,19 +154,23 @@ if (!Array.isArray(curriculumArray) || curriculumArray.length === 0) {
     );
     
     // ดึง main_asset_id ที่สร้างใหม่จากฐานข้อมูล
-    const new_main_asset_id = newAsset.rows[0].main_asset_id;
+    //const new_main_asset_id = newAsset.rows[0].main_asset_id;
     // INSERT assetcurriculum
+  if (curriculumArray.length > 0) {
     for (const curriculumId of curriculumArray) {
+      // ตรวจสอบความถูกต้องของ curriculumId ก่อน INSERT (เช่น ต้องเป็นตัวเลข/string ที่ไม่ว่างเปล่า)
+    if (curriculumId) {
       const result = await client.query(
         `INSERT INTO assetcurriculum (
           curriculum_id, 
           main_asset_id
         ) VALUES ($1, $2) RETURNING *`,
-        [curriculumId, new_main_asset_id] // ใช้ ID ใหม่
+        [curriculumId, main_asset_id] // ใช้ ID ใหม่
       );
       console.log('Inserted into assetcurriculum:', result.rows[0]);
     }
-
+  }
+}
     await client.query('COMMIT'); // 3. สำเร็จ: ยืนยัน Transaction (บันทึกข้อมูลทั้งหมด)
     res.status(201).json({ message: 'Asset added successfully', data: newAsset.rows[0] });
 
